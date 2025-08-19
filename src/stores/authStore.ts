@@ -7,6 +7,7 @@ interface AuthStore {
   loading: boolean;
   signUp: (email: string, password: string, userData: Partial<User>) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
 }
@@ -96,6 +97,29 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         }
       }
     } catch (error: any) {
+      throw error;
+    }
+  },
+
+  signInWithGoogle: async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+
+      if (error) {
+        console.error('Googleログインエラー:', error);
+        throw new Error('Googleログインに失敗しました');
+      }
+    } catch (error: any) {
+      console.error('Googleログインエラー:', error);
       throw error;
     }
   },
