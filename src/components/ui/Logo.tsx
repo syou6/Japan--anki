@@ -17,7 +17,7 @@ export const Logo: React.FC<LogoProps> = ({ className = '', size = 'md' }) => {
     <div className={`${sizeClasses[size]} ${className} relative`}>
       <img 
         src="/logo.png" 
-        alt="家族の絆日記" 
+        alt="日記AI" 
         className="w-full h-full object-contain"
       />
     </div>
@@ -36,7 +36,7 @@ export const LogoWithText: React.FC<LogoProps> = ({ className = '', size = 'md' 
     <div className={`flex flex-col items-center ${className}`}>
       <Logo size={size} />
       <h1 className={`${textSizes[size]} font-bold text-gray-900 mt-2`}>
-        家族の絆日記
+        日記AI
       </h1>
       <p className="text-sm text-gray-600 mt-1">Voice Journal</p>
     </div>

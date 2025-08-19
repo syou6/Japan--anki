@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
             <Logo size="sm" />
             <div className="hidden sm:block">
               <h1 className="text-base md:text-xl lg:text-2xl font-bold text-gray-900 whitespace-nowrap">
-                家族の絆日記
+                日記AI
               </h1>
               <p className="text-xs md:text-sm text-gray-500">
                 Voice Journal
