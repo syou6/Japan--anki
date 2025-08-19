@@ -51,17 +51,28 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   signIn: async (email: string, password: string) => {
     try {
+      console.log('ログイン試行:', { email, url: window.location.origin });
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        console.error('ログインエラー:', error);
+        console.error('ログインエラー詳細:', {
+          error,
+          message: error.message,
+          status: error.status,
+          name: error.name
+        });
+        
         if (error.message.includes('Invalid login credentials')) {
           throw new Error('メールアドレスまたはパスワードが正しくありません');
         }
-        throw error;
+        if (error.message.includes('Email not confirmed')) {
+          throw new Error('メールアドレスが確認されていません。メールを確認してください。');
+        }
+        throw new Error(`ログインに失敗しました: ${error.message}`);
       }
 
       // ログイン成功後、ユーザープロファイルが存在するか確認
