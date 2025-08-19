@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
+import { Logo } from '../ui/Logo';
 import { useAuthStore } from '../../stores/authStore';
 import { 
-  Heart, 
   LogOut, 
   Settings, 
   Calendar,
@@ -26,28 +26,26 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
     { id: 'home', label: 'ホーム', icon: Home, show: true },
     { id: 'record', label: '録音', icon: Mic, show: isParent },
     { id: 'diary', label: '日記', icon: Calendar, show: true },
-    { id: 'family', label: '家族', icon: Users, show: !isParent },
+    { id: 'family', label: '共有', icon: Users, show: true },
   ];
 
   return (
     <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
           <motion.div 
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex items-center gap-1 sm:gap-2 md:gap-3 cursor-pointer flex-shrink-0"
             whileHover={{ scale: 1.05 }}
             onClick={() => onViewChange('home')}
           >
-            <div className="bg-blue-600 p-2 rounded-full">
-              <Heart className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+            <Logo size="sm" />
+            <div className="hidden sm:block">
+              <h1 className="text-base md:text-xl lg:text-2xl font-bold text-gray-900 whitespace-nowrap">
                 家族の絆日記
               </h1>
-              <p className="text-sm text-gray-500">
-                {isParent ? '親モード' : '子どもモード'}
+              <p className="text-xs md:text-sm text-gray-500">
+                Voice Journal
               </p>
             </div>
           </motion.div>
@@ -68,31 +66,31 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
           </nav>
 
           {/* User Menu */}
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-3">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-shrink-0">
+            <div className="hidden lg:flex items-center gap-2 md:gap-3">
               <div className="text-right">
-                <div className="text-lg font-medium text-gray-900">
+                <div className="text-sm md:text-base lg:text-lg font-medium text-gray-900 whitespace-nowrap">
                   {user?.name}さん
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-xs md:text-sm text-gray-500">
                   {isParent ? 'ご利用者' : '管理者'}
                 </div>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-xl font-bold text-blue-600">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-lg md:text-xl font-bold text-blue-600">
                   {user?.name?.[0] || '👤'}
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm">
-                <Settings className="w-5 h-5" />
-                <span className="hidden sm:inline">設定</span>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Button variant="ghost" size="sm" className="p-2 sm:px-3">
+                <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden xl:inline">設定</span>
               </Button>
-              <Button variant="outline" size="sm" onClick={signOut}>
-                <LogOut className="w-5 h-5" />
-                <span className="hidden sm:inline">ログアウト</span>
+              <Button variant="outline" size="sm" onClick={signOut} className="p-2 sm:px-3">
+                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden xl:inline">ログアウト</span>
               </Button>
             </div>
           </div>

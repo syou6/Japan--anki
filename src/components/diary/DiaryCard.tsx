@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { useAuthStore } from '../../stores/authStore';
+import { useDiaryStore } from '../../stores/diaryStore';
+import { supabase } from '../../lib/supabase';
 import type { DiaryEntry } from '../../types';
 import { 
   Play, 
@@ -16,6 +18,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
+import toast from 'react-hot-toast';
 
 interface DiaryCardProps {
   entry: DiaryEntry;
@@ -26,8 +29,11 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
   const [showComments, setShowComments] = useState(false);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const [newComment, setNewComment] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
   const { user } = useAuthStore();
+  const { deleteEntry, fetchEntries } = useDiaryStore();
   const isOwner = user?.id === entry.user_id;
 
   useEffect(() => {
@@ -52,6 +58,48 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
       audioElement.play();
     }
     setIsPlaying(!isPlaying);
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('この日記を削除してもよろしいですか？')) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await deleteEntry(entry.id);
+      toast.success('日記を削除しました');
+    } catch (error) {
+      toast.error('削除に失敗しました');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleSubmitComment = async () => {
+    if (!newComment.trim()) return;
+
+    setIsSubmittingComment(true);
+    try {
+      const { error } = await supabase
+        .from('comments')
+        .insert({
+          diary_id: entry.id,
+          user_id: user?.id,
+          content: newComment.trim()
+        });
+
+      if (error) throw error;
+
+      toast.success('コメントを投稿しました');
+      setNewComment('');
+      // 日記一覧を再取得してコメントを反映
+      await fetchEntries();
+    } catch (error) {
+      toast.error('コメントの投稿に失敗しました');
+    } finally {
+      setIsSubmittingComment(false);
+    }
   };
 
   const getEmotionEmoji = (emotion: string) => {
@@ -83,32 +131,33 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
       className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
     >
       {/* Header */}
-      <div className="p-6 border-b border-gray-100">
+      <div className="p-4 sm:p-6 border-b border-gray-100">
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center text-sm sm:text-base">
               {entry.user?.name?.[0] || '👤'}
             </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-900">
+            <div className="flex-1">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900">
                 {entry.user?.name || 'ユーザー'}
               </h3>
-              <div className="flex items-center gap-3 text-gray-500">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-gray-500">
                 <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  <span className="text-lg">
-                    {format(new Date(entry.created_at), 'M月d日（E）HH:mm', { locale: ja })}
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="text-sm sm:text-lg">
+                    {format(new Date(entry.created_at), 'M/d HH:mm', { locale: ja })}
                   </span>
                 </div>
                 {entry.emotion && (
                   <div className="flex items-center gap-1">
-                    <span className="text-xl">{getEmotionEmoji(entry.emotion)}</span>
-                    <span className="text-lg">{entry.emotion}</span>
+                    <span className="text-lg sm:text-xl">{getEmotionEmoji(entry.emotion)}</span>
+                    <span className="text-sm sm:text-lg hidden sm:inline">{entry.emotion}</span>
                   </div>
                 )}
                 {entry.health_score && (
-                  <div className={`text-lg font-medium ${getHealthColor(entry.health_score)}`}>
-                    健康度: {entry.health_score}/100
+                  <div className={`text-sm sm:text-lg font-medium ${getHealthColor(entry.health_score)}`}>
+                    <span className="hidden sm:inline">健康度: </span>
+                    <span>{entry.health_score}/100</span>
                   </div>
                 )}
               </div>
@@ -116,7 +165,12 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
           </div>
 
           {isOwner && (
-            <Button variant="ghost" size="sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
               <Trash2 className="w-5 h-5 text-red-500" />
             </Button>
           )}
@@ -124,14 +178,14 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
       </div>
 
       {/* Content */}
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {/* AI Summary */}
         {entry.ai_summary && (
-          <div className="mb-4 p-4 bg-blue-50 rounded-xl">
-            <div className="text-lg font-medium text-blue-900 mb-2">
+          <div className="mb-4 p-3 sm:p-4 bg-blue-50 rounded-xl">
+            <div className="text-base sm:text-lg font-medium text-blue-900 mb-1 sm:mb-2">
               📋 AI要約
             </div>
-            <p className="text-lg text-blue-800">
+            <p className="text-sm sm:text-lg text-blue-800">
               {entry.ai_summary}
             </p>
           </div>
@@ -174,8 +228,8 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
         )}
 
         {/* Text Content */}
-        <div className="prose prose-lg max-w-none">
-          <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+        <div className="prose prose-sm sm:prose-lg max-w-none">
+          <p className="text-sm sm:text-base text-gray-800 leading-relaxed whitespace-pre-wrap">
             {entry.content}
           </p>
         </div>
@@ -196,32 +250,48 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
       </div>
 
       {/* Actions */}
-      <div className="px-6 py-4 border-t border-gray-100">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm">
-              <Heart className="w-5 h-5 text-red-500" />
-              <span className="text-lg">いいね</span>
-            </Button>
-            <Button variant="ghost" size="sm">
-              <ThumbsUp className="w-5 h-5 text-blue-500" />
-              <span className="text-lg">応援</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => setShowComments(!showComments)}
+      <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100">
+        <div className="flex items-center justify-around sm:justify-between">
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* いいねボタン */}
+            <button
+              className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 hover:bg-gray-50 rounded-lg transition-colors"
             >
-              <MessageCircle className="w-5 h-5 text-gray-500" />
-              <span className="text-lg">
-                コメント {entry.comments?.length || 0}
+              <Heart className="w-6 h-6 sm:w-5 sm:h-5 text-red-500" />
+              <span className="hidden sm:inline text-lg">いいね</span>
+            </button>
+            
+            {/* 応援ボタン */}
+            <button
+              className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 hover:bg-gray-50 rounded-lg transition-colors"
+            >
+              <ThumbsUp className="w-6 h-6 sm:w-5 sm:h-5 text-blue-500" />
+              <span className="hidden sm:inline text-lg">応援</span>
+            </button>
+            
+            {/* コメントボタン */}
+            <button
+              onClick={() => setShowComments(!showComments)}
+              className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 hover:bg-gray-50 rounded-lg transition-colors relative"
+            >
+              <MessageCircle className="w-6 h-6 sm:w-5 sm:h-5 text-gray-500" />
+              {entry.comments && entry.comments.length > 0 && (
+                <span className="absolute -top-1 -right-1 sm:static sm:absolute-none bg-blue-500 text-white text-xs sm:text-lg sm:bg-transparent sm:text-gray-700 rounded-full w-5 h-5 sm:w-auto sm:h-auto flex items-center justify-center sm:inline">
+                  {entry.comments.length}
+                </span>
+              )}
+              <span className="hidden sm:inline text-lg">
+                コメント{entry.comments && entry.comments.length > 0 && ` ${entry.comments.length}`}
               </span>
-            </Button>
+            </button>
+            
+            {/* スマイルボタン */}
+            <button
+              className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 hover:bg-gray-50 rounded-lg transition-colors sm:ml-auto"
+            >
+              <Smile className="w-6 h-6 sm:w-5 sm:h-5 text-orange-500" />
+            </button>
           </div>
-
-          <Button variant="ghost" size="sm">
-            <Smile className="w-5 h-5 text-orange-500" />
-          </Button>
         </div>
       </div>
 
@@ -248,36 +318,43 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
                 rows={3}
               />
               <div className="mt-3 flex justify-end">
-                <Button variant="primary" size="sm">
-                  コメントする
+                <Button 
+                  variant="primary" 
+                  size="sm"
+                  onClick={handleSubmitComment}
+                  disabled={isSubmittingComment || !newComment.trim()}
+                >
+                  {isSubmittingComment ? '投稿中...' : 'コメントする'}
                 </Button>
               </div>
             </div>
 
             {/* Comments List */}
             <div className="space-y-4">
-              {entry.comments?.map(comment => (
-                <div key={comment.id} className="bg-white rounded-xl p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      {comment.user?.name?.[0] || '👤'}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-medium text-gray-900">
-                          {comment.user?.name || 'ユーザー'}
-                        </span>
-                        <span className="text-gray-500">
-                          {format(new Date(comment.created_at), 'M月d日 HH:mm', { locale: ja })}
-                        </span>
+              {entry.comments && entry.comments.length > 0 ? (
+                entry.comments.map(comment => (
+                  <div key={comment.id} className="bg-white rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        {comment.user?.name?.[0] || '👤'}
                       </div>
-                      <p className="text-gray-800">
-                        {comment.content}
-                      </p>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-medium text-gray-900">
+                            {comment.user?.name || 'ユーザー'}
+                          </span>
+                          <span className="text-gray-500 text-sm">
+                            {format(new Date(comment.created_at), 'M月d日 HH:mm', { locale: ja })}
+                          </span>
+                        </div>
+                        <p className="text-gray-800">
+                          {comment.content}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )) || (
+                ))
+              ) : (
                 <div className="text-center py-8 text-gray-500">
                   まだコメントがありません
                 </div>

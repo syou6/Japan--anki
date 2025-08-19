@@ -7,6 +7,7 @@ import { Header } from './components/navigation/Header';
 import { ParentDashboard } from './components/dashboard/ParentDashboard';
 import { VoiceRecorder } from './components/recording/VoiceRecorder';
 import { DiaryList } from './components/diary/DiaryList';
+import { FamilyManager } from './components/family/FamilyManager';
 
 function App() {
   const [currentView, setCurrentView] = useState('home');
@@ -27,20 +28,11 @@ function App() {
           <DiaryList />
         );
       case 'record':
-        return user.role === 'parent' ? <VoiceRecorder /> : <DiaryList />;
+        return user.role === 'parent' ? <VoiceRecorder onViewChange={setCurrentView} /> : <DiaryList />;
       case 'diary':
         return <DiaryList />;
       case 'family':
-        return (
-          <div className="max-w-4xl mx-auto p-6 text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              家族管理機能
-            </h1>
-            <p className="text-xl text-gray-600">
-              この機能は開発中です
-            </p>
-          </div>
-        );
+        return <FamilyManager />;
       default:
         return <DiaryList />;
     }

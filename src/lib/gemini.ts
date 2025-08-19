@@ -1,138 +1,117 @@
-// Gemini API integration for voice transcription and AI analysis
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-export class GeminiService {
-  private apiKey: string;
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
-  constructor() {
-    this.apiKey = GEMINI_API_KEY || '';
+// Gemini 1.5 Flash - 低コストで高速
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+export interface TranscriptionResult {
+  text: string;
+  summary?: string;
+  keywords?: string[];
+  emotion?: string;
+}
+
+/**
+ * テキストを分析する（音声文字起こしは行わない）
+ */
+export async function analyzeText(text: string): Promise<TranscriptionResult> {
+  if (!text) {
+    return { text: '' };
   }
 
-  async transcribeAudio(audioBlob: Blob): Promise<string> {
-    try {
-      // Convert audio blob to base64
-      const base64Audio = await this.blobToBase64(audioBlob);
-      
-      const response = await fetch(`${GEMINI_API_URL}/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: 'この音声ファイルを日本語で文字起こししてください。高齢者の話し方を理解し、自然な日本語で正確に変換してください。'
-            }, {
-              inline_data: {
-                mime_type: audioBlob.type,
-                data: base64Audio.split(',')[1]
-              }
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.1,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
-          }
-        })
-      });
+  // Gemini APIで要約と分析
+  try {
+    const prompt = `
+以下の日記テキストを分析してください。
 
-      const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || '文字起こしできませんでした。';
-    } catch (error) {
-      console.error('Transcription error:', error);
-      return 'エラーが発生しました。もう一度お試しください。';
-    }
-  }
+テキスト:
+${text}
 
-  async generateSummary(content: string): Promise<string> {
-    try {
-      const response = await fetch(`${GEMINI_API_URL}/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `以下の日記の内容を1-2文で要約してください。高齢者の方の日記なので、温かみのある表現でまとめてください：\n\n${content}`
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 150,
-          }
-        })
-      });
-
-      const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    } catch (error) {
-      console.error('Summary error:', error);
-      return '';
-    }
-  }
-
-  async analyzeEmotion(content: string): Promise<{ emotion: string; healthScore: number }> {
-    try {
-      const response = await fetch(`${GEMINI_API_URL}/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `以下の日記の内容から感情と健康度を分析してください。
-
-日記の内容：
-${content}
-
-以下のJSON形式で回答してください：
+以下のJSONフォーマットで返答してください:
 {
-  "emotion": "感情（喜び、悲しみ、不安、平穏、怒りなど）",
-  "healthScore": "健康度（1-100の数値）",
-  "analysis": "簡潔な分析コメント"
+  "summary": "50文字以内の要約",
+  "keywords": ["キーワード1", "キーワード2", "キーワード3"],
+  "emotion": "喜び|悲しみ|不安|普通|楽しい|疲れ"
 }
+`;
 
-高齢者の方の心身の健康状態を考慮して、優しく分析してください。`
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 200,
-          }
-        })
-      });
-
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      
-      try {
-        const parsed = JSON.parse(text.replace(/```json\n|\n```/g, ''));
-        return {
-          emotion: parsed.emotion || '平穏',
-          healthScore: parsed.healthScore || 75
-        };
-      } catch {
-        return { emotion: '平穏', healthScore: 75 };
-      }
-    } catch (error) {
-      console.error('Emotion analysis error:', error);
-      return { emotion: '平穏', healthScore: 75 };
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const responseText = response.text();
+    
+    try {
+      const analysis = JSON.parse(responseText);
+      return {
+        text,
+        summary: analysis.summary,
+        keywords: analysis.keywords,
+        emotion: analysis.emotion
+      };
+    } catch {
+      // JSON解析に失敗した場合は、テキストのみ返す
+      return { text };
     }
-  }
-
-  private async blobToBase64(blob: Blob): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
+  } catch (error) {
+    console.error('Gemini API分析エラー:', error);
+    // エラーの場合もテキストは返す
+    return { text };
   }
 }
 
-export const geminiService = new GeminiService();
+/**
+ * 音声ファイルの文字起こし（現在は未実装）
+ * 注: Web Speech APIは録音済み音声の文字起こしには適していないため、
+ * 将来的にはWhisper APIなどの利用を検討
+ */
+export function transcribeAudioFile(audioBlob: Blob): Promise<string> {
+  return Promise.resolve('');
+}
+
+/**
+ * 長い日記を家族向けに要約
+ */
+export async function generateFamilySummary(content: string): Promise<string> {
+  try {
+    const prompt = `
+以下の高齢者の日記を、離れて暮らす家族が読みやすいように要約してください。
+重要な出来事、健康状態、感情の変化に焦点を当ててください。
+100文字以内で要約してください。
+
+日記内容:
+${content}
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error('要約生成エラー:', error);
+    return content.substring(0, 100) + '...';
+  }
+}
+
+/**
+ * 健康状態をスコアリング
+ */
+export async function analyzeHealthScore(content: string, voiceData?: any): Promise<number> {
+  try {
+    const prompt = `
+以下の日記内容から、高齢者の健康状態を0-100のスコアで評価してください。
+元気で活動的な内容は高スコア、体調不良や不安な内容は低スコアとしてください。
+数値のみを返してください。
+
+日記内容:
+${content}
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const score = parseInt(response.text().trim());
+    
+    return isNaN(score) ? 75 : Math.min(100, Math.max(0, score));
+  } catch (error) {
+    console.error('健康スコア分析エラー:', error);
+    return 75; // デフォルト値
+  }
+}

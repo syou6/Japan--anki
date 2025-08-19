@@ -20,6 +20,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            name: userData.name || '',
+            role: 'parent' // デフォルトでparentに設定
+          }
+        }
       });
 
       if (error) throw error;
@@ -30,10 +36,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           .insert({
             id: data.user.id,
             email: data.user.email,
-            ...userData,
+            name: userData.name || '',
+            role: 'parent'
           });
 
-        if (profileError) throw profileError;
+        if (profileError) {
+          console.warn('プロファイル作成エラー（自動作成されます）:', profileError);
+        }
       }
     } catch (error) {
       throw error;
@@ -42,13 +51,40 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   signIn: async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
-    } catch (error) {
+      if (error) {
+        console.error('ログインエラー:', error);
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('メールアドレスまたはパスワードが正しくありません');
+        }
+        throw error;
+      }
+
+      // ログイン成功後、ユーザープロファイルが存在するか確認
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+
+        if (!profile) {
+          // プロファイルがない場合は作成
+          await supabase
+            .from('users')
+            .insert({
+              id: data.user.id,
+              email: data.user.email,
+              name: data.user.user_metadata?.name || '',
+              role: 'parent'
+            });
+        }
+      }
+    } catch (error: any) {
       throw error;
     }
   },
@@ -68,26 +104,62 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
-        const { data: userProfile } = await supabase
+        const { data: userProfile, error } = await supabase
           .from('users')
           .select('*')
           .eq('id', session.user.id)
           .single();
 
-        set({ user: userProfile, loading: false });
+        if (!error && userProfile) {
+          set({ user: userProfile, loading: false });
+        } else {
+          // ユーザープロファイルが存在しない場合は作成
+          const newUserProfile = {
+            id: session.user.id,
+            email: session.user.email!,
+            name: session.user.user_metadata?.name || '',
+            role: session.user.user_metadata?.role || 'parent',
+          };
+          
+          const { data: createdProfile } = await supabase
+            .from('users')
+            .insert(newUserProfile)
+            .select()
+            .single();
+          
+          set({ user: createdProfile || newUserProfile, loading: false });
+        }
       } else {
         set({ user: null, loading: false });
       }
 
       supabase.auth.onAuthStateChange(async (event, session) => {
         if (session?.user) {
-          const { data: userProfile } = await supabase
+          const { data: userProfile, error } = await supabase
             .from('users')
             .select('*')
             .eq('id', session.user.id)
             .single();
 
-          set({ user: userProfile });
+          if (!error && userProfile) {
+            set({ user: userProfile });
+          } else {
+            // ユーザープロファイルが存在しない場合は作成
+            const newUserProfile = {
+              id: session.user.id,
+              email: session.user.email!,
+              name: session.user.user_metadata?.name || '',
+              role: session.user.user_metadata?.role || 'parent',
+            };
+            
+            const { data: createdProfile } = await supabase
+              .from('users')
+              .insert(newUserProfile)
+              .select()
+              .single();
+            
+            set({ user: createdProfile || newUserProfile });
+          }
         } else {
           set({ user: null });
         }

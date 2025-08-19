@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
+import { LogoWithText } from '../ui/Logo';
 import { useAuthStore } from '../../stores/authStore';
-import { LogIn, UserPlus, Heart } from 'lucide-react';
+import { LogIn, UserPlus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const AuthForm: React.FC = () => {
@@ -10,7 +11,6 @@ export const AuthForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [role, setRole] = useState<'parent' | 'child'>('parent');
   const [loading, setLoading] = useState(false);
 
   const { signUp, signIn } = useAuthStore();
@@ -21,7 +21,7 @@ export const AuthForm: React.FC = () => {
 
     try {
       if (isSignUp) {
-        await signUp(email, password, { name, role });
+        await signUp(email, password, { name });
         toast.success('アカウントを作成しました！');
       } else {
         await signIn(email, password);
@@ -35,20 +35,15 @@ export const AuthForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 flex items-center justify-center p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md"
+        className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 w-full max-w-md"
       >
-        <div className="text-center mb-8">
-          <div className="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Heart className="w-10 h-10 text-blue-600" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            家族の絆日記
-          </h1>
-          <p className="text-gray-600 text-lg">
+        <div className="text-center mb-6 sm:mb-8">
+          <LogoWithText size="lg" className="mb-4" />
+          <p className="text-gray-600 text-base sm:text-lg">
             {isSignUp ? 'アカウントを作成' : 'ログイン'}
           </p>
         </div>
@@ -69,35 +64,6 @@ export const AuthForm: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-lg font-medium text-gray-700 mb-2">
-                  利用者タイプ
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setRole('parent')}
-                    className={`p-4 rounded-xl border-2 text-lg font-medium transition-colors ${
-                      role === 'parent'
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    親（高齢者）
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRole('child')}
-                    className={`p-4 rounded-xl border-2 text-lg font-medium transition-colors ${
-                      role === 'child'
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    子供
-                  </button>
-                </div>
-              </div>
             </>
           )}
 
