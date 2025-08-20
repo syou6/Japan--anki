@@ -103,20 +103,30 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   signInWithGoogle: async () => {
     try {
+      console.log('Googleログイン開始:', {
+        redirectTo: `${window.location.origin}/`,
+        origin: window.location.origin
+      });
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
         },
       });
 
       if (error) {
-        console.error('Googleログインエラー:', error);
-        throw new Error('Googleログインに失敗しました');
+        console.error('Googleログインエラー詳細:', {
+          error,
+          message: error.message,
+          code: error.code,
+          details: error
+        });
+        
+        if (error.message?.includes('provider is not enabled')) {
+          throw new Error('Google認証が有効化されていません。管理者に連絡してください。');
+        }
+        throw new Error(`Googleログインに失敗しました: ${error.message}`);
       }
     } catch (error: any) {
       console.error('Googleログインエラー:', error);
