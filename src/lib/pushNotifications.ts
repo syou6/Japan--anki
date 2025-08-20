@@ -147,15 +147,22 @@ export class PushNotificationManager {
         // サブスクリプションをサーバーに保存
         await this.saveSubscription(userId, this.subscription);
         
-        // FCMトークンも取得して保存
-        try {
-          const fcmToken = await getFCMToken();
-          if (fcmToken) {
-            await this.saveFCMToken(userId, fcmToken);
-            console.log('FCM token saved');
+        // FCMトークンも取得して保存（AndroidとDesktopのみ）
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (!isIOS) {
+          try {
+            console.log('Getting FCM token (non-iOS device)...');
+            const fcmToken = await getFCMToken();
+            console.log('FCM token received:', fcmToken);
+            if (fcmToken) {
+              await this.saveFCMToken(userId, fcmToken);
+              console.log('FCM token saved successfully');
+            }
+          } catch (fcmError) {
+            console.error('FCM token save failed:', fcmError);
           }
-        } catch (fcmError) {
-          console.log('FCM token save failed:', fcmError);
+        } else {
+          console.log('iOS detected - skipping FCM token (using Web Push only)');
         }
         
         console.log('Push notification subscription successful');

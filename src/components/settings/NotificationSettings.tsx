@@ -89,10 +89,27 @@ export const NotificationSettings: React.FC = () => {
 
   const handleTestNotification = async () => {
     try {
+      // デバッグ情報を収集
+      const debugInfo = {
+        permission: Notification.permission,
+        serviceWorker: 'serviceWorker' in navigator,
+        pushManager: 'PushManager' in window,
+        isIOS: /iPad|iPhone|iPod/.test(navigator.userAgent),
+        isPWA: window.matchMedia('(display-mode: standalone)').matches,
+        time: new Date().toLocaleTimeString()
+      };
+      
+      // デバッグ情報を画面に表示
+      toast.info(`Debug: ${JSON.stringify(debugInfo, null, 2)}`, {
+        duration: 10000
+      });
+      
       await sendTestNotification();
       toast.success('テスト通知を送信しました');
-    } catch (error) {
-      toast.error('テスト通知の送信に失敗しました');
+    } catch (error: any) {
+      toast.error(`失敗: ${error.message || 'テスト通知の送信に失敗しました'}`, {
+        duration: 10000
+      });
     }
   };
 

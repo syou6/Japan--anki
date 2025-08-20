@@ -54,58 +54,88 @@ serve(async (req) => {
       if (rel.child_id !== record.user_id) familyUserIds.add(rel.child_id)
     })
 
-    // 通知設定を確認して通知を送信
-    for (const userId of familyUserIds) {
-      // 通知設定を確認
-      const { data: settings } = await supabase
-        .from('notification_settings')
-        .select('family_diary')
-        .eq('user_id', userId)
-        .single()
+    console.log(`Found ${familyUserIds.size} family members to potentially notify`)
 
-      if (!settings?.family_diary) {
-        console.log(`User ${userId} has disabled family diary notifications`)
-        continue
-      }
+    // 通知結果を追跡
+    const notificationResults = []
 
-      // プッシュサブスクリプションを取得
-      const { data: subscription } = await supabase
-        .from('push_subscriptions')
-        .select('*')
-        .eq('user_id', userId)
-        .single()
-
-      if (!subscription) {
-        console.log(`No subscription found for user ${userId}`)
-        continue
-      }
-
-      // 通知を送信
-      const notificationTitle = '新しい日記が投稿されました'
-      const notificationBody = `${author.name}さんが日記を投稿しました`
-      
-      // Edge Function経由で通知送信
-      const { error: notifyError } = await supabase.functions.invoke('send-push', {
-        body: {
-          subscription,
-          title: notificationTitle,
-          body: notificationBody,
-          data: {
-            url: '/diary',
-            diaryId: record.id
+    // 並行して通知を送信（パフォーマンス向上）
+    const notificationPromises = Array.from(familyUserIds).map(async (userId) => {
+      try {
+        const notificationTitle = '新しい日記が投稿されました'
+        const notificationBody = `${author.name}さんが日記を投稿しました`
+        
+        const { data, error: notifyError } = await supabase.functions.invoke('send-notification', {
+          body: {
+            userId: userId,
+            title: notificationTitle,
+            body: notificationBody,
+            type: 'diary',
+            data: {
+              url: '/diary',
+              diaryId: record.id,
+              authorName: author.name
+            }
           }
-        }
-      })
+        })
 
-      if (notifyError) {
-        console.error(`Failed to notify user ${userId}:`, notifyError)
-      } else {
-        console.log(`Successfully notified user ${userId}`)
+        const result = {
+          userId,
+          success: !notifyError,
+          error: notifyError ? notifyError.message : null,
+          response: data
+        }
+
+        if (notifyError) {
+          console.error(`Failed to notify user ${userId}:`, notifyError)
+        } else {
+          console.log(`Successfully notified user ${userId}`)
+        }
+
+        return result
+      } catch (error) {
+        console.error(`Error processing notification for user ${userId}:`, error)
+        return {
+          userId,
+          success: false,
+          error: error.message
+        }
       }
-    }
+    })
+
+    // 全ての通知処理を待機
+    const results = await Promise.allSettled(notificationPromises)
+    
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        notificationResults.push(result.value)
+      } else {
+        console.error(`Notification promise rejected for user:`, result.reason)
+        notificationResults.push({
+          userId: Array.from(familyUserIds)[index],
+          success: false,
+          error: result.reason?.message || 'Promise rejected'
+        })
+      }
+    })
+
+    const successCount = notificationResults.filter(r => r.success).length
+    const failureCount = notificationResults.length - successCount
 
     return new Response(
-      JSON.stringify({ success: true, notified: familyUserIds.size }),
+      JSON.stringify({ 
+        success: true, 
+        totalFamilyMembers: familyUserIds.size,
+        notificationsSent: successCount,
+        notificationsFailed: failureCount,
+        diaryId: record.id,
+        authorName: author.name,
+        results: notificationResults.map(r => ({
+          userId: r.userId,
+          success: r.success,
+          error: r.error
+        }))
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {

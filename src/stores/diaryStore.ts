@@ -320,31 +320,26 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
       // 各家族メンバーに通知を送信
       for (const userId of familyUserIds) {
         try {
-          // 通知設定を確認
-          const { data: settings } = await supabase
-            .from('notification_settings')
-            .select('family_diary')
-            .eq('user_id', userId)
-            .single();
+          // Edge Function経由でバックグラウンド通知を送信
+          const response = await supabase.functions.invoke('send-push-notification', {
+            body: {
+              userId,
+              title: '新しい日記が投稿されました',
+              body: `${authorName}さんが日記を投稿しました`,
+              type: 'family_diary',
+              data: {
+                url: 'https://ai-voce-journal.vercel.app/diary'
+              }
+            }
+          });
 
-          if (!settings?.family_diary) {
-            console.log(`User ${userId} has disabled family diary notifications`);
-            continue;
+          if (response.error) {
+            console.error(`Failed to send push notification to user ${userId}:`, response.error);
+          } else {
+            console.log(`Push notification sent to user ${userId}`);
           }
 
-          // プッシュサブスクリプションを確認
-          const { data: subscription } = await supabase
-            .from('push_subscriptions')
-            .select('*')
-            .eq('user_id', userId)
-            .single();
-
-          if (!subscription) {
-            console.log(`No subscription found for user ${userId}`);
-            continue;
-          }
-
-          // Service Worker経由でローカル通知を送信（ブラウザが開いている場合）
+          // ブラウザが開いている場合はローカル通知も送信（フォールバック）
           if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
             navigator.serviceWorker.controller.postMessage({
               type: 'SHOW_NOTIFICATION',
@@ -355,8 +350,6 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
               }
             });
           }
-
-          console.log(`Notification sent to user ${userId}`);
         } catch (error) {
           console.error(`Failed to notify user ${userId}:`, error);
         }

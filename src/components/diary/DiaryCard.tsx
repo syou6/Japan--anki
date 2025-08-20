@@ -91,6 +91,36 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
 
       if (error) throw error;
 
+      // 日記の投稿者に通知を送信（自分の日記でない場合）
+      if (!isOwner) {
+        try {
+          // 現在のユーザー名を取得
+          const { data: userData } = await supabase
+            .from('users')
+            .select('name')
+            .eq('id', user?.id)
+            .single();
+
+          if (userData?.name) {
+            // Edge Function経由でバックグラウンド通知を送信
+            await supabase.functions.invoke('send-push-notification', {
+              body: {
+                userId: entry.user_id,
+                title: '新しいコメントが投稿されました',
+                body: `${userData.name}さんがあなたの日記にコメントしました`,
+                type: 'new_comment',
+                data: {
+                  url: `https://ai-voce-journal.vercel.app/diary#${entry.id}`
+                }
+              }
+            });
+          }
+        } catch (notifyError) {
+          console.error('Failed to send comment notification:', notifyError);
+          // 通知エラーは無視して続行
+        }
+      }
+
       toast.success('コメントを投稿しました');
       setNewComment('');
       // 日記一覧を再取得してコメントを反映
