@@ -53,3 +53,19 @@ self.addEventListener('install', function(event) {
 self.addEventListener('activate', function(event) {
   event.waitUntil(clients.claim());
 });
+
+// メッセージ受信処理（アプリ内からの通知）
+self.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
+    const { title, body, data } = event.data;
+    
+    self.registration.showNotification(title || '日記AI', {
+      body: body || '新しい通知があります',
+      icon: '/icon-192x192.png',
+      badge: '/icon-192x192.png',
+      vibrate: [200, 100, 200],
+      data: data || {},
+      requireInteraction: false
+    });
+  }
+});

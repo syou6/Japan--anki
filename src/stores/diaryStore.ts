@@ -17,6 +17,7 @@ interface DiaryStore {
   startRecording: () => Promise<void>;
   stopRecording: () => Promise<Blob | null>;
   clearRecording: () => void;
+  notifyFamilyMembers: (authorId: string, authorName: string) => Promise<void>;
 }
 
 export const useDiaryStore = create<DiaryStore>((set, get) => ({
@@ -193,6 +194,23 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
       // Refresh entries
       await get().fetchEntries();
       
+      // 家族に通知を送信
+      try {
+        // ユーザー名を取得
+        const { data: userData } = await supabase
+          .from('users')
+          .select('name')
+          .eq('id', user.id)
+          .single();
+        
+        if (userData?.name) {
+          await get().notifyFamilyMembers(user.id, userData.name);
+        }
+      } catch (notifyError) {
+        console.error('Failed to send notifications:', notifyError);
+        // 通知エラーは無視して続行
+      }
+      
       return insertedData;
     } catch (error: any) {
       console.error('Failed to create entry:', error);
@@ -276,5 +294,75 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
       isRecording: false,
       mediaRecorder: null
     });
+  },
+
+  notifyFamilyMembers: async (authorId: string, authorName: string) => {
+    try {
+      // 家族関係を取得
+      const { data: relationships } = await supabase
+        .from('family_relationships')
+        .select('parent_id, child_id')
+        .or(`parent_id.eq.${authorId},child_id.eq.${authorId}`)
+        .eq('status', 'accepted');
+
+      if (!relationships || relationships.length === 0) {
+        console.log('No family relationships found');
+        return;
+      }
+
+      // 通知対象のユーザーIDを収集
+      const familyUserIds = new Set<string>();
+      relationships.forEach(rel => {
+        if (rel.parent_id !== authorId) familyUserIds.add(rel.parent_id);
+        if (rel.child_id !== authorId) familyUserIds.add(rel.child_id);
+      });
+
+      // 各家族メンバーに通知を送信
+      for (const userId of familyUserIds) {
+        try {
+          // 通知設定を確認
+          const { data: settings } = await supabase
+            .from('notification_settings')
+            .select('family_diary')
+            .eq('user_id', userId)
+            .single();
+
+          if (!settings?.family_diary) {
+            console.log(`User ${userId} has disabled family diary notifications`);
+            continue;
+          }
+
+          // プッシュサブスクリプションを確認
+          const { data: subscription } = await supabase
+            .from('push_subscriptions')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+
+          if (!subscription) {
+            console.log(`No subscription found for user ${userId}`);
+            continue;
+          }
+
+          // Service Worker経由でローカル通知を送信（ブラウザが開いている場合）
+          if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({
+              type: 'SHOW_NOTIFICATION',
+              title: '新しい日記が投稿されました',
+              body: `${authorName}さんが日記を投稿しました`,
+              data: {
+                url: '/diary'
+              }
+            });
+          }
+
+          console.log(`Notification sent to user ${userId}`);
+        } catch (error) {
+          console.error(`Failed to notify user ${userId}:`, error);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to notify family members:', error);
+    }
   }
 }));

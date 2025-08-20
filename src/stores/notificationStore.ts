@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { PushNotificationManager } from '../lib/pushNotifications';
+import { ReminderScheduler } from '../lib/reminderScheduler';
 import type { User } from '../types';
 
 interface NotificationSettings {
@@ -15,6 +16,7 @@ interface NotificationStore {
   settings: NotificationSettings | null;
   loading: boolean;
   pushManager: PushNotificationManager;
+  reminderScheduler: ReminderScheduler;
   
   initialize: (userId: string) => Promise<void>;
   subscribe: (userId: string) => Promise<boolean>;
@@ -30,6 +32,7 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
   settings: null,
   loading: true,
   pushManager: PushNotificationManager.getInstance(),
+  reminderScheduler: ReminderScheduler.getInstance(),
 
   initialize: async (userId: string) => {
     try {
@@ -76,6 +79,11 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
       const isSubscribed = hasSubscription || get().pushManager.isSubscribed();
       
       set({ isSubscribed, loading: false });
+      
+      // リマインダーをセットアップ
+      if (settings?.daily_reminder) {
+        await get().reminderScheduler.setupDailyReminder(userId, settings.reminder_time);
+      }
       
     } catch (error) {
       console.error('Failed to initialize notifications:', error);
@@ -134,6 +142,15 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
 
       if (!error && data) {
         set({ settings: data });
+        
+        // リマインダー設定が変更された場合
+        if ('daily_reminder' in settings || 'reminder_time' in settings) {
+          if (data.daily_reminder) {
+            await get().reminderScheduler.setupDailyReminder(userId, data.reminder_time);
+          } else {
+            get().reminderScheduler.clearReminder(userId);
+          }
+        }
       }
     } catch (error) {
       console.error('Failed to update settings:', error);
