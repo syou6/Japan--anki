@@ -16,9 +16,26 @@ export class PushNotificationManager {
 
   async initialize(): Promise<boolean> {
     try {
+      // iOSチェック
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+      const isStandalone = (window.navigator as any).standalone === true || 
+                          window.matchMedia('(display-mode: standalone)').matches;
+      
+      // iOSでスタンドアロンモードでない場合は通知不可
+      if (isIOS && !isStandalone) {
+        console.log('iOS requires PWA installation for notifications');
+        return false;
+      }
+      
       // Service Workerがサポートされているかチェック
-      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-        console.log('Push notifications are not supported');
+      if (!('serviceWorker' in navigator)) {
+        console.log('Service Worker not supported');
+        return false;
+      }
+      
+      // Notification APIがサポートされているかチェック
+      if (!('Notification' in window)) {
+        console.log('Notification API not supported');
         return false;
       }
 
@@ -26,8 +43,11 @@ export class PushNotificationManager {
       this.registration = await navigator.serviceWorker.register('/sw.js');
       console.log('Service Worker registered');
 
-      // 既存のサブスクリプションを取得
-      this.subscription = await this.registration.pushManager.getSubscription();
+      // PushManagerのサポートチェック（iOS 16.4+で必要）
+      if ('PushManager' in window && this.registration.pushManager) {
+        // 既存のサブスクリプションを取得
+        this.subscription = await this.registration.pushManager.getSubscription();
+      }
       
       return true;
     } catch (error) {

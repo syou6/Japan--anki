@@ -25,6 +25,12 @@ export const NotificationSettings: React.FC = () => {
     daily_reminder: false,
     reminder_time: '20:00'
   });
+  
+  // iOS/PWAチェック
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  const isStandalone = (window.navigator as any).standalone === true || 
+                       window.matchMedia('(display-mode: standalone)').matches;
+  const canUseNotifications = !isIOS || isStandalone;
 
   useEffect(() => {
     if (user) {
@@ -214,42 +220,79 @@ export const NotificationSettings: React.FC = () => {
       {!isSubscribed && (
         <div className="text-center py-8">
           <BellOff className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 mb-4">
-            プッシュ通知を有効にすると、<br />
-            家族の日記やコメントをリアルタイムで受け取れます
-          </p>
           
-          {/* スマホ向けの説明 */}
-          {/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 text-left">
-              <p className="text-sm text-yellow-800 font-semibold mb-2">
-                📱 スマートフォンでご利用の方へ
+          {/* iOSでPWAでない場合 */}
+          {isIOS && !isStandalone ? (
+            <>
+              <p className="text-gray-600 mb-4">
+                iPhoneでプッシュ通知を使用するには<br />
+                ホーム画面にアプリを追加してください
               </p>
-              <ul className="text-sm text-yellow-700 space-y-1">
-                {/iPhone|iPad|iPod/i.test(navigator.userAgent) ? (
-                  <>
-                    <li>• ホーム画面にアプリを追加してください</li>
-                    <li>• Safari → 共有ボタン → ホーム画面に追加</li>
-                    <li>• アプリから開くと通知が使えます</li>
-                  </>
-                ) : (
-                  <>
+              
+              <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-4 text-left max-w-sm mx-auto">
+                <p className="text-sm text-blue-900 font-bold mb-3">
+                  📱 アプリの追加方法
+                </p>
+                <ol className="text-sm text-blue-800 space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 text-xs">1</span>
+                    <span>Safari下部の共有ボタン
+                      <svg className="inline w-5 h-5 ml-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-7.432 0" />
+                      </svg>
+                      をタップ
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 text-xs">2</span>
+                    <span>「ホーム画面に追加」を選択</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 text-xs">3</span>
+                    <span>右上の「追加」をタップ</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 text-xs">4</span>
+                    <span>ホーム画面から「日記AI」を開く</span>
+                  </li>
+                </ol>
+              </div>
+              
+              <p className="text-xs text-gray-500">
+                ※iOS 16.4以降が必要です
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-gray-600 mb-4">
+                プッシュ通知を有効にすると、<br />
+                家族の日記やコメントをリアルタイムで受け取れます
+              </p>
+              
+              {/* Android向けの説明 */}
+              {/Android/i.test(navigator.userAgent) && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 text-left">
+                  <p className="text-sm text-yellow-800 font-semibold mb-2">
+                    📱 スマートフォンでご利用の方へ
+                  </p>
+                  <ul className="text-sm text-yellow-700 space-y-1">
                     <li>• Chrome/Edgeブラウザをご利用ください</li>
                     <li>• メニュー → ホーム画面に追加</li>
                     <li>• アプリとして使うと便利です</li>
-                  </>
-                )}
-              </ul>
-            </div>
+                  </ul>
+                </div>
+              )}
+              
+              <Button
+                onClick={handleToggleNotifications}
+                size="lg"
+                disabled={!canUseNotifications}
+              >
+                <Bell className="w-5 h-5" />
+                通知を有効にする
+              </Button>
+            </>
           )}
-          
-          <Button
-            onClick={handleToggleNotifications}
-            size="lg"
-          >
-            <Bell className="w-5 h-5" />
-            通知を有効にする
-          </Button>
         </div>
       )}
     </motion.div>
