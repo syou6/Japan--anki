@@ -127,8 +127,7 @@ export const AuthForm: React.FC = () => {
           </Button>
         </form>
 
-        {/* Googleログインボタン - 一時的に非表示 */}
-        {false && (
+        {/* Googleログインボタン */}
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -170,7 +169,6 @@ export const AuthForm: React.FC = () => {
             </Button>
           </div>
         </div>
-        )}
 
         <div className="mt-6 text-center">
           <button
