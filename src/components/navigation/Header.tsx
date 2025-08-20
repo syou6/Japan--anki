@@ -84,7 +84,12 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
             </div>
 
             <div className="flex items-center gap-1 sm:gap-2">
-              <Button variant="ghost" size="sm" className="p-2 sm:px-3">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="p-2 sm:px-3"
+                onClick={() => onViewChange('settings')}
+              >
                 <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="hidden xl:inline">設定</span>
               </Button>
