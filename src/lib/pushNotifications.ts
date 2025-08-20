@@ -156,17 +156,42 @@ export class PushNotificationManager {
 
   async unsubscribe(userId: string): Promise<boolean> {
     try {
+      console.log('Starting unsubscribe process...');
+      
+      // iOSの場合の特別処理
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS) {
+        console.log('iOS: Removing notification settings');
+        // iOSではサブスクリプションが存在しないので、DBのレコードのみ削除
+        await this.removeSubscription(userId);
+        console.log('iOS: Notification settings removed');
+        return true;
+      }
+      
+      // Android/デスクトップの場合
       if (this.subscription) {
+        console.log('Unsubscribing from push notifications...');
         await this.subscription.unsubscribe();
         await this.removeSubscription(userId);
         this.subscription = null;
         console.log('Push notification unsubscribed');
         return true;
+      } else {
+        // サブスクリプションがなくてもDBのレコードは削除
+        console.log('No subscription found, removing DB record only');
+        await this.removeSubscription(userId);
+        return true;
       }
-      return false;
     } catch (error) {
       console.error('Failed to unsubscribe from push notifications:', error);
-      return false;
+      // エラーが発生してもDBのレコードは削除を試みる
+      try {
+        await this.removeSubscription(userId);
+        return true;
+      } catch (dbError) {
+        console.error('Failed to remove DB record:', dbError);
+        return false;
+      }
     }
   }
 

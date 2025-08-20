@@ -65,7 +65,16 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
       }
 
       // サブスクリプション状態を確認
-      const isSubscribed = get().pushManager.isSubscribed();
+      // DBからも確認する
+      const { data: subscription } = await supabase
+        .from('push_subscriptions')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+      
+      const hasSubscription = !!subscription;
+      const isSubscribed = hasSubscription || get().pushManager.isSubscribed();
+      
       set({ isSubscribed, loading: false });
       
     } catch (error) {
