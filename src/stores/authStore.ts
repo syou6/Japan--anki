@@ -136,11 +136,26 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   signOut: async () => {
     try {
+      console.log('ログアウト処理開始');
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      
+      if (error) {
+        console.error('ログアウトエラー:', error);
+        throw error;
+      }
+      
+      // ローカルステートをクリア
       set({ user: null });
+      
+      // ページをリロードして完全にクリーンな状態にする
+      window.location.href = '/';
+      
+      console.log('ログアウト完了');
     } catch (error) {
-      throw error;
+      console.error('ログアウトエラー:', error);
+      // エラーが発生してもログアウト処理を続行
+      set({ user: null });
+      window.location.href = '/';
     }
   },
 
