@@ -79,6 +79,17 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
       const success = await get().pushManager.subscribe(userId);
       if (success) {
         set({ isSubscribed: true });
+        
+        // iOSの場合、ローカル通知として成功メッセージを表示
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (isIOS && Notification.permission === 'granted') {
+          // テスト通知を表示
+          new Notification('日記AI', {
+            body: '通知が有効になりました！',
+            icon: '/icon-192x192.png',
+            badge: '/icon-192x192.png'
+          });
+        }
       }
       return success;
     } catch (error) {

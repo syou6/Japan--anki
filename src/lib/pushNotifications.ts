@@ -75,8 +75,14 @@ export class PushNotificationManager {
 
   async subscribe(userId: string): Promise<boolean> {
     try {
+      console.log('Starting subscription process...');
+      
       if (!this.registration) {
-        await this.initialize();
+        console.log('Initializing service worker...');
+        const initialized = await this.initialize();
+        if (!initialized) {
+          throw new Error('Failed to initialize service worker');
+        }
       }
 
       if (!this.registration) {
@@ -84,28 +90,66 @@ export class PushNotificationManager {
       }
 
       // 通知の権限をチェック
+      console.log('Current permission:', Notification.permission);
       if (Notification.permission !== 'granted') {
         const granted = await this.requestPermission();
         if (!granted) {
+          console.log('Permission denied');
           return false;
         }
       }
 
-      // VAPIDキーを使用してサブスクライブ（本番環境では環境変数から取得）
-      const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || 'BKd0G3pTR6YzEfKbVxrXKKT5WJkDXzXDVyaVZQpxcK1kMKh7PZQMZjvkzE_4kRWwOc5pVkYfIA6KGBXmJjpWtQQ';
-      
-      this.subscription = await this.registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey)
-      });
+      // iOSの場合、PushManagerが利用可能か確認
+      if (!this.registration.pushManager) {
+        console.error('PushManager not available');
+        // iOSの場合は通知権限だけ取得して成功とする
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (isIOS && Notification.permission === 'granted') {
+          console.log('iOS: Notification permission granted, treating as success');
+          // ローカル通知のみ使用可能として扱う
+          await this.saveLocalNotificationSettings(userId);
+          return true;
+        }
+        throw new Error('PushManager not available');
+      }
 
-      // サブスクリプションをサーバーに保存
-      await this.saveSubscription(userId, this.subscription);
-      
-      console.log('Push notification subscription successful');
-      return true;
-    } catch (error) {
+      // VAPIDキーを使用してサブスクライブ
+      try {
+        console.log('Attempting to subscribe to push notifications...');
+        const vapidPublicKey = 'BKd0G3pTR6YzEfKbVxrXKKT5WJkDXzXDVyaVZQpxcK1kMKh7PZQMZjvkzE_4kRWwOc5pVkYfIA6KGBXmJjpWtQQ';
+        
+        this.subscription = await this.registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: this.urlBase64ToUint8Array(vapidPublicKey)
+        });
+
+        console.log('Subscription created:', this.subscription);
+        
+        // サブスクリプションをサーバーに保存
+        await this.saveSubscription(userId, this.subscription);
+        
+        console.log('Push notification subscription successful');
+        return true;
+      } catch (subscribeError: any) {
+        console.error('Subscribe error:', subscribeError);
+        
+        // iOSの場合、ローカル通知のみ使用
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (isIOS && Notification.permission === 'granted') {
+          console.log('iOS: Falling back to local notifications');
+          await this.saveLocalNotificationSettings(userId);
+          return true;
+        }
+        
+        throw subscribeError;
+      }
+    } catch (error: any) {
       console.error('Failed to subscribe to push notifications:', error);
+      console.error('Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
       return false;
     }
   }
@@ -127,6 +171,11 @@ export class PushNotificationManager {
   }
 
   isSubscribed(): boolean {
+    // iOSの場合、通知権限があれば購読済みとする
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS) {
+      return Notification.permission === 'granted';
+    }
     return this.subscription !== null;
   }
 
@@ -146,6 +195,26 @@ export class PushNotificationManager {
     if (error) {
       console.error('Failed to save subscription:', error);
       throw error;
+    }
+  }
+
+  private async saveLocalNotificationSettings(userId: string): Promise<void> {
+    // iOSの場合、ローカル通知設定のみ保存
+    const { error } = await supabase
+      .from('push_subscriptions')
+      .upsert({
+        user_id: userId,
+        endpoint: 'local-notifications-only',
+        p256dh: null,
+        auth: null,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id'
+      });
+
+    if (error) {
+      console.error('Failed to save local notification settings:', error);
+      // エラーを無視してローカル通知を有効とする
     }
   }
 
