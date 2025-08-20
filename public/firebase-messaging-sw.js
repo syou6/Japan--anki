@@ -4,12 +4,12 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-comp
 
 // Firebase設定（環境変数から取得できないため直接記述）
 firebase.initializeApp({
-  apiKey: "AIzaSyBWFv8xCvQrqT7qLrXGxbRCH3u5lWEuQY8",
-  authDomain: "nikki-ai.firebaseapp.com",
-  projectId: "nikki-ai",
-  storageBucket: "nikki-ai.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef123456"
+  apiKey: "AIzaSyBDB0gVI82wwhp7Khd5T5jgxyqGD96XPJM",
+  authDomain: "ai-voce-40094.firebaseapp.com",
+  projectId: "ai-voce-40094",
+  storageBucket: "ai-voce-40094.firebasestorage.app",
+  messagingSenderId: "881606027600",
+  appId: "1:881606027600:web:576b1f5b0a974a6191a455"
 });
 
 const messaging = firebase.messaging();
