@@ -116,7 +116,7 @@ export class PushNotificationManager {
       // VAPIDキーを使用してサブスクライブ
       try {
         console.log('Attempting to subscribe to push notifications...');
-        const vapidPublicKey = 'BKd0G3pTR6YzEfKbVxrXKKT5WJkDXzXDVyaVZQpxcK1kMKh7PZQMZjvkzE_4kRWwOc5pVkYfIA6KGBXmJjpWtQQ';
+        const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || 'BPbbeE9gPuQBaFzqzQ6sODqkCH4gODBWF2yNnCXQIr_ym1dvle_Gl_U2_QcdK-sG7KTRqCf9sKQZJw_F4B_bZwI';
         
         this.subscription = await this.registration.pushManager.subscribe({
           userVisibleOnly: true,
