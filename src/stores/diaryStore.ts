@@ -328,7 +328,7 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
               body: `${authorName}さんが日記を投稿しました`,
               type: 'family_diary',
               data: {
-                url: 'https://ai-voce-journal.vercel.app/diary'
+                url: 'https://journal-ai.cloud/diary'
               }
             }
           });

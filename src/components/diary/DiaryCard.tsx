@@ -110,7 +110,7 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
                 body: `${userData.name}さんがあなたの日記にコメントしました`,
                 type: 'new_comment',
                 data: {
-                  url: `https://ai-voce-journal.vercel.app/diary#${entry.id}`
+                  url: `https://journal-ai.cloud/diary#${entry.id}`
                 }
               }
             });
