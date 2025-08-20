@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { getFCMToken } from './firebase';
 
 export class PushNotificationManager {
   private static instance: PushNotificationManager;
@@ -42,6 +43,16 @@ export class PushNotificationManager {
       // Service Workerの登録
       this.registration = await navigator.serviceWorker.register('/sw.js');
       console.log('Service Worker registered');
+      
+      // Firebase Service Workerも登録（バックグラウンド通知用）
+      try {
+        await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+          scope: '/firebase-cloud-messaging-push-scope'
+        });
+        console.log('Firebase Service Worker registered');
+      } catch (fcmError) {
+        console.log('Firebase Service Worker registration failed:', fcmError);
+      }
 
       // PushManagerのサポートチェック（iOS 16.4+で必要）
       if ('PushManager' in window && this.registration.pushManager) {
@@ -127,6 +138,17 @@ export class PushNotificationManager {
         
         // サブスクリプションをサーバーに保存
         await this.saveSubscription(userId, this.subscription);
+        
+        // FCMトークンも取得して保存
+        try {
+          const fcmToken = await getFCMToken();
+          if (fcmToken) {
+            await this.saveFCMToken(userId, fcmToken);
+            console.log('FCM token saved');
+          }
+        } catch (fcmError) {
+          console.log('FCM token save failed:', fcmError);
+        }
         
         console.log('Push notification subscription successful');
         return true;
@@ -240,6 +262,21 @@ export class PushNotificationManager {
     if (error) {
       console.error('Failed to save local notification settings:', error);
       // エラーを無視してローカル通知を有効とする
+    }
+  }
+
+  private async saveFCMToken(userId: string, fcmToken: string): Promise<void> {
+    // FCMトークンを保存
+    const { error } = await supabase
+      .from('push_subscriptions')
+      .update({
+        fcm_token: fcmToken,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Failed to save FCM token:', error);
     }
   }
 
