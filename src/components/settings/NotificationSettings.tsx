@@ -218,6 +218,31 @@ export const NotificationSettings: React.FC = () => {
             プッシュ通知を有効にすると、<br />
             家族の日記やコメントをリアルタイムで受け取れます
           </p>
+          
+          {/* スマホ向けの説明 */}
+          {/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 text-left">
+              <p className="text-sm text-yellow-800 font-semibold mb-2">
+                📱 スマートフォンでご利用の方へ
+              </p>
+              <ul className="text-sm text-yellow-700 space-y-1">
+                {/iPhone|iPad|iPod/i.test(navigator.userAgent) ? (
+                  <>
+                    <li>• ホーム画面にアプリを追加してください</li>
+                    <li>• Safari → 共有ボタン → ホーム画面に追加</li>
+                    <li>• アプリから開くと通知が使えます</li>
+                  </>
+                ) : (
+                  <>
+                    <li>• Chrome/Edgeブラウザをご利用ください</li>
+                    <li>• メニュー → ホーム画面に追加</li>
+                    <li>• アプリとして使うと便利です</li>
+                  </>
+                )}
+              </ul>
+            </div>
+          )}
+          
           <Button
             onClick={handleToggleNotifications}
             size="lg"

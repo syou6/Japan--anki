@@ -9,6 +9,7 @@ import { VoiceRecorder } from './components/recording/VoiceRecorder';
 import { DiaryList } from './components/diary/DiaryList';
 import { FamilyManager } from './components/family/FamilyManager';
 import { NotificationSettings } from './components/settings/NotificationSettings';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 
 function App() {
   const [currentView, setCurrentView] = useState('home');
@@ -90,6 +91,8 @@ function App() {
           },
         }}
       />
+      
+      <PWAInstallPrompt />
     </div>
   );
 }
