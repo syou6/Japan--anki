@@ -39,42 +39,49 @@ export class IOSNotificationManager {
   }
 
   static async showLocalNotification(title: string, body: string, data?: any) {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    if (!isIOS) return;
-
     try {
-      // PWAかチェック
-      const isStandalone = (window.navigator as any).standalone === true ||
-                          window.matchMedia('(display-mode: standalone)').matches;
+      console.log('Attempting to show notification:', { title, body });
       
-      if (!isStandalone) {
-        console.log('iOS: Not in PWA mode, cannot show notification');
-        return;
+      // 通知権限の確認
+      if (Notification.permission !== 'granted') {
+        console.log('Notification permission not granted');
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          console.log('User denied notification permission');
+          return;
+        }
       }
 
-      // Service Worker経由で通知
-      const registration = await navigator.serviceWorker.getRegistration();
-      if (registration) {
+      // Service Workerを使用
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        console.log('Service Worker ready, showing notification');
+        
         await registration.showNotification(title, {
           body,
           icon: '/icon-192x192.png',
           badge: '/icon-192x192.png',
           data: data || {},
           vibrate: [200, 100, 200],
-          tag: `ios-${Date.now()}`,
-          requireInteraction: false
+          tag: `notification-${Date.now()}`,
+          requireInteraction: false,
+          silent: false
         });
+        
+        console.log('Notification shown successfully');
       } else {
         // フォールバック：通常のNotification API
-        if (Notification.permission === 'granted') {
-          new Notification(title, {
-            body,
-            icon: '/icon-192x192.png',
-          });
-        }
+        console.log('Using fallback Notification API');
+        new Notification(title, {
+          body,
+          icon: '/icon-192x192.png',
+        });
       }
     } catch (error) {
-      console.error('iOS local notification failed:', error);
+      console.error('Failed to show notification:', error);
+      
+      // 最終フォールバック：アラート
+      alert(`${title}\n\n${body}`);
     }
   }
 

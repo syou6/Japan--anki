@@ -317,25 +317,50 @@ export class PushNotificationManager {
 
   // テスト用の通知送信
   async sendTestNotification(): Promise<void> {
-    // iOSの場合は専用処理
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    if (isIOS) {
-      await IOSNotificationManager.showLocalNotification(
-        'テスト通知',
-        'プッシュ通知が正常に動作しています！'
-      );
-      return;
-    }
+    console.log('sendTestNotification called');
     
-    if (!this.registration) {
-      throw new Error('Service Worker not registered');
+    try {
+      // 通知権限を確認
+      if (Notification.permission !== 'granted') {
+        console.log('Permission not granted, requesting...');
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          throw new Error('通知の権限が拒否されました');
+        }
+      }
+      
+      // iOSかどうかチェック
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      console.log('Platform:', isIOS ? 'iOS' : 'Other');
+      
+      // 全プラットフォーム共通の処理
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        console.log('Using Service Worker for notification');
+        
+        await registration.showNotification('テスト通知', {
+          body: 'プッシュ通知が正常に動作しています！',
+          icon: '/icon-192x192.png',
+          badge: '/icon-192x192.png',
+          vibrate: [200, 100, 200],
+          tag: 'test-notification',
+          requireInteraction: false
+        });
+        
+        console.log('Test notification sent successfully');
+      } else {
+        // Service Workerが使えない場合
+        console.log('Service Worker not available, using Notification API');
+        new Notification('テスト通知', {
+          body: 'プッシュ通知が正常に動作しています！',
+          icon: '/icon-192x192.png'
+        });
+      }
+    } catch (error) {
+      console.error('Test notification failed:', error);
+      // 最終手段：アラート表示
+      alert('テスト通知\n\nプッシュ通知が正常に動作しています！');
+      throw error;
     }
-
-    await this.registration.showNotification('テスト通知', {
-      body: 'プッシュ通知が正常に動作しています！',
-      icon: '/icon-192x192.png',
-      badge: '/icon-192x192.png',
-      vibrate: [200, 100, 200]
-    });
   }
 }
