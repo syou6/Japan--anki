@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { getFCMToken } from './firebase';
+import { IOSNotificationManager } from './iosNotifications';
 
 export class PushNotificationManager {
   private static instance: PushNotificationManager;
@@ -69,6 +70,13 @@ export class PushNotificationManager {
 
   async requestPermission(): Promise<boolean> {
     try {
+      // iOSの場合は専用処理
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS) {
+        return await IOSNotificationManager.requestPermission();
+      }
+      
+      // その他のプラットフォーム
       const permission = await Notification.requestPermission();
       
       if (permission === 'granted') {
@@ -309,6 +317,16 @@ export class PushNotificationManager {
 
   // テスト用の通知送信
   async sendTestNotification(): Promise<void> {
+    // iOSの場合は専用処理
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS) {
+      await IOSNotificationManager.showLocalNotification(
+        'テスト通知',
+        'プッシュ通知が正常に動作しています！'
+      );
+      return;
+    }
+    
     if (!this.registration) {
       throw new Error('Service Worker not registered');
     }
