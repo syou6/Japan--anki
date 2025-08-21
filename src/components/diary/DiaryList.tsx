@@ -31,8 +31,11 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
     }
   }, [isGuest]);
 
+  // ゲストモードの場合はゲスト日記、通常モードは通常の日記を使用
+  const displayEntries = isGuest ? guestDiaries : entries;
+  
   const getEntriesForDate = (date: Date) => {
-    return entries.filter(entry => 
+    return displayEntries.filter(entry => 
       isSameDay(new Date(entry.created_at), date)
     );
   };
@@ -129,7 +132,11 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
           </h4>
           <div className="space-y-4">
             {getEntriesForDate(selectedDate).map(entry => (
-              <DiaryCard key={entry.id} entry={entry} />
+              isGuest ? (
+                <GuestDiaryCard key={entry.id} diary={entry} />
+              ) : (
+                <DiaryCard key={entry.id} entry={entry} />
+              )
             ))}
             {getEntriesForDate(selectedDate).length === 0 && (
               <div className="text-center py-6 sm:py-8 text-gray-500 text-base sm:text-lg">
@@ -155,7 +162,7 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          {user?.role === 'parent' ? 'あなたの日記' : `${user?.name}さんの日記`}
+          {isGuest ? 'ゲストの日記' : user?.role === 'parent' ? 'あなたの日記' : `${user?.name}さんの日記`}
         </h1>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -184,7 +191,7 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
             </button>
           </div>
 
-          {user?.role === 'parent' && (
+          {(user?.role === 'parent' || isGuest) && (
             <Button 
               onClick={() => setShowRecorder(true)} 
               variant="primary"
@@ -202,9 +209,13 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
         renderCalendarView()
       ) : (
         <div className="space-y-6">
-          {entries.length > 0 ? (
-            entries.map(entry => (
-              <DiaryCard key={entry.id} entry={entry} />
+          {displayEntries.length > 0 ? (
+            displayEntries.map(entry => (
+              isGuest ? (
+                <GuestDiaryCard key={entry.id} diary={entry} />
+              ) : (
+                <DiaryCard key={entry.id} entry={entry} />
+              )
             ))
           ) : (
             <motion.div
@@ -219,7 +230,7 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
               <p className="text-lg text-gray-600 mb-6">
                 最初の日記を録音してみましょう
               </p>
-              {user?.role === 'parent' && (
+              {(user?.role === 'parent' || isGuest) && (
                 <Button onClick={() => setShowRecorder(true)} size="lg">
                   <Plus className="w-6 h-6" />
                   録音を始める
