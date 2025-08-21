@@ -201,11 +201,9 @@ export const AuthForm: React.FC = () => {
             size="lg"
             className="w-full text-gray-600 hover:text-gray-800 hover:bg-gray-50 !min-h-[48px] sm:!min-h-[72px]"
           >
-            <span className="flex items-center justify-center gap-2 flex-wrap sm:flex-nowrap">
-              <span className="flex items-center gap-2">
-                <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-base sm:text-2xl">ゲストで試してみる</span>
-              </span>
+            <span className="flex items-center justify-center gap-2 whitespace-nowrap">
+              <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-base sm:text-2xl">ゲストで試してみる</span>
               <span className="text-xs sm:text-sm text-gray-500">（3回まで）</span>
             </span>
           </Button>
