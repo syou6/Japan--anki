@@ -161,7 +161,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   initialize: async () => {
     try {
-      console.log('Auth初期化開始');
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
@@ -171,7 +170,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }
       
       if (session?.user) {
-        console.log('セッション確認済み:', session.user.id);
         const { data: userProfile, error } = await supabase
           .from('users')
           .select('*')
@@ -179,10 +177,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           .single();
 
         if (!error && userProfile) {
-          console.log('ユーザープロファイル取得成功:', userProfile);
           set({ user: userProfile, loading: false });
         } else {
-          console.log('ユーザープロファイル作成中...');
           // ユーザープロファイルが存在しない場合は作成
           const newUserProfile = {
             id: session.user.id,
@@ -198,13 +194,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             .single();
           
           if (createError) {
-            console.error('プロファイル作成エラー:', createError);
+            console.warn('プロファイル作成エラー（自動リトライ）:', createError);
           }
           
           set({ user: createdProfile || newUserProfile, loading: false });
         }
       } else {
-        console.log('セッションなし');
         set({ user: null, loading: false });
       }
 
@@ -239,8 +234,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           set({ user: null });
         }
       });
-      
-      console.log('Auth初期化完了');
     } catch (error) {
       console.error('Auth初期化エラー:', error);
       set({ user: null, loading: false });

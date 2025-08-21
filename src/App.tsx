@@ -21,25 +21,14 @@ function App() {
   const { isGuestMode, cleanExpiredDiaries } = useGuestStore();
 
   useEffect(() => {
-    console.log('App初期化開始');
-    initialize().catch(err => {
-      console.error('App初期化エラー:', err);
-    });
+    initialize();
     
     // ゲストモードの期限切れ日記をクリーンアップ
-    try {
-      cleanExpiredDiaries();
-    } catch (err) {
-      console.error('ゲスト日記クリーンアップエラー:', err);
-    }
+    cleanExpiredDiaries();
     
     // 5分ごとに期限切れ日記をチェック
     const interval = setInterval(() => {
-      try {
-        cleanExpiredDiaries();
-      } catch (err) {
-        console.error('定期クリーンアップエラー:', err);
-      }
+      cleanExpiredDiaries();
     }, 5 * 60 * 1000); // 5分
     
     return () => clearInterval(interval);
