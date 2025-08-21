@@ -55,15 +55,15 @@ export const AuthForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 flex items-center justify-center p-4 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 flex items-center justify-center p-3 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 w-full max-w-md"
+        className="bg-white rounded-2xl shadow-xl p-5 sm:p-8 w-full max-w-md"
       >
-        <div className="text-center mb-6 sm:mb-8">
-          <LogoWithText size="lg" className="mb-4" />
-          <p className="text-gray-600 text-base sm:text-lg">
+        <div className="text-center mb-5 sm:mb-8">
+          <LogoWithText size="lg" className="mb-3 sm:mb-4" />
+          <p className="text-gray-600 text-sm sm:text-lg">
             {isSignUp ? 'アカウントを作成' : 'ログイン'}
           </p>
         </div>
@@ -119,46 +119,46 @@ export const AuthForm: React.FC = () => {
           <Button
             type="submit"
             size="lg"
-            className="w-full"
+            className="w-full !min-h-[48px] sm:!min-h-[72px]"
             disabled={loading}
           >
             {loading ? (
-              '処理中...'
+              <span className="text-base sm:text-2xl">処理中...</span>
             ) : isSignUp ? (
               <>
-                <UserPlus className="w-6 h-6" />
-                アカウント作成
+                <UserPlus className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span className="text-base sm:text-2xl">アカウント作成</span>
               </>
             ) : (
               <>
-                <LogIn className="w-6 h-6" />
-                ログイン
+                <LogIn className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span className="text-base sm:text-2xl">ログイン</span>
               </>
             )}
           </Button>
         </form>
 
         {/* Googleログインボタン */}
-        <div className="mt-6">
+        <div className="mt-5 sm:mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
             </div>
-            <div className="relative flex justify-center text-sm">
+            <div className="relative flex justify-center text-xs sm:text-sm">
               <span className="px-2 bg-white text-gray-500">または</span>
             </div>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-5 sm:mt-6">
             <Button
               type="button"
               onClick={handleGoogleSignIn}
               variant="outline"
               size="xl"
-              className="w-full flex items-center justify-center gap-3"
+              className="w-full flex items-center justify-center gap-2 sm:gap-3 !min-h-[48px] sm:!min-h-[96px]"
               disabled={loading}
             >
-              <svg className="w-6 h-6" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -176,15 +176,15 @@ export const AuthForm: React.FC = () => {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Googleでログイン
+              <span className="text-base sm:text-3xl">Googleでログイン</span>
             </Button>
           </div>
         </div>
 
-        <div className="mt-6 text-center">
+        <div className="mt-5 sm:mt-6 text-center">
           <button
             onClick={() => setIsSignUp(!isSignUp)}
-            className="text-blue-600 hover:text-blue-800 text-lg font-medium"
+            className="text-blue-600 hover:text-blue-800 text-sm sm:text-lg font-medium"
           >
             {isSignUp 
               ? 'すでにアカウントをお持ちですか？' 
@@ -194,16 +194,20 @@ export const AuthForm: React.FC = () => {
         </div>
 
         {/* ゲストモードボタン */}
-        <div className="mt-6 pt-6 border-t border-gray-200">
+        <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-gray-200">
           <Button
             onClick={handleGuestMode}
             variant="ghost"
             size="lg"
-            className="w-full text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+            className="w-full text-gray-600 hover:text-gray-800 hover:bg-gray-50 !min-h-[48px] sm:!min-h-[72px]"
           >
-            <UserCheck className="w-5 h-5" />
-            ゲストで試してみる
-            <span className="text-sm ml-2 text-gray-500">（3回まで）</span>
+            <span className="flex items-center justify-center gap-2 flex-wrap sm:flex-nowrap">
+              <span className="flex items-center gap-2">
+                <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-base sm:text-2xl">ゲストで試してみる</span>
+              </span>
+              <span className="text-xs sm:text-sm text-gray-500">（3回まで）</span>
+            </span>
           </Button>
         </div>
       </motion.div>

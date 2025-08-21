@@ -13,39 +13,67 @@ export const GuestBanner: React.FC = () => {
     <motion.div
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white p-4 shadow-lg"
+      className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white p-3 sm:p-4 shadow-lg"
     >
-      <div className="max-w-6xl mx-auto flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center gap-3">
-          <AlertCircle className="w-6 h-6" />
-          <div>
-            <p className="font-bold text-lg">ゲストモードで利用中</p>
-            <p className="text-sm opacity-90">
-              あと{remaining}回お試しできます
-            </p>
+      <div className="max-w-6xl mx-auto">
+        {/* モバイル版レイアウト */}
+        <div className="sm:hidden">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5" />
+              <div className="flex-1">
+                <p className="font-bold text-sm">ゲストモード</p>
+                <p className="text-xs opacity-90">残り{remaining}回</p>
+              </div>
+            </div>
+            <Button
+              onClick={() => {
+                setGuestMode(false);
+                window.location.reload();
+              }}
+              variant="primary"
+              size="sm"
+              className="!bg-white !text-orange-600 hover:!bg-orange-50 !border !border-white !px-3 !py-1.5 !min-h-0 !text-xs"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>ログイン</span>
+            </Button>
           </div>
         </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="text-right mr-2">
-            <p className="text-xs opacity-90">すべての機能を使うには</p>
-            <p className="text-sm font-semibold flex items-center gap-1">
-              <Sparkles className="w-4 h-4" />
-              無料アカウント作成
-            </p>
+
+        {/* デスクトップ版レイアウト */}
+        <div className="hidden sm:flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-6 h-6" />
+            <div>
+              <p className="font-bold text-lg">ゲストモードで利用中</p>
+              <p className="text-sm opacity-90">
+                あと{remaining}回お試しできます
+              </p>
+            </div>
           </div>
-          <Button
-            onClick={() => {
-              setGuestMode(false);
-              window.location.reload();
-            }}
-            variant="secondary"
-            size="md"
-            className="bg-white text-orange-600 hover:bg-gray-100"
-          >
-            <LogIn className="w-4 h-4" />
-            ログイン / 新規登録
-          </Button>
+          
+          <div className="flex items-center gap-3">
+            <div className="text-right mr-2">
+              <p className="text-xs opacity-90">すべての機能を使うには</p>
+              <p className="text-sm font-semibold flex items-center gap-1">
+                <Sparkles className="w-4 h-4" />
+                無料アカウント作成
+              </p>
+            </div>
+            <Button
+              onClick={() => {
+                setGuestMode(false);
+                window.location.reload();
+              }}
+              variant="primary"
+              size="md"
+              className="!bg-white !text-orange-600 hover:!bg-orange-50 !border-2 !border-white"
+            >
+              <LogIn className="w-4 h-4" />
+              ログイン / 新規登録
+            </Button>
+          </div>
         </div>
       </div>
     </motion.div>
