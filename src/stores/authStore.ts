@@ -161,9 +161,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   initialize: async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      console.log('Auth初期化開始');
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('セッション取得エラー:', sessionError);
+        set({ user: null, loading: false });
+        return;
+      }
       
       if (session?.user) {
+        console.log('セッション確認済み:', session.user.id);
         const { data: userProfile, error } = await supabase
           .from('users')
           .select('*')
@@ -171,8 +179,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           .single();
 
         if (!error && userProfile) {
+          console.log('ユーザープロファイル取得成功:', userProfile);
           set({ user: userProfile, loading: false });
         } else {
+          console.log('ユーザープロファイル作成中...');
           // ユーザープロファイルが存在しない場合は作成
           const newUserProfile = {
             id: session.user.id,
@@ -181,15 +191,20 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             role: session.user.user_metadata?.role || 'parent',
           };
           
-          const { data: createdProfile } = await supabase
+          const { data: createdProfile, error: createError } = await supabase
             .from('users')
             .insert(newUserProfile)
             .select()
             .single();
           
+          if (createError) {
+            console.error('プロファイル作成エラー:', createError);
+          }
+          
           set({ user: createdProfile || newUserProfile, loading: false });
         }
       } else {
+        console.log('セッションなし');
         set({ user: null, loading: false });
       }
 
@@ -224,9 +239,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           set({ user: null });
         }
       });
+      
+      console.log('Auth初期化完了');
     } catch (error) {
-      console.error('Auth initialization error:', error);
-      set({ loading: false });
+      console.error('Auth初期化エラー:', error);
+      set({ user: null, loading: false });
     }
   },
 }));
