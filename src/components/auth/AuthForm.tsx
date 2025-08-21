@@ -182,13 +182,16 @@ export const AuthForm: React.FC = () => {
         </div>
 
         <div className="mt-5 sm:mt-6 text-center">
+          <p className="text-xs sm:text-sm text-gray-600 mb-2">
+            {isSignUp ? 'すでにアカウントをお持ちの方' : 'まだアカウントをお持ちでない方'}
+          </p>
           <button
             onClick={() => setIsSignUp(!isSignUp)}
-            className="text-blue-600 hover:text-blue-800 text-sm sm:text-lg font-medium"
+            className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl text-sm sm:text-lg font-bold shadow-md hover:shadow-lg transition-all duration-200"
           >
             {isSignUp 
-              ? 'すでにアカウントをお持ちですか？' 
-              : 'アカウントを作成しますか？'
+              ? '→ ログインはこちら' 
+              : '→ 新規登録はこちら'
             }
           </button>
         </div>

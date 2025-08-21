@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { analyzeText, generateFamilySummary, analyzeHealthScore } from '../lib/gemini';
+import { formatFileSize } from '../utils/audioCompression';
 import type { DiaryEntry } from '../types';
 
 interface DiaryStore {
@@ -120,13 +121,23 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
       // If we have audio, upload it (but don't transcribe)
       if (audioBlob) {
         try {
+          console.log('音声アップロード開始:', {
+            size: formatFileSize(audioBlob.size),
+            type: audioBlob.type
+          });
+          
+          const uploadStartTime = performance.now();
           const fileName = `${user.id}/voice_${Date.now()}.webm`;
+          
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('voice-recordings')
             .upload(fileName, audioBlob, {
               contentType: 'audio/webm',
               upsert: false
             });
+
+          const uploadEndTime = performance.now();
+          console.log(`音声アップロード完了: ${Math.round(uploadEndTime - uploadStartTime)}ms`);
 
           if (!uploadError) {
             const { data: { publicUrl } } = supabase.storage
@@ -243,20 +254,46 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
 
   startRecording: async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 16000, // サンプルレートを下げて品質とサイズのバランスを取る
+        } 
+      });
+      
+      // MediaRecorderのオプションを設定（ビットレート削減）
+      const options: MediaRecorderOptions = {
+        mimeType: 'audio/webm;codecs=opus',
+        audioBitsPerSecond: 32000 // 32kbps（十分な音声品質を保ちながらサイズを削減）
+      };
+      
+      // ブラウザがサポートしていない場合のフォールバック
+      let mediaRecorder: MediaRecorder;
+      try {
+        mediaRecorder = new MediaRecorder(stream, options);
+      } catch (e) {
+        console.warn('指定したコーデックがサポートされていません。デフォルト設定を使用します。');
+        mediaRecorder = new MediaRecorder(stream);
+      }
+      
       const audioChunks: Blob[] = [];
 
       mediaRecorder.ondataavailable = (event) => {
-        audioChunks.push(event.data);
+        if (event.data.size > 0) {
+          audioChunks.push(event.data);
+        }
       };
 
-      mediaRecorder.start();
+      // 10秒ごとにデータを取得（長時間録音対応）
+      mediaRecorder.start(10000);
       set({ 
         mediaRecorder, 
         audioChunks, 
         isRecording: true 
       });
+      
+      console.log('録音開始: ビットレート32kbps, サンプルレート16kHz');
     } catch (error) {
       console.error('Failed to start recording:', error);
       throw error;

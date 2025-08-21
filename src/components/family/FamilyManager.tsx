@@ -192,17 +192,17 @@ export const FamilyManager: React.FC = () => {
             {sharedWith.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-xl"
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-xl gap-2"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl font-bold">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold flex-shrink-0">
                     {member.child?.name?.[0] || '?'}
                   </div>
-                  <div>
-                    <div className="font-medium text-lg">
+                  <div className="min-w-0">
+                    <div className="font-medium text-base sm:text-lg truncate">
                       {member.child?.name || 'ユーザー'}
                     </div>
-                    <div className="text-gray-500">
+                    <div className="text-sm sm:text-base text-gray-500 truncate">
                       {member.child?.email}
                     </div>
                   </div>
@@ -211,9 +211,10 @@ export const FamilyManager: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => removeFamilyMember(member.id)}
+                  className="flex-shrink-0"
                 >
-                  <X className="w-5 h-5 text-red-500" />
-                  解除
+                  <X className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
+                  <span className="hidden sm:inline">解除</span>
                 </Button>
               </div>
             ))}
@@ -235,22 +236,22 @@ export const FamilyManager: React.FC = () => {
             {sharedFrom.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center justify-between p-4 bg-green-50 rounded-xl"
+                className="flex items-center justify-between p-4 bg-green-50 rounded-xl gap-2"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-xl font-bold">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold flex-shrink-0">
                     {member.parent?.name?.[0] || '?'}
                   </div>
-                  <div>
-                    <div className="font-medium text-lg">
+                  <div className="min-w-0">
+                    <div className="font-medium text-base sm:text-lg truncate">
                       {member.parent?.name || 'ユーザー'}
                     </div>
-                    <div className="text-gray-500">
+                    <div className="text-sm sm:text-base text-gray-500 truncate">
                       {member.parent?.email}
                     </div>
                   </div>
                 </div>
-                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                <span className="px-2 sm:px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs sm:text-sm font-medium flex-shrink-0">
                   共有中
                 </span>
               </div>
