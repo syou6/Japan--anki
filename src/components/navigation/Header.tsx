@@ -37,16 +37,16 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
           <motion.div 
-            className="flex items-center gap-1 sm:gap-2 md:gap-3 cursor-pointer flex-shrink-0"
+            className="flex items-center gap-1.5 sm:gap-2 md:gap-3 cursor-pointer flex-shrink-0"
             whileHover={{ scale: 1.05 }}
             onClick={() => onViewChange('home')}
           >
             <Logo size="sm" />
-            <div className="hidden sm:block">
-              <h1 className="text-base md:text-xl lg:text-2xl font-bold text-gray-900 whitespace-nowrap">
+            <div>
+              <h1 className="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-gray-900 whitespace-nowrap">
                 日記AI
               </h1>
-              <p className="text-xs md:text-sm text-gray-500">
+              <p className="text-[10px] sm:text-xs md:text-sm text-gray-500 hidden sm:block">
                 Voice Journal
               </p>
             </div>
