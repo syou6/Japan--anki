@@ -1,8 +1,16 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { analyzeText, generateFamilySummary, analyzeHealthScore } from '../lib/gemini';
-import { formatFileSize } from '../utils/audioCompression';
 import type { DiaryEntry } from '../types';
+
+// ファイルサイズのフォーマット関数（インライン定義）
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+};
 
 interface DiaryStore {
   entries: DiaryEntry[];
@@ -263,7 +271,7 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
       });
       
       // MediaRecorderのオプションを設定（ビットレート削減）
-      const options: MediaRecorderOptions = {
+      const options = {
         mimeType: 'audio/webm;codecs=opus',
         audioBitsPerSecond: 32000 // 32kbps（十分な音声品質を保ちながらサイズを削減）
       };
