@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useAuthStore } from './stores/authStore';
 import { useGuestStore } from './stores/guestStore';
 import { AuthForm } from './components/auth/AuthForm';
@@ -28,12 +29,21 @@ function App() {
     if (isGuestMode) {
       switch (currentView) {
         case 'home':
-        case 'diary':
-          return <GuestDiaryList />;
+          return <ParentDashboard onViewChange={setCurrentView} isGuest={true} />;
         case 'record':
           return <VoiceRecorder onViewChange={setCurrentView} isGuest={true} />;
+        case 'diary':
+          return <DiaryList isGuest={true} />;
+        case 'family':
+          // ゲストは家族機能使えない
+          toast.error('ゲストモードでは家族機能は利用できません');
+          return <DiaryList isGuest={true} />;
+        case 'settings':
+          // ゲストは設定使えない
+          toast.error('ゲストモードでは設定は利用できません');
+          return <DiaryList isGuest={true} />;
         default:
-          return <GuestDiaryList />;
+          return <DiaryList isGuest={true} />;
       }
     }
 

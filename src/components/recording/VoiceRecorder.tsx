@@ -12,7 +12,7 @@ interface VoiceRecorderProps {
   isGuest?: boolean;
 }
 
-export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange }) => {
+export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGuest }) => {
   const [recordingTime, setRecordingTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
@@ -31,6 +31,8 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange }) =>
     clearRecording,
     createEntry
   } = useDiaryStore();
+  
+  const { createGuestDiary, canCreateMore } = useGuestStore();
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -60,6 +62,12 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange }) =>
   }, [currentAudio, isRecording]);
 
   const handleStartRecording = async () => {
+    // ゲストモードの場合、作成可能か確認
+    if (isGuest && !canCreateMore()) {
+      toast.error('ゲスト利用の上限に達しました。ログインしてください。');
+      return;
+    }
+
     try {
       // 音声録音を開始
       await startRecording();
@@ -89,6 +97,16 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange }) =>
       }
       
       toast.success('録音を開始しました');
+      
+      // ゲストモードは30秒で自動停止
+      if (isGuest) {
+        setTimeout(() => {
+          if (isRecording) {
+            handleStopRecording();
+            toast.info('ゲストモードは30秒までです');
+          }
+        }, 30000);
+      }
     } catch (error) {
       toast.error('録音の開始に失敗しました');
     }
@@ -162,7 +180,12 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange }) =>
       // 保存処理中のトーストを表示
       const loadingToast = toast.loading('日記を保存中です...');
       
-      await createEntry(contentToSave, currentAudio);
+      // ゲストモードとして通常モードで保存
+      if (isGuest) {
+        await createGuestDiary(contentToSave, currentAudio);
+      } else {
+        await createEntry(contentToSave, currentAudio);
+      }
       
       // 成功トーストに切り替え
       toast.dismiss(loadingToast);
