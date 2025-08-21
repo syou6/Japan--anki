@@ -10,6 +10,7 @@ interface GuestDiary {
   health_score: number;
   ai_summary: string;
   created_at: string;
+  expires_at: string; // 有効期限
   voice_data?: string; // Base64エンコードされた音声データ
 }
 
@@ -26,6 +27,7 @@ interface GuestStore {
   canCreateMore: () => boolean;
   clearGuestData: () => void;
   setGuestMode: (enabled: boolean) => void;
+  cleanExpiredDiaries: () => void;
 }
 
 export const useGuestStore = create<GuestStore>()(
@@ -73,6 +75,9 @@ export const useGuestStore = create<GuestStore>()(
           console.warn('AI分析をスキップしました:', error);
         }
 
+        const now = new Date();
+        const expiresAt = new Date(now.getTime() + 30 * 60 * 1000); // 30分後
+        
         const newDiary: GuestDiary = {
           id: `guest-${Date.now()}`,
           content,
@@ -80,7 +85,8 @@ export const useGuestStore = create<GuestStore>()(
           emotion,
           health_score: healthScore,
           ai_summary: aiSummary,
-          created_at: new Date().toISOString(),
+          created_at: now.toISOString(),
+          expires_at: expiresAt.toISOString(),
           voice_data: voiceData
         };
 
@@ -119,6 +125,26 @@ export const useGuestStore = create<GuestStore>()(
 
       setGuestMode: (enabled: boolean) => {
         set({ isGuestMode: enabled });
+      },
+
+      cleanExpiredDiaries: () => {
+        const now = new Date();
+        set((state) => {
+          const validDiaries = state.diaries.filter(diary => {
+            const expiresAt = new Date(diary.expires_at);
+            return expiresAt > now;
+          });
+          
+          // 削除された日記の数だけusageCountも減らす
+          const deletedCount = state.diaries.length - validDiaries.length;
+          
+          console.log(`期限切れの日記を${deletedCount}件削除しました`);
+          
+          return {
+            diaries: validDiaries,
+            usageCount: Math.max(0, state.usageCount - deletedCount)
+          };
+        });
       }
     }),
     {

@@ -2,25 +2,34 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useDiaryStore } from '../../stores/diaryStore';
 import { useAuthStore } from '../../stores/authStore';
+import { useGuestStore } from '../../stores/guestStore';
 import { Button } from '../ui/Button';
 import { DiaryCard } from './DiaryCard';
-import { Calendar, List, Plus } from 'lucide-react';
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay } from 'date-fns';
+import { GuestDiaryCard } from '../guest/GuestDiaryCard';
+import { Calendar, List, Plus, Clock } from 'lucide-react';
+import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, formatDistanceToNow } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 type ViewMode = 'list' | 'calendar';
 
-export const DiaryList: React.FC = () => {
+interface DiaryListProps {
+  isGuest?: boolean;
+}
+
+export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showRecorder, setShowRecorder] = useState(false);
 
   const { entries, loading, fetchEntries } = useDiaryStore();
   const { user } = useAuthStore();
+  const { diaries: guestDiaries, getRemainingTries } = useGuestStore();
 
   useEffect(() => {
-    fetchEntries();
-  }, []);
+    if (!isGuest) {
+      fetchEntries();
+    }
+  }, [isGuest]);
 
   const getEntriesForDate = (date: Date) => {
     return entries.filter(entry => 

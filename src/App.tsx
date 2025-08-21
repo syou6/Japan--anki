@@ -18,10 +18,20 @@ import { GuestDiaryList } from './components/guest/GuestDiaryList';
 function App() {
   const [currentView, setCurrentView] = useState('home');
   const { user, loading, initialize } = useAuthStore();
-  const { isGuestMode } = useGuestStore();
+  const { isGuestMode, cleanExpiredDiaries } = useGuestStore();
 
   useEffect(() => {
     initialize();
+    
+    // ゲストモードの期限切れ日記をクリーンアップ
+    cleanExpiredDiaries();
+    
+    // 5分ごとに期限切れ日記をチェック
+    const interval = setInterval(() => {
+      cleanExpiredDiaries();
+    }, 5 * 60 * 1000); // 5分
+    
+    return () => clearInterval(interval);
   }, []);
 
   const renderView = () => {
