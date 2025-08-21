@@ -3,7 +3,9 @@ import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { LogoWithText } from '../ui/Logo';
 import { useAuthStore } from '../../stores/authStore';
-import { LogIn, UserPlus } from 'lucide-react';
+import { useGuestStore } from '../../stores/guestStore';
+import { LogIn, UserPlus, UserCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 export const AuthForm: React.FC = () => {
@@ -14,6 +16,8 @@ export const AuthForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const { signUp, signIn, signInWithGoogle } = useAuthStore();
+  const { setGuestMode, clearGuestData } = useGuestStore();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +48,12 @@ export const AuthForm: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGuestMode = () => {
+    setGuestMode(true);
+    navigate('/');
+    toast.success('ゲストモードで開始しました（3回まで試せます）');
   };
 
   return (
@@ -180,6 +190,20 @@ export const AuthForm: React.FC = () => {
               : 'アカウントを作成しますか？'
             }
           </button>
+        </div>
+
+        {/* ゲストモードボタン */}
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <Button
+            onClick={handleGuestMode}
+            variant="ghost"
+            size="lg"
+            className="w-full text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+          >
+            <UserCheck className="w-5 h-5" />
+            ゲストで試してみる
+            <span className="text-sm ml-2 text-gray-500">（3回まで）</span>
+          </Button>
         </div>
       </motion.div>
     </div>

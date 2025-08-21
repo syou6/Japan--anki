@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './stores/authStore';
+import { useGuestStore } from './stores/guestStore';
 import { AuthForm } from './components/auth/AuthForm';
 import { Header } from './components/navigation/Header';
 import { ParentDashboard } from './components/dashboard/ParentDashboard';
@@ -10,16 +11,33 @@ import { DiaryList } from './components/diary/DiaryList';
 import { FamilyManager } from './components/family/FamilyManager';
 import { NotificationSettings } from './components/settings/NotificationSettings';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
+import { GuestBanner } from './components/guest/GuestBanner';
+import { GuestDiaryList } from './components/guest/GuestDiaryList';
 
 function App() {
   const [currentView, setCurrentView] = useState('home');
   const { user, loading, initialize } = useAuthStore();
+  const { isGuestMode } = useGuestStore();
 
   useEffect(() => {
     initialize();
   }, []);
 
   const renderView = () => {
+    // ゲストモードの場合
+    if (isGuestMode) {
+      switch (currentView) {
+        case 'home':
+        case 'diary':
+          return <GuestDiaryList />;
+        case 'record':
+          return <VoiceRecorder onViewChange={setCurrentView} isGuest={true} />;
+        default:
+          return <GuestDiaryList />;
+      }
+    }
+
+    // 通常ユーザーの場合
     if (!user) return null;
 
     switch (currentView) {
@@ -54,7 +72,7 @@ function App() {
     );
   }
 
-  if (!user) {
+  if (!user && !isGuestMode) {
     return (
       <>
         <AuthForm />
@@ -65,6 +83,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {isGuestMode && <GuestBanner />}
       <Header currentView={currentView} onViewChange={setCurrentView} />
       
       <main className="pb-20">

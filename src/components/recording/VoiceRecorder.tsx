@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { useDiaryStore } from '../../stores/diaryStore';
+import { useGuestStore } from '../../stores/guestStore';
 import { VoiceTranscriber } from '../../lib/speechRecognition';
-import { Mic, MicOff, Play, Pause, Save, X, Trash2, Home } from 'lucide-react';
+import { Mic, MicOff, Play, Pause, Save, X, Trash2, Home, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface VoiceRecorderProps {
   onViewChange?: (view: string) => void;
+  isGuest?: boolean;
 }
 
 export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange }) => {
