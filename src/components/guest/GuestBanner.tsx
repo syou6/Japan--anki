@@ -3,11 +3,8 @@ import { motion } from 'framer-motion';
 import { AlertCircle, LogIn, Sparkles } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useGuestStore } from '../../stores/guestStore';
-import { useNavigate } from 'react-router-dom';
-
 export const GuestBanner: React.FC = () => {
-  const { getRemainingTries, isGuestMode } = useGuestStore();
-  const navigate = useNavigate();
+  const { getRemainingTries, isGuestMode, setGuestMode } = useGuestStore();
   const remaining = getRemainingTries();
 
   if (!isGuestMode) return null;
@@ -38,7 +35,10 @@ export const GuestBanner: React.FC = () => {
             </p>
           </div>
           <Button
-            onClick={() => navigate('/auth')}
+            onClick={() => {
+              setGuestMode(false);
+              window.location.reload();
+            }}
             variant="secondary"
             size="md"
             className="bg-white text-orange-600 hover:bg-gray-100"

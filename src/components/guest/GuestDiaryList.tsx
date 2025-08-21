@@ -5,14 +5,12 @@ import { Play, Pause, Trash2, AlertCircle, LogIn } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 export const GuestDiaryList: React.FC = () => {
-  const { diaries, deleteGuestDiary, getRemainingTries, canCreateMore } = useGuestStore();
+  const { diaries, deleteGuestDiary, getRemainingTries, canCreateMore, setGuestMode } = useGuestStore();
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [audioElements, setAudioElements] = useState<{ [key: string]: HTMLAudioElement }>({});
-  const navigate = useNavigate();
   const remaining = getRemainingTries();
 
   const handlePlayPause = (diaryId: string, voiceData?: string) => {
@@ -77,7 +75,10 @@ export const GuestDiaryList: React.FC = () => {
             無料アカウントを作成して、すべての機能をお使いください
           </p>
           <Button
-            onClick={() => navigate('/auth')}
+            onClick={() => {
+              setGuestMode(false);
+              window.location.reload();
+            }}
             size="lg"
             className="mx-auto"
           >
@@ -126,7 +127,10 @@ export const GuestDiaryList: React.FC = () => {
                   </p>
                 </div>
                 <Button
-                  onClick={() => navigate('/auth')}
+                  onClick={() => {
+                    setGuestMode(false);
+                    window.location.reload();
+                  }}
                   size="sm"
                   variant="primary"
                 >

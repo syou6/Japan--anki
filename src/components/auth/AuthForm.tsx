@@ -5,7 +5,6 @@ import { LogoWithText } from '../ui/Logo';
 import { useAuthStore } from '../../stores/authStore';
 import { useGuestStore } from '../../stores/guestStore';
 import { LogIn, UserPlus, UserCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 export const AuthForm: React.FC = () => {
@@ -16,8 +15,7 @@ export const AuthForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const { signUp, signIn, signInWithGoogle } = useAuthStore();
-  const { setGuestMode, clearGuestData } = useGuestStore();
-  const navigate = useNavigate();
+  const { setGuestMode } = useGuestStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +50,7 @@ export const AuthForm: React.FC = () => {
 
   const handleGuestMode = () => {
     setGuestMode(true);
-    navigate('/');
+    window.location.reload(); // Routerが設定される前なのでreloadで対応
     toast.success('ゲストモードで開始しました（3回まで試せます）');
   };
 
