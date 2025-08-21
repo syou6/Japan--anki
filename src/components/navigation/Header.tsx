@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { Logo } from '../ui/Logo';
 import { useAuthStore } from '../../stores/authStore';
+import { useGuestStore } from '../../stores/guestStore';
 import { 
   LogOut, 
   Settings, 
@@ -19,14 +20,15 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => {
   const { user, signOut } = useAuthStore();
+  const { isGuestMode } = useGuestStore();
 
   const isParent = user?.role === 'parent';
 
   const navigation = [
     { id: 'home', label: 'ホーム', icon: Home, show: true },
-    { id: 'record', label: '録音', icon: Mic, show: isParent },
+    { id: 'record', label: '録音', icon: Mic, show: isParent || isGuestMode },
     { id: 'diary', label: '日記', icon: Calendar, show: true },
-    { id: 'family', label: '共有', icon: Users, show: true },
+    { id: 'family', label: '共有', icon: Users, show: !isGuestMode },
   ];
 
   return (
@@ -70,33 +72,37 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
             <div className="hidden lg:flex items-center gap-2 md:gap-3">
               <div className="text-right">
                 <div className="text-sm md:text-base lg:text-lg font-medium text-gray-900 whitespace-nowrap">
-                  {user?.name}さん
+                  {isGuestMode ? 'ゲスト' : `${user?.name}さん`}
                 </div>
                 <div className="text-xs md:text-sm text-gray-500">
-                  {isParent ? 'ご利用者' : '管理者'}
+                  {isGuestMode ? 'お試し利用' : isParent ? 'ご利用者' : '管理者'}
                 </div>
               </div>
               <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-full flex items-center justify-center">
                 <span className="text-lg md:text-xl font-bold text-blue-600">
-                  {user?.name?.[0] || '👤'}
+                  {isGuestMode ? 'G' : user?.name?.[0] || '👤'}
                 </span>
               </div>
             </div>
 
             <div className="flex items-center gap-1 sm:gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="p-2 sm:px-3"
-                onClick={() => onViewChange('settings')}
-              >
-                <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="hidden xl:inline">設定</span>
-              </Button>
-              <Button variant="outline" size="sm" onClick={signOut} className="p-2 sm:px-3">
-                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="hidden xl:inline">ログアウト</span>
-              </Button>
+              {!isGuestMode && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="p-2 sm:px-3"
+                  onClick={() => onViewChange('settings')}
+                >
+                  <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden xl:inline">設定</span>
+                </Button>
+              )}
+              {!isGuestMode && (
+                <Button variant="outline" size="sm" onClick={signOut} className="p-2 sm:px-3">
+                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden xl:inline">ログアウト</span>
+                </Button>
+              )}
             </div>
           </div>
         </div>
