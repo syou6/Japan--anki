@@ -81,6 +81,7 @@ export const AuthForm: React.FC = () => {
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
+                  autoComplete="name"
                 />
               </div>
 
@@ -97,6 +98,7 @@ export const AuthForm: React.FC = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
+              autoComplete="email"
             />
           </div>
 
@@ -110,6 +112,7 @@ export const AuthForm: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
+              autoComplete={isSignUp ? "new-password" : "current-password"}
             />
           </div>
 

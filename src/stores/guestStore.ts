@@ -125,7 +125,8 @@ export const useGuestStore = create<GuestStore>()(
       name: 'guest-diary-storage',
       partialize: (state) => ({
         diaries: state.diaries,
-        usageCount: state.usageCount
+        usageCount: state.usageCount,
+        isGuestMode: state.isGuestMode  // ゲストモードも永続化
       })
     }
   )
