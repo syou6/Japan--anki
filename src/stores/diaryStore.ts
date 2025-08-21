@@ -262,26 +262,21 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
 
   startRecording: async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: 16000, // サンプルレートを下げて品質とサイズのバランスを取る
-        } 
-      });
+      // シンプルなオプションに戻す（互換性のため）
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
       // MediaRecorderのオプションを設定（ビットレート削減）
-      const options = {
-        mimeType: 'audio/webm;codecs=opus',
-        audioBitsPerSecond: 32000 // 32kbps（十分な音声品質を保ちながらサイズを削減）
-      };
-      
-      // ブラウザがサポートしていない場合のフォールバック
       let mediaRecorder: MediaRecorder;
       try {
+        const options = {
+          mimeType: 'audio/webm',
+          audioBitsPerSecond: 64000 // 64kbps（互換性を考慮して少し上げる）
+        };
         mediaRecorder = new MediaRecorder(stream, options);
+        console.log('録音開始: ビットレート64kbps');
       } catch (e) {
-        console.warn('指定したコーデックがサポートされていません。デフォルト設定を使用します。');
+        // フォールバック：デフォルト設定を使用
+        console.warn('カスタム設定が使用できません。デフォルト設定を使用します。');
         mediaRecorder = new MediaRecorder(stream);
       }
       
@@ -293,15 +288,14 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
         }
       };
 
-      // 10秒ごとにデータを取得（長時間録音対応）
-      mediaRecorder.start(10000);
+      // 通常の開始方法に戻す（安定性重視）
+      mediaRecorder.start();
+      
       set({ 
         mediaRecorder, 
         audioChunks, 
         isRecording: true 
       });
-      
-      console.log('録音開始: ビットレート32kbps, サンプルレート16kHz');
     } catch (error) {
       console.error('Failed to start recording:', error);
       throw error;
