@@ -26,6 +26,14 @@ function App() {
   useEffect(() => {
     initialize();
     
+    // ログイン画面表示フラグをチェック
+    const shouldShowAuth = sessionStorage.getItem('showAuthForm');
+    if (shouldShowAuth) {
+      sessionStorage.removeItem('showAuthForm');
+      setGuestMode(false);
+      return;
+    }
+    
     // デフォルトでゲストモードを有効化（ユーザーがログインしていない場合）
     const checkAndEnableGuestMode = async () => {
       const { data: { user } } = await supabase.auth.getUser();

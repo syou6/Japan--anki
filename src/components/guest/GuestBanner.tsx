@@ -3,8 +3,9 @@ import { motion } from 'framer-motion';
 import { AlertCircle, LogIn, Sparkles } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useGuestStore } from '../../stores/guestStore';
+
 export const GuestBanner: React.FC = () => {
-  const { getRemainingTries, isGuestMode, setGuestMode } = useGuestStore();
+  const { getRemainingTries, isGuestMode, setGuestMode, clearGuestData } = useGuestStore();
   const remaining = getRemainingTries();
 
   if (!isGuestMode) return null;
@@ -28,7 +29,9 @@ export const GuestBanner: React.FC = () => {
             </div>
             <Button
               onClick={() => {
+                clearGuestData(); // ゲストデータをクリア
                 setGuestMode(false);
+                sessionStorage.setItem('showAuthForm', 'true'); // ログイン画面表示フラグ
                 window.location.reload();
               }}
               variant="primary"
@@ -63,7 +66,9 @@ export const GuestBanner: React.FC = () => {
             </div>
             <Button
               onClick={() => {
+                clearGuestData(); // ゲストデータをクリア
                 setGuestMode(false);
+                sessionStorage.setItem('showAuthForm', 'true'); // ログイン画面表示フラグ
                 window.location.reload();
               }}
               variant="primary"
