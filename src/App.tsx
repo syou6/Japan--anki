@@ -15,15 +15,26 @@ import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { GuestBanner } from './components/guest/GuestBanner';
 import { GuestDiaryList } from './components/guest/GuestDiaryList';
 import { WelcomeGuide } from './components/onboarding/WelcomeGuide';
+import { supabase } from './lib/supabase';
 
 function App() {
   const [currentView, setCurrentView] = useState('home');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const { user, loading, initialize } = useAuthStore();
-  const { isGuestMode, cleanExpiredDiaries } = useGuestStore();
+  const { isGuestMode, cleanExpiredDiaries, setGuestMode } = useGuestStore();
 
   useEffect(() => {
     initialize();
+    
+    // デフォルトでゲストモードを有効化（ユーザーがログインしていない場合）
+    const checkAndEnableGuestMode = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user && !isGuestMode) {
+        setGuestMode(true);
+        setShowOnboarding(true); // ゲストモードでもオンボーディングを表示
+      }
+    };
+    checkAndEnableGuestMode();
     
     // ゲストモードの期限切れ日記をクリーンアップ
     cleanExpiredDiaries();
