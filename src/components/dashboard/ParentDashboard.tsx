@@ -125,6 +125,38 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
         </div>
       </motion.div>
 
+      {/* Value Proposition for Remote Families */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        delay={0.1}
+        className="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-6 border-2 border-red-200"
+      >
+        <div className="flex items-start gap-4">
+          <Heart className="w-8 h-8 text-red-500 flex-shrink-0 mt-1" />
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              離れた親の様子が毎日わかります
+            </h3>
+            <p className="text-gray-700 mb-3">
+              親御さんが話した3分の音声日記から、AIが健康状態や感情を分析。
+              体調の変化や認知機能の低下を早期に発見できます。
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-red-600">
+                🎯 認知症の早期発見
+              </span>
+              <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-red-600">
+                💊 服薬忘れの防止
+              </span>
+              <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-red-600">
+                🏥 受診タイミング
+              </span>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {/* Record Voice Diary */}
@@ -138,12 +170,21 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
             <Mic className="w-10 h-10 sm:w-12 sm:h-12 text-red-600" />
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
-            音声日記を録音
+            今日の様子を話してください
           </h2>
-          <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-4 sm:mb-6">
-            今日の出来事や<span className="sm:hidden">気持ちを</span><br className="sm:hidden" />
-            <span className="hidden sm:inline">気持ちを</span>音声で記録しましょう
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-2">
+            3分でOK！気軽に話しかけて
           </p>
+          <div className="text-left bg-red-50 rounded-lg p-3 mb-4">
+            <p className="text-sm text-gray-700">
+              💡 こんな話題でOK：
+            </p>
+            <ul className="text-sm text-gray-600 mt-1">
+              <li>• 今日食べたもの、散歩の様子</li>
+              <li>• 体調、眠れたか</li>
+              <li>• 楽しかったこと、困ったこと</li>
+            </ul>
+          </div>
           <Button
             onClick={() => onViewChange('record')}
             variant="primary"

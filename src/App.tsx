@@ -14,9 +14,11 @@ import { NotificationSettings } from './components/settings/NotificationSettings
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { GuestBanner } from './components/guest/GuestBanner';
 import { GuestDiaryList } from './components/guest/GuestDiaryList';
+import { WelcomeGuide } from './components/onboarding/WelcomeGuide';
 
 function App() {
   const [currentView, setCurrentView] = useState('home');
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const { user, loading, initialize } = useAuthStore();
   const { isGuestMode, cleanExpiredDiaries } = useGuestStore();
 
@@ -33,6 +35,16 @@ function App() {
     
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (user && !isGuestMode) {
+      // Check if onboarding has been completed
+      const onboardingCompleted = localStorage.getItem('onboardingCompleted');
+      if (!onboardingCompleted) {
+        setShowOnboarding(true);
+      }
+    }
+  }, [user, isGuestMode]);
 
   const renderView = () => {
     // ゲストモードの場合
@@ -105,6 +117,11 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       {isGuestMode && <GuestBanner />}
       <Header currentView={currentView} onViewChange={setCurrentView} />
+      
+      <WelcomeGuide 
+        show={showOnboarding} 
+        onComplete={() => setShowOnboarding(false)} 
+      />
       
       <main className="pb-20">
         <AnimatePresence mode="wait">
