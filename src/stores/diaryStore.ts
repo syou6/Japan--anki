@@ -129,34 +129,57 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
       // If we have audio, upload it (but don't transcribe)
       if (audioBlob) {
         try {
+          const audioSize = audioBlob.size;
           console.log('音声アップロード開始:', {
-            size: formatFileSize(audioBlob.size),
+            size: formatFileSize(audioSize),
             type: audioBlob.type
           });
+          
+          // ファイルサイズ制限 (50MB)
+          const MAX_FILE_SIZE = 50 * 1024 * 1024;
+          if (audioSize > MAX_FILE_SIZE) {
+            throw new Error(`ファイルサイズが大きすぎます (${formatFileSize(audioSize)})。50MB以下にしてください。`);
+          }
           
           const uploadStartTime = performance.now();
           const fileName = `${user.id}/voice_${Date.now()}.webm`;
           
-          const { data: uploadData, error: uploadError } = await supabase.storage
+          // タイムアウト付きアップロード (30秒)
+          const uploadPromise = supabase.storage
             .from('voice-recordings')
             .upload(fileName, audioBlob, {
               contentType: 'audio/webm',
               upsert: false
             });
+            
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('アップロードがタイムアウトしました（30秒）')), 30000)
+          );
+          
+          const { data: uploadData, error: uploadError } = await Promise.race([
+            uploadPromise,
+            timeoutPromise
+          ]).catch(err => ({ data: null, error: err })) as any;
 
           const uploadEndTime = performance.now();
-          console.log(`音声アップロード完了: ${Math.round(uploadEndTime - uploadStartTime)}ms`);
+          const uploadTime = Math.round(uploadEndTime - uploadStartTime);
+          console.log(`音声アップロード時間: ${uploadTime}ms`);
 
           if (!uploadError) {
             const { data: { publicUrl } } = supabase.storage
               .from('voice-recordings')
               .getPublicUrl(fileName);
             voiceUrl = publicUrl;
+            console.log('音声URL取得成功');
           } else {
-            console.warn('音声アップロードをスキップしました:', uploadError);
+            console.error('音声アップロードエラー:', uploadError);
+            toast.error('音声のアップロードに失敗しました。日記は音声なしで保存されます。');
+            // 音声なしでも日記は保存を続行
           }
-        } catch (storageError) {
-          console.warn('音声アップロードをスキップしました:', storageError);
+        } catch (storageError: any) {
+          console.error('音声アップロードエラー:', storageError);
+          toast.error(storageError.message || '音声のアップロードに失敗しました');
+          // 音声なしでも日記は保存を続行
         }
       }
 
@@ -171,14 +194,29 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
         }
       }
 
-      // Generate AI summary and health score
+      // Generate AI summary and health score with timeout
       let aiSummary = '';
       let healthScore = 75;
       
       try {
         if (transcribedContent && import.meta.env.VITE_GEMINI_API_KEY) {
-          aiSummary = await generateFamilySummary(transcribedContent);
-          healthScore = await analyzeHealthScore(transcribedContent);
+          // AI分析もタイムアウト設定 (10秒)
+          const aiPromise = Promise.all([
+            generateFamilySummary(transcribedContent),
+            analyzeHealthScore(transcribedContent)
+          ]);
+          
+          const aiTimeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('AI分析タイムアウト')), 10000)
+          );
+          
+          const [summary, score] = await Promise.race([
+            aiPromise,
+            aiTimeoutPromise
+          ]).catch(() => ['', 75]) as any;
+          
+          aiSummary = summary || '';
+          healthScore = score || 75;
         }
       } catch (aiError) {
         console.warn('AI分析をスキップしました:', aiError);
