@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { geminiLimiter } from './gemini-limiter';
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
@@ -20,6 +21,13 @@ export async function analyzeText(text: string): Promise<TranscriptionResult> {
     return { text: '' };
   }
 
+  // 使用量制限チェック
+  const canUseAPI = await geminiLimiter.checkLimit();
+  if (!canUseAPI) {
+    console.warn('Gemini API使用量制限に達しました');
+    return { text, summary: '使用量制限のため分析をスキップしました' };
+  }
+
   // Gemini APIで要約と分析
   try {
     const prompt = `
@@ -39,6 +47,9 @@ ${text}
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const responseText = response.text();
+    
+    // 使用量を記録（推定トークン数）
+    await geminiLimiter.recordUsage(text.length + 200);
     
     try {
       const analysis = JSON.parse(responseText);
