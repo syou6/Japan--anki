@@ -22,6 +22,7 @@ export const FamilyManager: React.FC = () => {
   const [sharedWith, setSharedWith] = useState<FamilyMember[]>([]);
   const [sharedFrom, setSharedFrom] = useState<FamilyMember[]>([]);
   const [loading, setLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -34,7 +35,7 @@ export const FamilyManager: React.FC = () => {
 
     try {
       // 自分が共有している相手
-      const { data: shared } = await supabase
+      const { data: shared, error: sharedError } = await supabase
         .from('family_relationships')
         .select(`
           *,
@@ -43,12 +44,15 @@ export const FamilyManager: React.FC = () => {
         .eq('parent_id', user.id)
         .eq('status', 'accepted');
 
-      if (shared) {
-        setSharedWith(shared);
+      if (sharedError) {
+        console.error('共有先取得エラー:', sharedError);
+      } else {
+        setSharedWith(shared || []);
+        console.log('共有先リスト更新:', shared);
       }
 
       // 自分に共有してくれている相手
-      const { data: sharedToMe } = await supabase
+      const { data: sharedToMe, error: sharedToMeError } = await supabase
         .from('family_relationships')
         .select(`
           *,
@@ -57,8 +61,11 @@ export const FamilyManager: React.FC = () => {
         .eq('child_id', user.id)
         .eq('status', 'accepted');
 
-      if (sharedToMe) {
-        setSharedFrom(sharedToMe);
+      if (sharedToMeError) {
+        console.error('共有元取得エラー:', sharedToMeError);
+      } else {
+        setSharedFrom(sharedToMe || []);
+        console.log('共有元リスト更新:', sharedToMe);
       }
     } catch (error) {
       console.error('家族メンバー取得エラー:', error);
@@ -126,18 +133,70 @@ export const FamilyManager: React.FC = () => {
       return;
     }
 
+    setDeletingId(relationshipId);
+    
     try {
-      const { error } = await supabase
+      console.log('削除開始 - ID:', relationshipId);
+      console.log('現在のユーザー:', user?.id);
+      
+      // まず削除前の状態を確認
+      const { data: beforeDelete } = await supabase
+        .from('family_relationships')
+        .select('*')
+        .eq('id', relationshipId)
+        .single();
+      
+      console.log('削除対象のレコード:', beforeDelete);
+      
+      // 削除を実行
+      const { data, error } = await supabase
         .from('family_relationships')
         .delete()
         .eq('id', relationshipId);
 
-      if (!error) {
-        toast.success('共有を解除しました');
-        fetchFamilyMembers();
+      if (error) {
+        console.error('削除エラー詳細:', {
+          error,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        toast.error(`解除に失敗しました: ${error.message}`);
+        
+        // エラー時はリストを再取得して正しい状態を表示
+        await fetchFamilyMembers();
+      } else {
+        console.log('削除レスポンス:', data);
+        
+        // 削除後の確認
+        const { data: afterDelete } = await supabase
+          .from('family_relationships')
+          .select('*')
+          .eq('id', relationshipId);
+        
+        console.log('削除後の確認:', afterDelete);
+        
+        if (afterDelete && afterDelete.length > 0) {
+          console.error('削除が実行されていません！');
+          toast.error('削除に失敗しました。権限を確認してください。');
+        } else {
+          // UIから即座に削除
+          setSharedWith(prev => prev.filter(m => m.id !== relationshipId));
+          setSharedFrom(prev => prev.filter(m => m.id !== relationshipId));
+          toast.success('共有を解除しました');
+        }
+        
+        // 最新のリストを取得
+        await fetchFamilyMembers();
       }
-    } catch (error) {
-      toast.error('解除に失敗しました');
+    } catch (error: any) {
+      console.error('予期しないエラー:', error);
+      toast.error(`解除に失敗しました: ${error.message || '不明なエラー'}`);
+      // エラー時はリストを再取得
+      await fetchFamilyMembers();
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -211,9 +270,14 @@ export const FamilyManager: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => removeFamilyMember(member.id)}
+                  disabled={deletingId === member.id}
                   className="flex-shrink-0"
                 >
-                  <X className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
+                  {deletingId === member.id ? (
+                    <span className="animate-spin">⏳</span>
+                  ) : (
+                    <X className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
+                  )}
                   <span className="hidden sm:inline">解除</span>
                 </Button>
               </div>
@@ -251,9 +315,20 @@ export const FamilyManager: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <span className="px-2 sm:px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs sm:text-sm font-medium flex-shrink-0">
-                  共有中
-                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeFamilyMember(member.id)}
+                  disabled={deletingId === member.id}
+                  className="flex-shrink-0"
+                >
+                  {deletingId === member.id ? (
+                    <span className="animate-spin">⏳</span>
+                  ) : (
+                    <X className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
+                  )}
+                  <span className="hidden sm:inline">解除</span>
+                </Button>
               </div>
             ))}
             {sharedFrom.length === 0 && (

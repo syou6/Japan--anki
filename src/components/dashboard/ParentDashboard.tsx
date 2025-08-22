@@ -23,6 +23,8 @@ interface ParentDashboardProps {
 export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }) => {
   const [recentComments, setRecentComments] = useState<any[]>([]);
   const [commentCount, setCommentCount] = useState(0);
+  const [todayHealthScore, setTodayHealthScore] = useState<number | null>(null);
+  const [todayEmotion, setTodayEmotion] = useState<string | null>(null);
   const { entries, fetchEntries } = useDiaryStore();
   const { user } = useAuthStore();
   const today = new Date();
@@ -31,6 +33,18 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
     if (hour < 12) return 'おはようございます';
     if (hour < 18) return 'こんにちは';
     return 'こんばんは';
+  };
+
+  const getEmotionEmoji = (emotion: string): string => {
+    const emotionMap: { [key: string]: string } = {
+      '喜び': '😊',
+      '楽しい': '😄',
+      '普通': '😐',
+      '不安': '😟',
+      '悲しみ': '😢',
+      '疲れ': '😴',
+    };
+    return emotionMap[emotion] || '😊';
   };
 
   useEffect(() => {
@@ -43,6 +57,26 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
     // ユーザーの日記に対するコメントを取得
     const userDiaries = entries.filter(entry => entry.user_id === user?.id);
     const allComments: any[] = [];
+    
+    // 今日の日記データを取得
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+    
+    const todayDiary = userDiaries.find(diary => {
+      const diaryDate = new Date(diary.created_at);
+      return diaryDate >= todayStart && diaryDate <= todayEnd;
+    });
+    
+    // 今日の健康スコアと感情を設定
+    if (todayDiary) {
+      setTodayHealthScore(todayDiary.health_score || null);
+      setTodayEmotion(todayDiary.emotion || null);
+    } else {
+      setTodayHealthScore(null);
+      setTodayEmotion(null);
+    }
     
     userDiaries.forEach(diary => {
       if (diary.comments && diary.comments.length > 0) {
@@ -167,7 +201,9 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
             <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <TrendingUp className="w-8 h-8 text-green-600" />
             </div>
-            <div className="text-3xl font-bold text-green-600 mb-2">85</div>
+            <div className="text-3xl font-bold text-green-600 mb-2">
+              {todayHealthScore !== null ? todayHealthScore : '-'}
+            </div>
             <div className="text-lg text-gray-700">健康スコア</div>
           </div>
 
@@ -175,7 +211,9 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
             <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Heart className="w-8 h-8 text-blue-600" />
             </div>
-            <div className="text-3xl font-bold text-blue-600 mb-2">😊</div>
+            <div className="text-3xl font-bold text-blue-600 mb-2">
+              {todayEmotion ? getEmotionEmoji(todayEmotion) : '-'}
+            </div>
             <div className="text-lg text-gray-700">今日の気分</div>
           </div>
 
