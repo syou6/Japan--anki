@@ -27,6 +27,7 @@ interface DiaryCardProps {
 export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [showFullContent, setShowFullContent] = useState(false);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const [newComment, setNewComment] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -260,8 +261,18 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
         {/* Text Content */}
         <div className="prose prose-sm sm:prose-lg max-w-none">
           <p className="text-sm sm:text-base text-gray-800 leading-relaxed whitespace-pre-wrap">
-            {entry.content}
+            {showFullContent || entry.content.length <= 150 
+              ? entry.content 
+              : `${entry.content.substring(0, 150)}...`}
           </p>
+          {entry.content.length > 150 && (
+            <button
+              onClick={() => setShowFullContent(!showFullContent)}
+              className="mt-2 text-blue-600 hover:text-blue-700 font-medium text-sm sm:text-base transition-colors"
+            >
+              {showFullContent ? '▲ 閉じる' : '▼ もっと見る'}
+            </button>
+          )}
         </div>
 
         {/* Tags */}
