@@ -148,11 +148,11 @@ export const FamilyManager: React.FC = () => {
       
       console.log('削除対象のレコード:', beforeDelete);
       
-      // 削除を実行
+      // 削除を実行 - RPC関数を使用
       const { data, error } = await supabase
-        .from('family_relationships')
-        .delete()
-        .eq('id', relationshipId);
+        .rpc('delete_family_relationship', {
+          relationship_id: relationshipId
+        });
 
       if (error) {
         console.error('削除エラー詳細:', {
@@ -179,7 +179,23 @@ export const FamilyManager: React.FC = () => {
         
         if (afterDelete && afterDelete.length > 0) {
           console.error('削除が実行されていません！');
-          toast.error('削除に失敗しました。権限を確認してください。');
+          console.log('RPC関数での削除を試みます...');
+          
+          // 直接削除が失敗した場合、RPC関数を使用
+          const { error: rpcError } = await supabase
+            .rpc('delete_family_relationship', {
+              relationship_id: relationshipId
+            });
+            
+          if (rpcError) {
+            console.error('RPC削除エラー:', rpcError);
+            toast.error('削除に失敗しました。権限を確認してください。');
+          } else {
+            // UIから即座に削除
+            setSharedWith(prev => prev.filter(m => m.id !== relationshipId));
+            setSharedFrom(prev => prev.filter(m => m.id !== relationshipId));
+            toast.success('共有を解除しました');
+          }
         } else {
           // UIから即座に削除
           setSharedWith(prev => prev.filter(m => m.id !== relationshipId));
