@@ -1,10 +1,14 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { geminiLimiter } from './gemini-limiter';
+import { analyzeFree, generateFamilySummaryFree } from './free-analyzer';
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+// Gemini APIキーがある場合のみ初期化
+const genAI = import.meta.env.VITE_GEMINI_API_KEY 
+  ? new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY)
+  : null;
 
 // Gemini 1.5 Flash - 低コストで高速
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+const model = genAI ? genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }) : null;
 
 export interface TranscriptionResult {
   text: string;
@@ -21,11 +25,29 @@ export async function analyzeText(text: string): Promise<TranscriptionResult> {
     return { text: '' };
   }
 
+  // Gemini APIキーがない場合は無料分析を使用
+  if (!model) {
+    console.log('Gemini APIキーがないため、無料分析を使用します');
+    const result = analyzeFree(text);
+    return {
+      text,
+      summary: result.summary,
+      keywords: result.keywords,
+      emotion: result.emotion
+    };
+  }
+
   // 使用量制限チェック
   const canUseAPI = await geminiLimiter.checkLimit();
   if (!canUseAPI) {
     console.warn('Gemini API使用量制限に達しました');
-    return { text, summary: '使用量制限のため分析をスキップしました' };
+    const result = analyzeFree(text);
+    return {
+      text,
+      summary: result.summary,
+      keywords: result.keywords,
+      emotion: result.emotion
+    };
   }
 
   // Gemini APIで要約と分析
@@ -83,6 +105,11 @@ export function transcribeAudioFile(audioBlob: Blob): Promise<string> {
  * 長い日記を家族向けに要約
  */
 export async function generateFamilySummary(content: string): Promise<string> {
+  // Gemini APIキーがない場合は無料版を使用
+  if (!model) {
+    return generateFamilySummaryFree(content);
+  }
+  
   try {
     const prompt = `
 以下の高齢者の日記を、離れて暮らす家族が読みやすいように要約してください。
@@ -106,6 +133,12 @@ ${content}
  * 健康状態をスコアリング
  */
 export async function analyzeHealthScore(content: string, voiceData?: any): Promise<number> {
+  // Gemini APIキーがない場合は無料版を使用
+  if (!model) {
+    const result = analyzeFree(content);
+    return result.health_score;
+  }
+  
   try {
     const prompt = `
 以下の日記内容から、高齢者の健康状態を0-100のスコアで評価してください。
