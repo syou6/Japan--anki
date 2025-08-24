@@ -31,7 +31,7 @@ function App() {
     // ログイン画面表示フラグをチェック
     const shouldShowAuth = sessionStorage.getItem('showAuthForm');
     if (shouldShowAuth) {
-      sessionStorage.removeItem('showAuthForm');
+      // フラグは削除しない（認証画面が表示される間は保持）
       setGuestMode(false);
       return;
     }
@@ -39,7 +39,7 @@ function App() {
     // デフォルトでゲストモードを有効化（ユーザーがログインしていない場合）
     const checkAndEnableGuestMode = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user && !isGuestMode) {
+      if (!user && !isGuestMode && !sessionStorage.getItem('showAuthForm')) {
         setGuestMode(true);
         setShowOnboarding(true); // ゲストモードでもオンボーディングを表示
       }

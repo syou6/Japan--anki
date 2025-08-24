@@ -25,9 +25,13 @@ export const AuthForm: React.FC = () => {
       if (isSignUp) {
         await signUp(email, password, { name });
         toast.success('アカウントを作成しました！');
+        // 認証成功時にフラグをクリア
+        sessionStorage.removeItem('showAuthForm');
       } else {
         await signIn(email, password);
         toast.success('ログインしました！');
+        // 認証成功時にフラグをクリア
+        sessionStorage.removeItem('showAuthForm');
       }
     } catch (error: any) {
       toast.error(error.message || 'エラーが発生しました');
@@ -41,6 +45,8 @@ export const AuthForm: React.FC = () => {
     try {
       await signInWithGoogle();
       toast.success('Googleアカウントでログインしています...');
+      // 認証成功時にフラグをクリア
+      sessionStorage.removeItem('showAuthForm');
     } catch (error: any) {
       toast.error(error.message || 'Googleログインに失敗しました');
     } finally {
@@ -49,6 +55,8 @@ export const AuthForm: React.FC = () => {
   };
 
   const handleGuestMode = () => {
+    // 認証画面フラグをクリア
+    sessionStorage.removeItem('showAuthForm');
     setGuestMode(true);
     window.location.reload(); // Routerが設定される前なのでreloadで対応
     toast.success('ゲストモードで開始しました（3回まで試せます）');
