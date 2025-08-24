@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
   ];
 
   return (
-    <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
+    <header className="bg-navy-500 border-b-4 border-navy-900 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
@@ -43,10 +43,10 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
           >
             <Logo size="sm" />
             <div>
-              <h1 className="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-gray-900 whitespace-nowrap">
+              <h1 className="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-white whitespace-nowrap">
                 日記AI
               </h1>
-              <p className="text-[10px] sm:text-xs md:text-sm text-gray-500 hidden sm:block">
+              <p className="text-[10px] sm:text-xs md:text-sm text-gray-200 hidden sm:block">
                 Voice Journal
               </p>
             </div>
