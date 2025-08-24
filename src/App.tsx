@@ -15,6 +15,7 @@ import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { GuestBanner } from './components/guest/GuestBanner';
 import { GuestDiaryList } from './components/guest/GuestDiaryList';
 import { WelcomeGuide } from './components/onboarding/WelcomeGuide';
+import { HelpButton } from './components/help/HelpButton';
 import { supabase } from './lib/supabase';
 
 function App() {
@@ -164,6 +165,9 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       {isGuestMode && <GuestBanner />}
       <Header currentView={currentView} onViewChange={setCurrentView} />
+      
+      {/* Help Button */}
+      <HelpButton context={currentView as any} />
       
       <WelcomeGuide 
         show={showOnboarding} 

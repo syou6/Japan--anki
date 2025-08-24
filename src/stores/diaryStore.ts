@@ -284,9 +284,13 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
 
   deleteEntry: async (id: string) => {
     try {
+      // Soft delete - ゴミ箱に移動（deleted_atを設定）
       const { error } = await supabase
         .from('diaries')
-        .delete()
+        .update({ 
+          deleted_at: new Date().toISOString(),
+          delete_after: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30日後
+        })
         .eq('id', id);
 
       if (error) throw error;

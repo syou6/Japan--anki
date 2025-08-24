@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../ui/Button';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { useAuthStore } from '../../stores/authStore';
 import { useDiaryStore } from '../../stores/diaryStore';
 import { supabase } from '../../lib/supabase';
@@ -32,6 +33,7 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
   const [newComment, setNewComment] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { user } = useAuthStore();
   const { deleteEntry, fetchEntries } = useDiaryStore();
@@ -62,14 +64,11 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('この日記を削除してもよろしいですか？')) {
-      return;
-    }
-
     setIsDeleting(true);
     try {
       await deleteEntry(entry.id);
-      toast.success('日記を削除しました');
+      toast.success('日記をゴミ箱に移動しました（30日間保管されます）');
+      setShowDeleteConfirm(false);
     } catch (error) {
       toast.error('削除に失敗しました');
     } finally {
@@ -199,7 +198,7 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={handleDelete}
+              onClick={() => setShowDeleteConfirm(true)}
               disabled={isDeleting}
             >
               <Trash2 className="w-5 h-5 text-red-500" />
@@ -404,6 +403,19 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="日記を削除しますか？"
+        message="この日記はゴミ箱に移動され、30日間は復元可能です。他の日記は影響を受けません。"
+        confirmText="ゴミ箱に移動"
+        cancelText="キャンセル"
+        type="warning"
+        isLoading={isDeleting}
+      />
     </motion.div>
   );
 };
