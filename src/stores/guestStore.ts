@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { analyzeText, generateFamilySummary, analyzeHealthScore } from '../lib/gemini';
+// import { analyzeText, generateFamilySummary, analyzeHealthScore } from '../lib/gemini'; // AI機能無効化
 
 interface GuestDiary {
   id: string;
@@ -59,21 +59,21 @@ export const useGuestStore = create<GuestStore>()(
           });
         }
 
-        // AI分析
+        // AI機能は無効化
         let emotion = '普通';
         let healthScore = 75;
         let aiSummary = '';
 
-        try {
-          if (content && import.meta.env.VITE_GEMINI_API_KEY) {
-            const analysisResult = await analyzeText(content);
-            emotion = analysisResult?.emotion || '普通';
-            aiSummary = await generateFamilySummary(content);
-            healthScore = await analyzeHealthScore(content);
-          }
-        } catch (error) {
-          console.warn('AI分析をスキップしました:', error);
-        }
+        // try {
+        //   if (content && import.meta.env.VITE_GEMINI_API_KEY) {
+        //     const analysisResult = await analyzeText(content);
+        //     emotion = analysisResult?.emotion || '普通';
+        //     aiSummary = await generateFamilySummary(content);
+        //     healthScore = await analyzeHealthScore(content);
+        //   }
+        // } catch (error) {
+        //   console.warn('AI分析をスキップしました:', error);
+        // }
 
         const now = new Date();
         const expiresAt = new Date(now.getTime() + 30 * 60 * 1000); // 30分後

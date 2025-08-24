@@ -1,0 +1,46 @@
+【日記AI LP 画像差し替えガイド】
+
+■ 画像の保存場所
+/public/ フォルダに画像を保存してください。
+例：
+- /public/screens/screen1.png
+- /public/screens/screen2.png
+など
+
+■ HTMLの編集箇所
+lp2.html の275行目から336行目にある各phone-mockupの中を編集します。
+
+■ 差し替え方法
+現在のコード（例：276-283行目）：
+<div class="phone-mockup phone-1">
+    <div class="phone-screen">
+        <div style="...">
+            日記AI
+        </div>
+    </div>
+</div>
+
+↓ これを以下のように変更：
+
+<div class="phone-mockup phone-1">
+    <div class="phone-screen">
+        <img src="/screens/screen1.png" alt="日記AI画面">
+    </div>
+</div>
+
+■ 7つのスマートフォンの位置：
+1. phone-1（276行目）: 左側中央の大きめのスマホ
+2. phone-2（285行目）: 上部中央
+3. phone-3（294行目）: 左下
+4. phone-4（301行目）: 右側上部
+5. phone-5（310行目）: 中央右
+6. phone-6（318行目）: 上部右
+7. phone-7（326行目）: 右端上部
+
+■ 推奨画像サイズ
+- 幅: 390px
+- 高さ: 844px
+（iPhone 14 Pro相当）
+
+■ 画像形式
+PNG または JPG 推奨

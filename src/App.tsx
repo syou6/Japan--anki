@@ -20,7 +20,7 @@ import { supabase } from './lib/supabase';
 function App() {
   const [currentView, setCurrentView] = useState('home');
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [isMaintenanceMode, setIsMaintenanceMode] = useState(true); // メンテナンスモード
+  const [isMaintenanceMode, setIsMaintenanceMode] = useState(false); // メンテナンスモード無効
   const { user, loading, initialize } = useAuthStore();
   const { isGuestMode, cleanExpiredDiaries, setGuestMode } = useGuestStore();
 

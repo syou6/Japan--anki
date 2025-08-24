@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { useDiaryStore } from '../../stores/diaryStore';
 import { useGuestStore } from '../../stores/guestStore';
 import { VoiceTranscriber } from '../../lib/speechRecognition';
+import { VolumeIndicator } from '../audio/VolumeIndicator';
 import { Mic, MicOff, Play, Pause, Save, X, Trash2, Home, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -21,7 +22,11 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
   const [transcribedText, setTranscribedText] = useState('');
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [volumeLevel, setVolumeLevel] = useState(0);
   const transcriberRef = useRef<VoiceTranscriber | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   const {
     isRecording,
@@ -61,6 +66,24 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
     }
   }, [currentAudio, isRecording]);
 
+  // 音量レベルを分析する関数
+  const analyzeVolume = () => {
+    if (!analyserRef.current) return;
+    
+    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+    analyserRef.current.getByteFrequencyData(dataArray);
+    
+    // 平均音量を計算
+    const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+    const normalizedVolume = Math.min(100, (average / 128) * 100);
+    
+    setVolumeLevel(normalizedVolume);
+    
+    if (isRecording) {
+      animationFrameRef.current = requestAnimationFrame(analyzeVolume);
+    }
+  };
+
   const handleStartRecording = async () => {
     // ゲストモードの場合、作成可能か確認
     if (isGuest && !canCreateMore()) {
@@ -71,6 +94,20 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
     try {
       // 音声録音を開始
       await startRecording();
+      
+      // 音量レベル分析を開始
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        analyserRef.current = audioContextRef.current.createAnalyser();
+        const source = audioContextRef.current.createMediaStreamSource(stream);
+        source.connect(analyserRef.current);
+        analyserRef.current.fftSize = 256;
+        
+        analyzeVolume();
+      } catch (error) {
+        console.warn('音量分析の初期化に失敗しました:', error);
+      }
       
       // 音声認識も開始
       if (VoiceTranscriber.isSupported()) {
@@ -116,6 +153,17 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
     try {
       // 録音を停止
       await stopRecording();
+      
+      // 音量分析を停止
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+      setVolumeLevel(0);
       
       // 音声認識を停止して最終テキストを取得
       if (transcriberRef.current) {
@@ -253,6 +301,9 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                 className="mb-8"
               >
                 <div className="bg-red-50 rounded-2xl p-8 mb-6">
+                  {/* 音量メーター */}
+                  <VolumeIndicator volume={volumeLevel} isRecording={isRecording} />
+                  
                   <div className="flex justify-center mb-4">
                     <motion.div
                       animate={{ scale: [1, 1.3, 1] }}
