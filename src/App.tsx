@@ -6,9 +6,12 @@ import { useAuthStore } from './stores/authStore';
 import { useGuestStore } from './stores/guestStore';
 import { AuthForm } from './components/auth/AuthForm';
 import { Header } from './components/navigation/Header';
+import { ElderlyNav } from './components/navigation/ElderlyNav';
 import { ParentDashboard } from './components/dashboard/ParentDashboard';
+import { ElderlyParentDashboard } from './components/dashboard/ElderlyParentDashboard';
 import { VoiceRecorder } from './components/recording/VoiceRecorder';
 import { DiaryList } from './components/diary/DiaryList';
+import { ElderlyDiaryList } from './components/diary/ElderlyDiaryList';
 import { FamilyManager } from './components/family/FamilyManager';
 import { NotificationSettings } from './components/settings/NotificationSettings';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
@@ -72,21 +75,21 @@ function App() {
     if (isGuestMode) {
       switch (currentView) {
         case 'home':
-          return <ParentDashboard onViewChange={setCurrentView} isGuest={true} />;
+          return <ElderlyParentDashboard onViewChange={setCurrentView} isGuest={true} />;
         case 'record':
           return <VoiceRecorder onViewChange={setCurrentView} isGuest={true} />;
         case 'diary':
-          return <DiaryList isGuest={true} />;
+          return <ElderlyDiaryList isGuest={true} />;
         case 'family':
           // ゲストは家族機能使えない
           toast.error('ゲストモードでは家族機能は利用できません');
-          return <DiaryList isGuest={true} />;
+          return <ElderlyDiaryList isGuest={true} />;
         case 'settings':
           // ゲストは設定使えない
           toast.error('ゲストモードでは設定は利用できません');
-          return <DiaryList isGuest={true} />;
+          return <ElderlyDiaryList isGuest={true} />;
         default:
-          return <DiaryList isGuest={true} />;
+          return <ElderlyDiaryList isGuest={true} />;
       }
     }
 
@@ -96,20 +99,20 @@ function App() {
     switch (currentView) {
       case 'home':
         return user.role === 'parent' ? (
-          <ParentDashboard onViewChange={setCurrentView} />
+          <ElderlyParentDashboard onViewChange={setCurrentView} />
         ) : (
-          <DiaryList />
+          <ElderlyDiaryList />
         );
       case 'record':
-        return user.role === 'parent' ? <VoiceRecorder onViewChange={setCurrentView} /> : <DiaryList />;
+        return user.role === 'parent' ? <VoiceRecorder onViewChange={setCurrentView} /> : <ElderlyDiaryList />;
       case 'diary':
-        return <DiaryList />;
+        return <ElderlyDiaryList />;
       case 'family':
         return <FamilyManager />;
       case 'settings':
         return <NotificationSettings />;
       default:
-        return <DiaryList />;
+        return <ElderlyDiaryList />;
     }
   };
 
@@ -162,9 +165,8 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white w-full overflow-x-hidden flex flex-col">
       {isGuestMode && <GuestBanner />}
-      <Header currentView={currentView} onViewChange={setCurrentView} />
       
       {/* Help Button */}
       <HelpButton context={currentView as any} />
@@ -174,7 +176,7 @@ function App() {
         onComplete={() => setShowOnboarding(false)} 
       />
       
-      <main className="pb-20">
+      <main className="flex-1 pb-40 sm:pb-44 container mx-auto px-4 sm:px-6 lg:px-8 overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentView}
@@ -187,6 +189,13 @@ function App() {
           </motion.div>
         </AnimatePresence>
       </main>
+      
+      {/* Elderly Navigation */}
+      <ElderlyNav 
+        currentView={currentView} 
+        onViewChange={setCurrentView}
+        isGuest={isGuestMode}
+      />
 
       <Toaster 
         position="top-center"

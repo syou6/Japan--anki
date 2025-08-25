@@ -80,7 +80,7 @@ export const HelpButton: React.FC<HelpButtonProps> = ({ context }) => {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setShowHelp(true)}
-        className="fixed top-20 right-4 z-40 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full p-3 shadow-lg hover:shadow-xl transition-shadow"
+        className="fixed top-4 right-4 z-40 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full p-3 shadow-lg hover:shadow-xl transition-shadow"
         title="困った時はここ"
       >
         <HelpCircle className="w-6 h-6" />

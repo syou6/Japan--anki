@@ -5,6 +5,7 @@ import { useDiaryStore } from '../../stores/diaryStore';
 import { useGuestStore } from '../../stores/guestStore';
 import { VoiceTranscriber } from '../../lib/speechRecognition';
 import { VolumeIndicator } from '../audio/VolumeIndicator';
+import { colors } from '../../styles/colorPalette';
 import { Mic, MicOff, Play, Pause, Save, X, Trash2, Home, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -276,7 +277,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-4 sm:p-6">
+    <div className="max-w-3xl mx-auto p-4 sm:p-6 pt-8 sm:pt-12">
       <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
         {/* Header with Instructions */}
         <div className="text-center mb-8">
@@ -300,7 +301,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="mb-8"
               >
-                <div className="bg-red-50 rounded-2xl p-8 mb-6">
+                <div className="rounded-2xl p-8 mb-6" style={{ backgroundColor: colors.record.light }}>
                   {/* 音量メーター */}
                   <VolumeIndicator volume={volumeLevel} isRecording={isRecording} />
                   
@@ -308,7 +309,8 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                     <motion.div
                       animate={{ scale: [1, 1.3, 1] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
-                      className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center"
+                      className="w-16 h-16 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: colors.record.dark }}
                     >
                       <Mic className="w-8 h-8 text-white" />
                     </motion.div>
@@ -344,7 +346,11 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                   onClick={handleStopRecording}
                   variant="secondary"
                   size="xl"
-                  className="w-full sm:w-64 h-24 bg-red-500 hover:bg-red-600 text-white rounded-2xl"
+                  className="w-full sm:w-64 h-24 text-white rounded-2xl"
+                  style={{ 
+                    backgroundColor: colors.record.dark,
+                    ':hover': { backgroundColor: colors.record.darker }
+                  }}
                 >
                   <MicOff className="w-10 h-10" />
                   <span className="text-2xl font-bold ml-3">録音を止める</span>
@@ -355,7 +361,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                     onClick={handleStartRecording}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="w-48 h-48 sm:w-56 sm:h-56 mx-auto bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full shadow-xl flex flex-col items-center justify-center gap-3"
+                    className="w-48 h-48 sm:w-56 sm:h-56 mx-auto bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-full shadow-xl flex flex-col items-center justify-center gap-3"
                   >
                     <Mic className="w-20 h-20 sm:w-24 sm:h-24" />
                     <span className="text-2xl sm:text-3xl font-bold">録音開始</span>
@@ -440,7 +446,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
               exit={{ opacity: 0, y: 20 }}
               className="mt-8"
             >
-              <div className="bg-blue-50 rounded-2xl p-8">
+              <div className="rounded-2xl p-8" style={{ backgroundColor: colors.record.light }}>
                 <h3 className="text-3xl font-bold text-gray-900 mb-6 text-center">
                   日記の保存
                 </h3>

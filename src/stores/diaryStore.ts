@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
-// import { analyzeText, generateFamilySummary, analyzeHealthScore } from '../lib/gemini'; // AI機能無効化
+import { analyzeText, generateFamilySummary, analyzeHealthScore } from '../lib/gemini';
 import { toast } from 'sonner';
 import type { DiaryEntry } from '../types';
 
@@ -117,7 +117,6 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
       
       let voiceUrl = null;
       let transcribedContent = content;
-      let analysisResult = null;
       
       // Get user first
       const { data: { user } } = await supabase.auth.getUser();
@@ -184,53 +183,29 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
         }
       }
 
-      // AI機能は無効化
-      // Analyze text content if provided
-      // if (content && content.trim()) {
-      //   try {
-      //     if (import.meta.env.VITE_GEMINI_API_KEY) {
-      //       analysisResult = await analyzeText(content);
-      //     }
-      //   } catch (analysisError) {
-      //     console.warn('テキスト分析をスキップしました:', analysisError);
-      //   }
-      // }
-
-      // AI機能は無効化
+      // 無料AI分析機能（APIコストゼロ）
+      let analysisResult: any = null;
       let aiSummary = '';
       let healthScore = 75;
       
-      // try {
-      //   if (transcribedContent && import.meta.env.VITE_GEMINI_API_KEY) {
-      //     // AI分析もタイムアウト設定 (10秒)
-      //     const aiPromise = Promise.all([
-      //       generateFamilySummary(transcribedContent),
-      //       analyzeHealthScore(transcribedContent)
-      //     ]);
-      //     
-      //     const aiTimeoutPromise = new Promise((_, reject) => 
-      //       setTimeout(() => reject(new Error('AI分析タイムアウト')), 10000)
-      //     );
-      //     
-      //     const [summary, score] = await Promise.race([
-      //       aiPromise,
-      //       aiTimeoutPromise
-      //     ]).catch(() => ['', 75]) as any;
-      //     
-      //     aiSummary = summary || '';
-      //     healthScore = score || 75;
-      //   }
-      // } catch (aiError) {
-      //   console.warn('AI分析をスキップしました:', aiError);
-      // }
+      // テキストコンテンツがある場合は無料分析を実行
+      if (content && content.trim()) {
+        try {
+          analysisResult = await analyzeText(content);
+          aiSummary = await generateFamilySummary(content);
+          healthScore = await analyzeHealthScore(content);
+        } catch (analysisError) {
+          console.warn('無料分析エラー:', analysisError);
+        }
+      }
 
       console.log('Inserting diary entry...');
       const { data: insertedData, error } = await supabase
         .from('diaries')
         .insert({
           user_id: user.id,
-          title: transcribedContent.substring(0, 50),
-          content: transcribedContent,
+          title: content.substring(0, 50),
+          content: content,
           voice_url: voiceUrl,
           duration: audioBlob ? Math.round(audioBlob.size / 1000) : null,
           emotion: analysisResult?.emotion || '普通',

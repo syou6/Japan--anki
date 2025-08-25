@@ -1,6 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  safelist: [
+    // SimplifiedNav用の色クラス
+    'bg-green-50', 'bg-green-100', 'bg-green-600', 'border-green-600',
+    'bg-red-50', 'bg-red-100', 'bg-red-600', 'border-red-600',
+    'bg-blue-50', 'bg-blue-100', 'bg-blue-600', 'border-blue-600',
+    'hover:bg-green-100', 'hover:bg-red-100', 'hover:bg-blue-100',
+  ],
   theme: {
     extend: {
       colors: {
@@ -33,6 +40,7 @@ export default {
       borderWidth: {
         '3': '3px',
         '4': '4px',
+        '6': '6px',
       },
       fontWeight: {
         'normal': '500', // 通常でも少し太め

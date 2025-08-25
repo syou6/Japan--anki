@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../ui/Button';
-import { ConfirmDialog } from '../ui/ConfirmDialog';
+import { StandardDialog } from '../ui/StandardDialog';
 import { useAuthStore } from '../../stores/authStore';
 import { useDiaryStore } from '../../stores/diaryStore';
 import { supabase } from '../../lib/supabase';
@@ -34,33 +34,60 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
 
   const { user } = useAuthStore();
   const { deleteEntry, fetchEntries } = useDiaryStore();
   const isOwner = user?.id === entry.user_id;
 
   useEffect(() => {
-    if (entry.voice_url) {
-      const audio = new Audio(entry.voice_url);
-      audio.onended = () => setIsPlaying(false);
-      setAudioElement(audio);
-
-      return () => {
-        audio.pause();
+    return () => {
+      if (audioElement) {
+        audioElement.pause();
+        audioElement.src = '';
         setAudioElement(null);
-      };
-    }
-  }, [entry.voice_url]);
+      }
+    };
+  }, [audioElement]);
 
-  const handlePlayPause = () => {
-    if (!audioElement) return;
+  const handlePlayPause = async () => {
+    if (!entry.voice_url) return;
 
-    if (isPlaying) {
+    if (isPlaying && audioElement) {
       audioElement.pause();
+      setIsPlaying(false);
+      return;
+    }
+
+    if (!audioElement) {
+      setIsLoadingAudio(true);
+      try {
+        const audio = new Audio();
+        audio.preload = 'none';
+        audio.src = entry.voice_url;
+        
+        await new Promise((resolve, reject) => {
+          audio.oncanplaythrough = resolve;
+          audio.onerror = reject;
+          audio.onended = () => {
+            setIsPlaying(false);
+          };
+          audio.load();
+        });
+        
+        setAudioElement(audio);
+        await audio.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.error('音声の再生に失敗しました:', error);
+        toast.error('音声の再生に失敗しました');
+      } finally {
+        setIsLoadingAudio(false);
+      }
     } else {
       audioElement.play();
+      setIsPlaying(true);
     }
-    setIsPlaying(!isPlaying);
   };
 
   const handleDelete = async () => {
@@ -230,8 +257,18 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
                   onClick={handlePlayPause}
                   variant="outline"
                   size="sm"
+                  disabled={isLoadingAudio}
                 >
-                  {isPlaying ? (
+                  {isLoadingAudio ? (
+                    <>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-5 h-5 border-2 border-gray-600 border-t-transparent rounded-full"
+                      />
+                      読込中
+                    </>
+                  ) : isPlaying ? (
                     <>
                       <Pause className="w-5 h-5" />
                       停止
@@ -405,17 +442,20 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
       </AnimatePresence>
       
       {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
+      <StandardDialog
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleDelete}
         title="日記を削除しますか？"
-        message="この日記はゴミ箱に移動され、30日間は復元可能です。他の日記は影響を受けません。"
-        confirmText="ゴミ箱に移動"
-        cancelText="キャンセル"
-        type="warning"
+        confirmLabel="ゴミ箱に移動"
+        cancelLabel="キャンセル"
+        confirmVariant="danger"
         isLoading={isDeleting}
-      />
+      >
+        <p className="text-lg text-black">
+          この日記はゴミ箱に移動され、30日間は復元可能です。他の日記は影響を受けません。
+        </p>
+      </StandardDialog>
     </motion.div>
   );
 };
