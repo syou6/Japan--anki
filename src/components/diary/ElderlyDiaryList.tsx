@@ -14,7 +14,7 @@ interface ElderlyDiaryListProps {
 
 export const ElderlyDiaryList: React.FC<ElderlyDiaryListProps> = ({ isGuest = false }) => {
   const { entries, fetchEntries } = useDiaryStore();
-  const { guestDiaries } = useGuestStore();
+  const { diaries: guestDiaries } = useGuestStore();
   const { user } = useAuthStore();
 
   useEffect(() => {

@@ -1,0 +1,19 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="24" cy="24" r="22" fill="url(#gradient)" stroke="white" stroke-width="2"/>
+  
+  <!-- Microphone Icon -->
+  <path d="M24 14C22.9 14 22 14.9 22 16V24C22 25.1 22.9 26 24 26C25.1 26 26 25.1 26 24V16C26 14.9 25.1 14 24 14Z" fill="white"/>
+  <path d="M19 22V24C19 26.76 21.24 29 24 29C26.76 29 29 26.76 29 24V22H31V24C31 27.52 28.64 30.44 25.5 30.93V34H22.5V30.93C19.36 30.44 17 27.52 17 24V22H19Z" fill="white"/>
+  
+  <!-- Heart Symbol (representing family) -->
+  <path d="M32 12C31.2 12 30.5 12.3 30 12.8C29.5 12.3 28.8 12 28 12C26.9 12 26 12.9 26 14C26 14.3 26.1 14.6 26.2 14.9L30 19L33.8 14.9C33.9 14.6 34 14.3 34 14C34 12.9 33.1 12 32 12Z" fill="#FF6B6B" opacity="0.9"/>
+  
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0" y1="0" x2="48" y2="48">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+  </defs>
+</svg>

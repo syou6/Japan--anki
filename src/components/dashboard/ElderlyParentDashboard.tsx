@@ -22,7 +22,7 @@ interface ElderlyParentDashboardProps {
 export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ onViewChange, isGuest = false }) => {
   const [todayRecorded, setTodayRecorded] = useState(false);
   const { entries, fetchEntries } = useDiaryStore();
-  const { guestDiaries, setGuestMode } = useGuestStore();
+  const { diaries: guestDiaries, setGuestMode } = useGuestStore();
   const { user } = useAuthStore();
   const authStore = useAuthStore();
   const today = new Date();

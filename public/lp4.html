@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日記AI - 声でつながる、家族の絆</title>
+    <link rel="icon" type="image/svg+xml" href="/logo-lp.svg">
+    <meta name="description" content="日記AIは、声で簡単に日記を残せる家族向けアプリです。離れて暮らす家族と声でつながり、大切な思い出を共有できます。">
+    <meta property="og:title" content="日記AI - 声でつながる、家族の絆">
+    <meta property="og:description" content="声で簡単に日記を残せる家族向けアプリ。離れて暮らす家族と声でつながり、大切な思い出を共有。">
+    <meta property="og:image" content="https://nikki-ai.com/og-image.svg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="日記AI - 声で簡単に日記を残せる家族向けアプリ">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://nikki-ai.com/og-image.svg">
+    <meta name="twitter:title" content="日記AI - 声でつながる、家族の絆">
+    <meta name="twitter:description" content="声で簡単に日記を残せる家族向けアプリ。離れて暮らす家族と声でつながり、大切な思い出を共有。">
+    <meta property="og:type" content="website">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
@@ -66,6 +79,80 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
     </style>
+    <!-- 構造化データ (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "日記AI",
+      "applicationCategory": "LifestyleApplication",
+      "operatingSystem": "Web, iOS, Android",
+      "description": "声で簡単に日記を残せる家族向けアプリ。AIが音声を文字起こし・要約し、離れて暮らす家族と思い出を共有できます。",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "JPY",
+        "description": "30日間無料トライアル"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "523"
+      },
+      "image": "https://nikki-ai.com/og-image.svg",
+      "screenshot": [
+        "https://nikki-ai.com/screenshot1.png",
+        "https://nikki-ai.com/screenshot2.png"
+      ],
+      "featureList": [
+        "音声録音による簡単な日記作成",
+        "AI による自動文字起こし",
+        "AI による内容要約",
+        "家族との共有機能",
+        "感情分析",
+        "健康スコア分析"
+      ],
+      "creator": {
+        "@type": "Organization",
+        "name": "日記AI運営チーム",
+        "url": "https://nikki-ai.com"
+      }
+    }
+    </script>
+
+    <!-- FAQ 構造化データ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "日記AIは無料で使えますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "はい、30日間の無料トライアルがあります。クレジットカード登録も不要です。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "高齢者でも使えますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "はい、大きな文字と簡単な操作で、シニア世代の方にも使いやすく設計されています。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "家族と共有できますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "はい、家族を招待して日記を共有できます。プライバシー設定も細かく調整可能です。"
+          }
+        }
+      ]
+    }
+    </script>
 </head>
 <body class="bg-gray-50">
     <!-- ヘッダー -->
@@ -73,18 +160,18 @@
         <div class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-3">
-                    <img src="/logo-lp.png" alt="日記AI" class="w-12 h-12">
+                    <img src="/logo-lp.svg" alt="日記AI" class="w-12 h-12">
                     <span class="text-xl font-bold text-gray-800">日記AI</span>
                 </div>
-                <button onclick="scrollToSection('cta')" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full font-medium hover:shadow-lg transition-all">
+                <a href="/" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full font-medium hover:shadow-lg transition-all inline-block">
                     無料で始める
-                </button>
+                </a>
             </div>
         </div>
     </header>
 
     <!-- ヒーローセクション -->
-    <section class="hero-gradient text-white pt-24 pb-20 px-4">
+    <section class="hero-gradient text-white pt-24 pb-20 px-4" id="hero">
         <div class="container mx-auto max-w-6xl">
             <div class="text-center mb-12 slide-in">
                 <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
@@ -96,12 +183,12 @@
                     大切な人に想いを届けます
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onclick="scrollToSection('cta')" class="bg-white text-purple-700 px-8 py-4 rounded-full font-bold text-lg hover:shadow-2xl transition-all transform hover:scale-105">
+                    <a href="/" class="bg-white text-purple-700 px-8 py-4 rounded-full font-bold text-lg hover:shadow-2xl transition-all transform hover:scale-105 inline-block">
                         🎙️ 今すぐ無料で始める
-                    </button>
-                    <button onclick="scrollToSection('how-it-works')" class="border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-purple-700 transition-all">
+                    </a>
+                    <a href="#how-it-works" class="border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-purple-700 transition-all inline-block">
                         使い方を見る →
-                    </button>
+                    </a>
                 </div>
             </div>
             
@@ -192,7 +279,7 @@
     </section>
 
     <!-- 問題提起セクション -->
-    <section class="py-20 px-4 bg-white">
+    <section class="py-20 px-4 bg-white" id="features">
         <div class="container mx-auto max-w-4xl">
             <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 gradient-text">
                 こんなお悩みありませんか？
@@ -339,7 +426,7 @@
     </section>
 
     <!-- 料金プラン -->
-    <section class="py-20 px-4 bg-white">
+    <section class="py-20 px-4 bg-white" id="pricing">
         <div class="container mx-auto max-w-4xl">
             <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">
                 シンプルな料金プラン
@@ -381,9 +468,9 @@
                             </li>
                         </ul>
                         
-                        <button onclick="scrollToSection('cta')" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-full font-bold text-lg hover:shadow-lg transition-all transform hover:scale-105">
+                        <a href="/" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-full font-bold text-lg hover:shadow-lg transition-all transform hover:scale-105 block text-center">
                             30日間無料で始める
-                        </button>
+                        </a>
                         <p class="text-center text-sm text-gray-500 mt-4">
                             ※ クレジットカード不要<br>
                             ※ いつでも解約可能

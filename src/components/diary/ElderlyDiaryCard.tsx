@@ -44,7 +44,9 @@ export const ElderlyDiaryCard: React.FC<ElderlyDiaryCardProps> = ({ entry }) => 
   }, [audioElement]);
 
   const handlePlayPause = async () => {
-    if (!entry.voice_url) return;
+    // ゲストモードの場合はvoice_data、通常はvoice_urlを使用
+    const audioSource = (entry as any).voice_data || entry.voice_url;
+    if (!audioSource) return;
 
     if (isPlaying && audioElement) {
       audioElement.pause();
@@ -57,7 +59,7 @@ export const ElderlyDiaryCard: React.FC<ElderlyDiaryCardProps> = ({ entry }) => 
       try {
         const audio = new Audio();
         audio.preload = 'none';
-        audio.src = entry.voice_url;
+        audio.src = audioSource;
         
         await new Promise((resolve, reject) => {
           audio.oncanplaythrough = resolve;
@@ -155,7 +157,7 @@ export const ElderlyDiaryCard: React.FC<ElderlyDiaryCardProps> = ({ entry }) => 
       {/* Content */}
       <div className="p-8 sm:p-10">
         {/* Voice Player - Huge and Central */}
-        {entry.voice_url && (
+        {((entry as any).voice_data || entry.voice_url) && (
           <div className="mb-10">
             <button
               onClick={handlePlayPause}

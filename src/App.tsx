@@ -83,10 +83,12 @@ function App() {
         case 'family':
           // ゲストは家族機能使えない
           toast.error('ゲストモードでは家族機能は利用できません');
+          setCurrentView('diary');
           return <ElderlyDiaryList isGuest={true} />;
         case 'settings':
           // ゲストは設定使えない
           toast.error('ゲストモードでは設定は利用できません');
+          setCurrentView('diary');
           return <ElderlyDiaryList isGuest={true} />;
         default:
           return <ElderlyDiaryList isGuest={true} />;
