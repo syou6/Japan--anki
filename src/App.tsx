@@ -14,6 +14,7 @@ import { DiaryList } from './components/diary/DiaryList';
 import { ElderlyDiaryList } from './components/diary/ElderlyDiaryList';
 import { FamilyManager } from './components/family/FamilyManager';
 import { NotificationSettings } from './components/settings/NotificationSettings';
+import { SubscriptionPage } from './components/subscription/SubscriptionPage';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { GuestBanner } from './components/guest/GuestBanner';
 import { GuestDiaryList } from './components/guest/GuestDiaryList';
