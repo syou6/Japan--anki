@@ -1,15 +1,23 @@
 {
-  "buildCommand": "npm run build && cp -r public/* dist/",
+  "buildCommand": "npm run build && cp index.html dist/index-stripe.html && cp -r public/* dist/",
   "outputDirectory": "dist",
   "framework": "vite",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/app",
-      "destination": "/index.html"
+      "src": "^/$",
+      "dest": "/index-stripe.html"
     },
     {
-      "source": "/app/(.*)",
-      "destination": "/index.html"
+      "src": "^/app/?$",
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/app/(.*)$",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/(.*\\.(html|css|js|png|jpg|jpeg|gif|svg|ico|json|txt|xml|pdf|woff|woff2|ttf|eot))$",
+      "dest": "/$1"
     }
   ]
 }
