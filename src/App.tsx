@@ -35,6 +35,12 @@ function App() {
     // URLパラメータをチェック
     const urlParams = new URLSearchParams(window.location.search);
     const isGuestParam = urlParams.get('guest') === 'true';
+    const viewParam = urlParams.get('view');
+    
+    // ビューパラメータがあれば設定
+    if (viewParam) {
+      setCurrentView(viewParam);
+    }
     
     // ログイン画面表示フラグをチェック
     const shouldShowAuth = sessionStorage.getItem('showAuthForm');
@@ -122,6 +128,8 @@ function App() {
         return <FamilyManager />;
       case 'settings':
         return <NotificationSettings />;
+      case 'subscription':
+        return <SubscriptionPage />;
       default:
         return <ElderlyDiaryList />;
     }

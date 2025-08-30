@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, BellOff, Clock, MessageCircle, Book, TestTube } from 'lucide-react';
+import { Bell, BellOff, Clock, MessageCircle, Book, TestTube, CreditCard } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useAuthStore } from '../../stores/authStore';
 import { useNotificationStore } from '../../stores/notificationStore';
@@ -122,11 +122,41 @@ export const NotificationSettings: React.FC = () => {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl shadow-lg p-6 max-w-2xl mx-auto"
-    >
+    <div className="space-y-6">
+      {/* サブスクリプションカード */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl shadow-lg p-6 max-w-2xl mx-auto text-white"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
+              <CreditCard className="w-7 h-7" />
+              プレミアムプラン
+            </h2>
+            <p className="text-lg opacity-90">
+              月額¥500で全機能をご利用いただけます
+            </p>
+          </div>
+          <Button
+            onClick={() => window.location.href = '/app?view=subscription'}
+            variant="outline"
+            size="lg"
+            className="bg-white text-purple-600 hover:bg-gray-100 border-white"
+          >
+            プランを見る
+          </Button>
+        </div>
+      </motion.div>
+
+      {/* 通知設定カード */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="bg-white rounded-2xl shadow-lg p-6 max-w-2xl mx-auto"
+      >
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
           <Bell className="w-7 h-7 text-blue-600" />
@@ -312,6 +342,7 @@ export const NotificationSettings: React.FC = () => {
           )}
         </div>
       )}
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
