@@ -32,20 +32,28 @@ function App() {
   useEffect(() => {
     initialize();
     
+    // URLパラメータをチェック
+    const urlParams = new URLSearchParams(window.location.search);
+    const isGuestParam = urlParams.get('guest') === 'true';
+    
     // ログイン画面表示フラグをチェック
     const shouldShowAuth = sessionStorage.getItem('showAuthForm');
-    if (shouldShowAuth) {
+    if (shouldShowAuth && !isGuestParam) {
       // フラグは削除しない（認証画面が表示される間は保持）
       setGuestMode(false);
       return;
     }
     
-    // デフォルトでゲストモードを有効化（ユーザーがログインしていない場合）
+    // URLパラメータまたはデフォルトでゲストモードを有効化
     const checkAndEnableGuestMode = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user && !isGuestMode && !sessionStorage.getItem('showAuthForm')) {
+      if (!user && !isGuestMode && (isGuestParam || !sessionStorage.getItem('showAuthForm'))) {
         setGuestMode(true);
         setShowOnboarding(true); // ゲストモードでもオンボーディングを表示
+        // URLからパラメータを削除
+        if (isGuestParam) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
       }
     };
     checkAndEnableGuestMode();
