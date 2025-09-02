@@ -20,6 +20,7 @@ import { GuestBanner } from './components/guest/GuestBanner';
 import { GuestDiaryList } from './components/guest/GuestDiaryList';
 import { WelcomeGuide } from './components/onboarding/WelcomeGuide';
 import { HelpButton } from './components/help/HelpButton';
+import { ApiUsageMonitor } from './components/ApiUsageMonitor';
 import { supabase } from './lib/supabase';
 
 function App() {
@@ -228,6 +229,9 @@ function App() {
       />
       
       <PWAInstallPrompt />
+      
+      {/* API使用量モニター（開発環境のみ） */}
+      <ApiUsageMonitor />
     </div>
   );
 }
