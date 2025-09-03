@@ -19,12 +19,14 @@ interface GuestStore {
   usageCount: number;
   maxDiaries: number;
   isGuestMode: boolean;
+  aiUsageCount: number; // AI分析の使用回数
   
   createGuestDiary: (content: string, audioBlob?: Blob) => Promise<void>;
   deleteGuestDiary: (id: string) => void;
   getGuestDiaries: () => GuestDiary[];
   getRemainingTries: () => number;
   canCreateMore: () => boolean;
+  canUseAI: () => boolean; // AI分析が使用可能か
   clearGuestData: () => void;
   setGuestMode: (enabled: boolean) => void;
   cleanExpiredDiaries: () => void;
@@ -37,6 +39,7 @@ export const useGuestStore = create<GuestStore>()(
       usageCount: 0,
       maxDiaries: 3,
       isGuestMode: false,
+      aiUsageCount: 0, // AI使用回数の初期値
 
       createGuestDiary: async (content: string, audioBlob?: Blob) => {
         const { usageCount, maxDiaries } = get();
@@ -59,21 +62,31 @@ export const useGuestStore = create<GuestStore>()(
           });
         }
 
-        // AI機能は無効化
+        // ゲストモードのAI機能制限
         let emotion = '普通';
         let healthScore = 75;
         let aiSummary = '';
 
-        // try {
-        //   if (content && import.meta.env.VITE_GEMINI_API_KEY) {
-        //     const analysisResult = await analyzeText(content);
-        //     emotion = analysisResult?.emotion || '普通';
-        //     aiSummary = await generateFamilySummary(content);
-        //     healthScore = await analyzeHealthScore(content);
-        //   }
-        // } catch (error) {
-        //   console.warn('AI分析をスキップしました:', error);
-        // }
+        // ゲストモードは1回だけAI分析を使用可能
+        if (get().canUseAI() && content && import.meta.env.VITE_GEMINI_API_KEY) {
+          try {
+            const { analyzeText, generateFamilySummary, analyzeHealthScore } = await import('../lib/gemini');
+            console.log('ゲストモード: AI分析を実行（1回限定）');
+            
+            const analysisResult = await analyzeText(content);
+            emotion = analysisResult?.emotion || '普通';
+            aiSummary = await generateFamilySummary(content);
+            healthScore = await analyzeHealthScore(content);
+            
+            // AI使用回数を増やす
+            set(state => ({ aiUsageCount: state.aiUsageCount + 1 }));
+          } catch (error) {
+            console.warn('AI分析エラー:', error);
+          }
+        } else if (get().aiUsageCount >= 1) {
+          console.log('ゲストモード: AI分析の上限に達しています（1回まで）');
+          aiSummary = 'AI分析はゲストモードで1回まで利用可能です。';
+        }
 
         const now = new Date();
         const expiresAt = new Date(now.getTime() + 30 * 60 * 1000); // 30分後
@@ -115,11 +128,17 @@ export const useGuestStore = create<GuestStore>()(
         return usageCount < maxDiaries;
       },
 
+      canUseAI: () => {
+        const { aiUsageCount } = get();
+        return aiUsageCount < 1; // ゲストモードは1回まで
+      },
+
       clearGuestData: () => {
         set({
           diaries: [],
           usageCount: 0,
-          isGuestMode: false
+          isGuestMode: false,
+          aiUsageCount: 0
         });
       },
 
@@ -152,7 +171,8 @@ export const useGuestStore = create<GuestStore>()(
       partialize: (state) => ({
         diaries: state.diaries,
         usageCount: state.usageCount,
-        isGuestMode: state.isGuestMode  // ゲストモードも永続化
+        isGuestMode: state.isGuestMode,  // ゲストモードも永続化
+        aiUsageCount: state.aiUsageCount  // AI使用回数も永続化
       })
     }
   )

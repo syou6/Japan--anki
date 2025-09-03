@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { canUseApi, recordApiUsage } from './api-limiter';
+import { canUseApi, recordApiUsage, getCachedAnalysis, cacheAnalysis, showApiUsageWarning } from './api-limiter';
 
 // Gemini API設定
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -24,10 +24,17 @@ export async function analyzeWithGemini(text: string): Promise<AnalysisResult> {
     };
   }
 
+  // キャッシュをチェック
+  const cachedResult = getCachedAnalysis(text);
+  if (cachedResult) {
+    console.log('✅ キャッシュから分析結果を使用');
+    return cachedResult;
+  }
+
   // API使用制限チェック
   const { allowed, reason } = canUseApi();
   if (!allowed) {
-    console.warn('API使用制限:', reason);
+    console.warn('🚫 API使用制限:', reason);
     // 制限に達した場合は無料版にフォールバック
     return {
       summary: text.substring(0, 100) + '...(API制限により簡易分析)',
@@ -36,6 +43,9 @@ export async function analyzeWithGemini(text: string): Promise<AnalysisResult> {
       keywords: []
     };
   }
+
+  // 使用量警告を表示
+  showApiUsageWarning();
 
   try {
     // Gemini 2.0 Flash モデルを初期化
@@ -77,12 +87,17 @@ ${text}
     recordApiUsage(estimatedTokens);
     
     // 検証とデフォルト値
-    return {
+    const result = {
       summary: analysis.summary || text.substring(0, 50),
       emotion: analysis.emotion || '普通',
       health_score: Math.min(100, Math.max(0, analysis.health_score || 75)),
       keywords: Array.isArray(analysis.keywords) ? analysis.keywords.slice(0, 3) : []
     };
+    
+    // 結果をキャッシュに保存
+    cacheAnalysis(text, result);
+    
+    return result;
     
   } catch (error) {
     console.error('Gemini API エラー:', error);

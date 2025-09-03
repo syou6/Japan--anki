@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { getCurrentUsageStats, resetUsage } from '../lib/api-limiter';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { useGuestStore } from '../stores/guestStore';
+import { AlertCircle, RefreshCw, Zap } from 'lucide-react';
 
 export const ApiUsageMonitor: React.FC = () => {
   const [stats, setStats] = useState(getCurrentUsageStats());
   const [showDetails, setShowDetails] = useState(false);
+  const { isGuestMode, aiUsageCount } = useGuestStore();
 
   useEffect(() => {
     // 定期的に使用状況を更新
@@ -19,8 +21,8 @@ export const ApiUsageMonitor: React.FC = () => {
   const isNearLimit = usagePercentage > 80;
   const isAtLimit = stats.remainingRequests === 0;
 
-  // 開発環境でのみ表示
-  if (import.meta.env.PROD) {
+  // 本番環境でも制限に近い場合は表示
+  if (import.meta.env.PROD && !isNearLimit && !isAtLimit && !isGuestMode) {
     return null;
   }
 
@@ -34,45 +36,84 @@ export const ApiUsageMonitor: React.FC = () => {
       >
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-sm flex items-center gap-2">
-            <AlertCircle className={`w-4 h-4 ${
-              isAtLimit ? 'text-red-500' : isNearLimit ? 'text-yellow-500' : 'text-blue-500'
-            }`} />
-            Gemini API 使用状況
+            {isGuestMode ? (
+              <>
+                <Zap className="w-4 h-4 text-purple-500" />
+                ゲストモード
+              </>
+            ) : (
+              <>
+                <AlertCircle className={`w-4 h-4 ${
+                  isAtLimit ? 'text-red-500' : isNearLimit ? 'text-yellow-500' : 'text-blue-500'
+                }`} />
+                Gemini API 使用状況
+              </>
+            )}
           </h3>
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className="text-xs text-blue-600 hover:text-blue-800"
-          >
-            {showDetails ? '簡易表示' : '詳細'}
-          </button>
+          {!isGuestMode && (
+            <button
+              onClick={() => setShowDetails(!showDetails)}
+              className="text-xs text-blue-600 hover:text-blue-800"
+            >
+              {showDetails ? '簡易表示' : '詳細'}
+            </button>
+          )}
         </div>
 
         <div className="space-y-2">
-          {/* プログレスバー */}
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className={`h-2 rounded-full transition-all ${
-                isAtLimit ? 'bg-red-500' : isNearLimit ? 'bg-yellow-500' : 'bg-blue-500'
-              }`}
-              style={{ width: `${Math.min(100, usagePercentage)}%` }}
-            />
-          </div>
+          {/* ゲストモード専用表示 */}
+          {isGuestMode ? (
+            <>
+              <div className="text-xs space-y-1">
+                <div className="flex justify-between">
+                  <span>AI分析使用回数:</span>
+                  <span className={`font-semibold ${aiUsageCount >= 1 ? 'text-red-500' : ''}`}>
+                    {aiUsageCount} / 1 回
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>状態:</span>
+                  <span className="font-semibold">
+                    {aiUsageCount >= 1 ? 'AI分析使用済み' : 'AI分析可能'}
+                  </span>
+                </div>
+              </div>
+              {aiUsageCount >= 1 && (
+                <div className="bg-purple-50 text-purple-700 text-xs p-2 rounded">
+                  AI分析は1回まで利用可能です。<br />
+                  続けるにはログインしてください。
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              {/* 通常モードのプログレスバー */}
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className={`h-2 rounded-full transition-all ${
+                    isAtLimit ? 'bg-red-500' : isNearLimit ? 'bg-yellow-500' : 'bg-blue-500'
+                  }`}
+                  style={{ width: `${Math.min(100, usagePercentage)}%` }}
+                />
+              </div>
 
-          {/* 基本情報 */}
-          <div className="text-xs space-y-1">
-            <div className="flex justify-between">
-              <span>本日の使用回数:</span>
-              <span className="font-semibold">
-                {stats.dailyUsed} / {stats.dailyLimit}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>残り:</span>
-              <span className={`font-semibold ${isAtLimit ? 'text-red-500' : ''}`}>
-                {stats.remainingRequests} 回
-              </span>
-            </div>
-          </div>
+              {/* 基本情報 */}
+              <div className="text-xs space-y-1">
+                <div className="flex justify-between">
+                  <span>本日の使用回数:</span>
+                  <span className="font-semibold">
+                    {stats.dailyUsed} / {stats.dailyLimit}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>残り:</span>
+                  <span className={`font-semibold ${isAtLimit ? 'text-red-500' : ''}`}>
+                    {stats.remainingRequests} 回
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* 詳細情報 */}
           {showDetails && (

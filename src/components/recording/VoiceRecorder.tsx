@@ -229,30 +229,57 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
       // 保存処理中のトーストを表示
       const loadingToast = toast.loading('日記を保存中です...');
       
+      // タイムアウト設定（30秒）
+      const timeoutId = setTimeout(() => {
+        toast.dismiss(loadingToast);
+        toast.error('保存がタイムアウトしました。もう一度お試しください。');
+        setIsSaving(false);
+      }, 30000);
+      
       // ゲストモードとして通常モードで保存
+      let saveResult;
       if (isGuest) {
         await createGuestDiary(contentToSave, currentAudio);
+        saveResult = true; // ゲストモードは戻り値なし
       } else {
-        await createEntry(contentToSave, currentAudio);
+        saveResult = await createEntry(contentToSave, currentAudio);
       }
       
-      // 成功トーストに切り替え
-      toast.dismiss(loadingToast);
-      toast.success('日記を保存しました！');
+      // タイムアウトをクリア
+      clearTimeout(timeoutId);
       
-      clearRecording();
-      setShowSaveDialog(false);
-      setAdditionalText('');
-      setTranscribedText('');
-      
-      // ホーム画面に戻る
-      if (onViewChange) {
-        setTimeout(() => {
-          onViewChange('home');
-        }, 1000);
+      // 保存に成功したかチェック
+      if (saveResult !== undefined) {
+        // 成功トーストに切り替え
+        toast.dismiss(loadingToast);
+        toast.success('日記を保存しました！');
+        
+        clearRecording();
+        setShowSaveDialog(false);
+        setAdditionalText('');
+        setTranscribedText('');
+        
+        // ホーム画面に戻る
+        if (onViewChange) {
+          setTimeout(() => {
+            onViewChange('home');
+          }, 1000);
+        }
+      } else {
+        throw new Error('保存処理が完了しませんでした');
       }
     } catch (error) {
-      console.error('保存エラー:', error);
+      console.error('保存エラーの詳細:', {
+        error,
+        message: (error as Error).message,
+        stack: (error as Error).stack,
+        audioSize: currentAudio?.size,
+        contentLength: contentToSave?.length
+      });
+      // loadingToastが定義されている場合のみdismiss
+      try {
+        toast.dismiss();
+      } catch {}
       toast.error('保存に失敗しました: ' + (error as Error).message);
     } finally {
       setIsSaving(false);

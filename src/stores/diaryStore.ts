@@ -22,7 +22,7 @@ interface DiaryStore {
   currentAudio: Blob | null;
   
   fetchEntries: () => Promise<void>;
-  createEntry: (content: string, audioBlob?: Blob) => Promise<void>;
+  createEntry: (content: string, audioBlob?: Blob) => Promise<any>;
   deleteEntry: (id: string) => Promise<void>;
   startRecording: () => Promise<void>;
   stopRecording: () => Promise<Blob | null>;
@@ -111,7 +111,7 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
     }
   },
 
-  createEntry: async (content: string, audioBlob?: Blob) => {
+  createEntry: async (content: string, audioBlob?: Blob): Promise<any> => {
     try {
       console.log('createEntry start:', { contentLength: content.length, hasAudio: !!audioBlob });
       
