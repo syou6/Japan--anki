@@ -21,10 +21,10 @@ export const ApiUsageMonitor: React.FC = () => {
   const isNearLimit = usagePercentage > 80;
   const isAtLimit = stats.remainingRequests === 0;
 
-  // 本番環境でも制限に近い場合は表示
-  if (import.meta.env.PROD && !isNearLimit && !isAtLimit && !isGuestMode) {
-    return null;
-  }
+  // 常に表示する（コメントアウトすれば制限時のみ表示）
+  // if (import.meta.env.PROD && !isNearLimit && !isAtLimit && !isGuestMode) {
+  //   return null;
+  // }
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
