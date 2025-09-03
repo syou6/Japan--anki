@@ -352,14 +352,26 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
   stopRecording: async () => {
     const { mediaRecorder, audioChunks } = get();
     
+    console.log('stopRecording開始:', {
+      hasMediaRecorder: !!mediaRecorder,
+      chunksCount: audioChunks.length
+    });
+    
     return new Promise((resolve) => {
       if (!mediaRecorder) {
+        console.warn('MediaRecorderが存在しません');
         resolve(null);
         return;
       }
 
       mediaRecorder.onstop = () => {
+        console.log('MediaRecorder停止イベント発火');
         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        console.log('Blob作成完了:', {
+          size: audioBlob.size,
+          type: audioBlob.type,
+          chunksUsed: audioChunks.length
+        });
         set({ 
           currentAudio: audioBlob,
           isRecording: false,

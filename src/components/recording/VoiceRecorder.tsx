@@ -151,9 +151,14 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
   };
 
   const handleStopRecording = async () => {
+    console.log('handleStopRecording開始');
     try {
       // 録音を停止
-      await stopRecording();
+      const audioBlob = await stopRecording();
+      console.log('録音停止完了:', {
+        blobSize: audioBlob?.size,
+        blobType: audioBlob?.type
+      });
       
       // 音量分析を停止
       if (animationFrameRef.current) {
@@ -176,8 +181,10 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
       
       toast.success('録音を停止しました');
       setShowSaveDialog(true);
+      console.log('保存ダイアログを表示');
     } catch (error) {
-      toast.error('録音の停止に失敗しました');
+      console.error('録音停止エラー:', error);
+      toast.error('録音の停止に失敗しました: ' + (error as Error).message);
     }
   };
 
@@ -193,12 +200,20 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
   };
 
   const handleSave = async () => {
+    console.log('handleSave開始:', {
+      hasCurrentAudio: !!currentAudio,
+      audioSize: currentAudio?.size,
+      isSaving,
+      isGuest
+    });
+
     if (!currentAudio) {
       toast.error('録音データがありません');
       return;
     }
 
     if (isSaving) {
+      console.log('既に保存処理中です');
       return; // 既に保存処理中の場合は何もしない
     }
 
@@ -238,12 +253,22 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
       
       // ゲストモードとして通常モードで保存
       let saveResult;
+      console.log('保存処理開始:', {
+        isGuest,
+        contentLength: contentToSave.length,
+        audioSize: currentAudio.size
+      });
+      
       if (isGuest) {
+        console.log('ゲストモードで保存');
         await createGuestDiary(contentToSave, currentAudio);
         saveResult = true; // ゲストモードは戻り値なし
       } else {
+        console.log('通常モードで保存');
         saveResult = await createEntry(contentToSave, currentAudio);
       }
+      
+      console.log('保存結果:', saveResult);
       
       // タイムアウトをクリア
       clearTimeout(timeoutId);
