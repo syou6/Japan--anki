@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { canUseApi, recordApiUsage, getCachedAnalysis, cacheAnalysis, showApiUsageWarning } from './api-limiter';
+import { canCallApi, recordApiUsage, getCachedAnalysis, cacheAnalysis, showApiUsageWarning, recordApiSuccess, recordApiError } from './api-limiter';
 
 // Gemini API設定
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -31,10 +31,10 @@ export async function analyzeWithGemini(text: string): Promise<AnalysisResult> {
     return cachedResult;
   }
 
-  // API使用制限チェック
-  const { allowed, reason } = canUseApi();
+  // 総合的なAPI制限チェック（レート制限、サーキットブレーカー、使用量制限）
+  const { allowed, reason } = canCallApi();
   if (!allowed) {
-    console.warn('🚫 API使用制限:', reason);
+    console.warn('🚫 API制限:', reason);
     // 制限に達した場合は無料版にフォールバック
     return {
       summary: text.substring(0, 100) + '...(API制限により簡易分析)',
@@ -47,12 +47,17 @@ export async function analyzeWithGemini(text: string): Promise<AnalysisResult> {
   // 使用量警告を表示
   showApiUsageWarning();
 
-  try {
-    // Gemini 2.0 Flash モデルを初期化
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ 
-      model: 'gemini-2.0-flash-exp' // 最新の2.0 Flashモデル
-    });
+  // リトライ設定（最大2回まで）
+  const MAX_RETRIES = 2;
+  let retryCount = 0;
+  
+  while (retryCount < MAX_RETRIES) {
+    try {
+      // Gemini 2.0 Flash モデルを初期化
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ 
+        model: 'gemini-2.0-flash-exp' // 最新の2.0 Flashモデル
+      });
 
     // プロンプトを構成
     const prompt = `
@@ -94,21 +99,49 @@ ${text}
       keywords: Array.isArray(analysis.keywords) ? analysis.keywords.slice(0, 3) : []
     };
     
+    // 成功を記録
+    recordApiSuccess();
+    
     // 結果をキャッシュに保存
     cacheAnalysis(text, result);
     
-    return result;
-    
-  } catch (error) {
-    console.error('Gemini API エラー:', error);
-    // エラー時は無料版の分析にフォールバック
-    return {
-      summary: text.substring(0, 100),
-      emotion: '普通',
-      health_score: 75,
-      keywords: []
-    };
+      return result;
+      
+    } catch (error: any) {
+      retryCount++;
+      console.error(`Gemini API エラー (試行 ${retryCount}/${MAX_RETRIES}):`, error.message);
+      
+      // ネットワークエラーまたはタイムアウトの場合のみリトライ
+      if (retryCount < MAX_RETRIES && 
+          (error.message?.includes('network') || 
+           error.message?.includes('timeout') || 
+           error.message?.includes('fetch'))) {
+        console.log('1秒後にリトライします...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        continue;
+      }
+      
+      // リトライ限界またはその他のエラー
+      // エラーを記録（サーキットブレーカー用）
+      recordApiError();
+      
+      // エラー時は無料版の分析にフォールバック
+      return {
+        summary: text.substring(0, 100),
+        emotion: '普通',
+        health_score: 75,
+        keywords: []
+      };
+    }
   }
+  
+  // ここには到達しないはずだが念のため
+  return {
+    summary: text.substring(0, 100),
+    emotion: '普通',
+    health_score: 75,
+    keywords: []
+  };
 }
 
 // 家族向け要約を生成

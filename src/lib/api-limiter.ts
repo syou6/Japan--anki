@@ -8,10 +8,13 @@ interface ApiUsage {
 
 const USAGE_KEY = 'gemini_api_usage';
 const CACHE_KEY = 'gemini_api_cache';
+const CIRCUIT_BREAKER_KEY = 'gemini_circuit_breaker';
 const DAILY_LIMIT = 20; // 1日あたりの最大リクエスト数（大幅削減）
 const MONTHLY_LIMIT = 500; // 月あたりの最大リクエスト数（削減）
 const MAX_TOKENS_PER_DAY = 10000; // 1日あたりの最大トークン数（大幅削減）
 const CACHE_EXPIRY_HOURS = 24; // キャッシュ有効期限（時間）
+const MAX_REQUESTS_PER_MINUTE = 3; // 1分あたりの最大リクエスト数（バースト防止）
+const CIRCUIT_BREAKER_THRESHOLD = 5; // 連続エラー回数の閾値
 
 // ローカルストレージから使用量を取得
 function getUsage(): ApiUsage {
@@ -222,4 +225,121 @@ export function showApiUsageWarning(): void {
     console.warn(`⚠️ API使用量警告: 本日の残り回数 ${stats.remainingRequests}/${stats.dailyLimit}`);
     // UIに警告を表示する場合はここに追加
   }
+}
+
+// レート制限（1分あたりのリクエスト数を制限）
+interface RateLimitInfo {
+  requests: number[];
+  lastReset: number;
+}
+
+function getRateLimitInfo(): RateLimitInfo {
+  const stored = localStorage.getItem('gemini_rate_limit');
+  if (!stored) {
+    return { requests: [], lastReset: Date.now() };
+  }
+  return JSON.parse(stored);
+}
+
+function checkRateLimit(): boolean {
+  const now = Date.now();
+  const info = getRateLimitInfo();
+  
+  // 1分以上経過していたらリセット
+  if (now - info.lastReset > 60000) {
+    info.requests = [];
+    info.lastReset = now;
+  }
+  
+  // 1分以内のリクエストをフィルタ
+  info.requests = info.requests.filter(time => now - time < 60000);
+  
+  // 制限チェック
+  if (info.requests.length >= MAX_REQUESTS_PER_MINUTE) {
+    console.error(`🚫 レート制限: 1分間に${MAX_REQUESTS_PER_MINUTE}回までです`);
+    return false;
+  }
+  
+  // リクエストを記録
+  info.requests.push(now);
+  localStorage.setItem('gemini_rate_limit', JSON.stringify(info));
+  return true;
+}
+
+// サーキットブレーカー（連続エラーでAPI呼び出しを停止）
+interface CircuitBreakerState {
+  errorCount: number;
+  lastError: number;
+  isOpen: boolean;
+  nextRetry: number;
+}
+
+export function getCircuitBreakerState(): CircuitBreakerState {
+  const stored = localStorage.getItem(CIRCUIT_BREAKER_KEY);
+  if (!stored) {
+    return {
+      errorCount: 0,
+      lastError: 0,
+      isOpen: false,
+      nextRetry: 0
+    };
+  }
+  return JSON.parse(stored);
+}
+
+export function recordApiError(): void {
+  const state = getCircuitBreakerState();
+  state.errorCount++;
+  state.lastError = Date.now();
+  
+  // 閾値を超えたらサーキットを開く（10分間停止）
+  if (state.errorCount >= CIRCUIT_BREAKER_THRESHOLD) {
+    state.isOpen = true;
+    state.nextRetry = Date.now() + 600000; // 10分後
+    console.error('🔴 サーキットブレーカー発動: API呼び出しを10分間停止します');
+  }
+  
+  localStorage.setItem(CIRCUIT_BREAKER_KEY, JSON.stringify(state));
+}
+
+export function recordApiSuccess(): void {
+  const state = getCircuitBreakerState();
+  state.errorCount = 0;
+  state.isOpen = false;
+  localStorage.setItem(CIRCUIT_BREAKER_KEY, JSON.stringify(state));
+}
+
+export function isCircuitBreakerOpen(): boolean {
+  const state = getCircuitBreakerState();
+  
+  // 時間が経過していたらリセット
+  if (state.isOpen && Date.now() > state.nextRetry) {
+    state.isOpen = false;
+    state.errorCount = 0;
+    localStorage.setItem(CIRCUIT_BREAKER_KEY, JSON.stringify(state));
+  }
+  
+  return state.isOpen;
+}
+
+// 総合的なAPI呼び出し可否チェック
+export function canCallApi(): { allowed: boolean; reason?: string } {
+  // サーキットブレーカーチェック
+  if (isCircuitBreakerOpen()) {
+    return { 
+      allowed: false, 
+      reason: 'API呼び出しが一時的に停止されています（連続エラーのため）' 
+    };
+  }
+  
+  // レート制限チェック
+  if (!checkRateLimit()) {
+    return { 
+      allowed: false, 
+      reason: '短時間に多すぎるリクエストです。1分後に再試行してください。' 
+    };
+  }
+  
+  // 既存の使用量制限チェック
+  return canUseApi();
 }
