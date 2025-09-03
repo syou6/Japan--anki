@@ -70,8 +70,8 @@ ${text}
 }`;
 
     // Gemini APIを呼び出し
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
+    const generateResult = await model.generateContent(prompt);
+    const response = await generateResult.response;
     const responseText = response.text();
     
     // JSONを抽出してパース
@@ -132,8 +132,8 @@ ${text}
 
 要約（100文字以内）：`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
+    const generateResult = await model.generateContent(prompt);
+    const response = await generateResult.response;
     return response.text().trim();
     
   } catch (error) {
