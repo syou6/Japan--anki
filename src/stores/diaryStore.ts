@@ -119,10 +119,14 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
       let transcribedContent = content;
       
       // Get user first
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        console.error('認証エラー:', authError);
+        throw new Error(`認証エラー: ${authError.message}`);
+      }
       if (!user) {
         console.error('User not authenticated');
-        throw new Error('Not authenticated');
+        throw new Error('ログインが必要です');
       }
       console.log('User authenticated:', user.id);
       
@@ -143,6 +147,15 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
           
           const uploadStartTime = performance.now();
           const fileName = `${user.id}/voice_${Date.now()}.webm`;
+          
+          // バケット存在チェック（デバッグ用）
+          console.log('アップロード準備:', {
+            bucketName: 'voice-recordings',
+            fileName,
+            fileSize: formatFileSize(audioSize),
+            fileType: audioBlob.type,
+            userId: user.id
+          });
           
           // タイムアウト付きアップロード (30秒)
           const uploadPromise = supabase.storage
@@ -165,15 +178,24 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
           const uploadTime = Math.round(uploadEndTime - uploadStartTime);
           console.log(`音声アップロード時間: ${uploadTime}ms`);
 
-          if (!uploadError) {
+          if (!uploadError && uploadData) {
             const { data: { publicUrl } } = supabase.storage
               .from('voice-recordings')
               .getPublicUrl(fileName);
             voiceUrl = publicUrl;
-            console.log('音声URL取得成功');
+            console.log('音声URL取得成功:', publicUrl);
           } else {
-            console.error('音声アップロードエラー:', uploadError);
-            toast.error('音声のアップロードに失敗しました。日記は音声なしで保存されます。');
+            console.error('音声アップロードエラー詳細:', {
+              error: uploadError,
+              message: uploadError?.message,
+              statusCode: uploadError?.statusCode,
+              fileName,
+              blobSize: audioBlob.size,
+              blobType: audioBlob.type
+            });
+            // エラーメッセージを詳細化
+            const errorMsg = uploadError?.message || '音声のアップロードに失敗しました';
+            toast.error(`音声アップロードエラー: ${errorMsg}`);
             // 音声なしでも日記は保存を続行
           }
         } catch (storageError: any) {
@@ -219,8 +241,14 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
         .single();
 
       if (error) {
-        console.error('Insert error:', error);
-        throw error;
+        console.error('データベース挿入エラー詳細:', {
+          error,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        throw new Error(`日記の保存に失敗: ${error.message || '不明なエラー'}`);
       }
       
       console.log('Diary saved successfully:', insertedData);
