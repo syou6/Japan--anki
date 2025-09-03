@@ -418,23 +418,33 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
       // 各家族メンバーに通知を送信
       for (const userId of familyUserIds) {
         try {
-          // Edge Function経由でバックグラウンド通知を送信
-          const response = await supabase.functions.invoke('send-push-notification', {
-            body: {
-              userId,
-              title: '新しい日記が投稿されました',
-              body: `${authorName}さんが日記を投稿しました`,
-              type: 'family_diary',
-              data: {
-                url: 'https://journal-ai.cloud/diary'
+          // Edge Function経由でバックグラウンド通知を送信（オプション）
+          try {
+            const response = await supabase.functions.invoke('send-push-notification', {
+              body: {
+                userId,
+                title: '新しい日記が投稿されました',
+                body: `${authorName}さんが日記を投稿しました`,
+                type: 'family_diary',
+                data: {
+                  url: 'https://journal-ai.cloud/diary'
+                }
               }
-            }
-          });
+            });
 
-          if (response.error) {
-            console.error(`Failed to send push notification to user ${userId}:`, response.error);
-          } else {
-            console.log(`Push notification sent to user ${userId}`);
+            if (response.error) {
+              // Edge Functionが存在しない場合は無視（404エラー）
+              if (response.error.message?.includes('not found') || response.error.message?.includes('404')) {
+                console.log('プッシュ通知機能は未実装です');
+              } else {
+                console.warn(`プッシュ通知送信エラー (user ${userId}):`, response.error.message);
+              }
+            } else {
+              console.log(`Push notification sent to user ${userId}`);
+            }
+          } catch (funcError: any) {
+            // Edge Functionのエラーは無視（日記保存には影響なし）
+            console.log('プッシュ通知はスキップされました');
           }
 
           // ブラウザが開いている場合はローカル通知も送信（フォールバック）
