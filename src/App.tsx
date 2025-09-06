@@ -54,13 +54,12 @@ function App() {
     // URLパラメータまたはデフォルトでゲストモードを有効化
     const checkAndEnableGuestMode = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user && !isGuestMode && (isGuestParam || !sessionStorage.getItem('showAuthForm'))) {
+      // ゲストパラメータがある場合のみゲストモードを有効化
+      if (!user && !isGuestMode && isGuestParam) {
         setGuestMode(true);
         setShowOnboarding(true); // ゲストモードでもオンボーディングを表示
         // URLからパラメータを削除
-        if (isGuestParam) {
-          window.history.replaceState({}, document.title, window.location.pathname);
-        }
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
     };
     checkAndEnableGuestMode();
