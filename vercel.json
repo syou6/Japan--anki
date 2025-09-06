@@ -4,10 +4,6 @@
   "framework": "vite",
   "routes": [
     {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
       "src": "/company.html",
       "dest": "/company.html"
     },
