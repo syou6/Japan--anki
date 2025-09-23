@@ -4,6 +4,10 @@
   "framework": "vite",
   "routes": [
     {
+      "src": "/lp.html",
+      "dest": "/lp.html"
+    },
+    {
       "src": "/company.html",
       "dest": "/company.html"
     },
@@ -26,6 +30,10 @@
     {
       "src": "/app/(.*)",
       "dest": "/app.html"
+    },
+    {
+      "src": "/",
+      "dest": "/lp.html"
     },
     {
       "src": "/(.*)",
