@@ -1,0 +1,312 @@
+import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
+import { useAuthStore } from '../stores/authStore';
+import { useGuestStore } from '../stores/guestStore';
+import { AuthForm } from '../components/auth/AuthForm';
+import { Header } from '../components/navigation/Header';
+import { ElderlyNav } from '../components/navigation/ElderlyNav';
+import { ParentDashboard } from '../components/dashboard/ParentDashboard';
+import { ElderlyParentDashboard } from '../components/dashboard/ElderlyParentDashboard';
+import { VoiceRecorder } from '../components/recording/VoiceRecorder';
+import { DiaryList } from '../components/diary/DiaryList';
+import { ElderlyDiaryList } from '../components/diary/ElderlyDiaryList';
+import { FamilyManager } from '../components/family/FamilyManager';
+import { NotificationSettings } from '../components/settings/NotificationSettings';
+import { SubscriptionPage } from '../components/subscription/SubscriptionPage';
+import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
+import { GuestBanner } from '../components/guest/GuestBanner';
+import { GuestDiaryList } from '../components/guest/GuestDiaryList';
+import { WelcomeGuide } from '../components/onboarding/WelcomeGuide';
+import { HelpButton } from '../components/help/HelpButton';
+import { ApiUsageMonitor } from '../components/ApiUsageMonitor';
+import { supabase } from '../lib/supabase';
+
+export const AppPage: React.FC = () => {
+  const [currentView, setCurrentView] = useState('home');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
+  const { user, loading, initialize } = useAuthStore();
+  const { isGuestMode, cleanExpiredDiaries, setGuestMode } = useGuestStore();
+
+  useEffect(() => {
+    initialize();
+    
+    // URLパラメータをチェック
+    const urlParams = new URLSearchParams(window.location.search);
+    const isGuestParam = urlParams.get('guest') === 'true';
+    const isSignupParam = urlParams.get('signup') === 'true';
+    const isLoginParam = urlParams.get('login') === 'true';
+    const viewParam = urlParams.get('view');
+    
+    // デバッグ情報
+    console.log('AppPage.tsx - URL params:', {
+      pathname: window.location.pathname,
+      search: window.location.search,
+      isGuestParam,
+      isSignupParam,
+      isLoginParam,
+      viewParam
+    });
+    
+    // サインアップパラメータがある場合
+    if (isSignupParam) {
+      sessionStorage.setItem('showAuthForm', 'true');
+      sessionStorage.setItem('showSignupForm', 'true');
+      setGuestMode(false);
+      // URLからパラメータを削除
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('signup');
+      window.history.replaceState({}, '', newUrl.toString());
+      console.log('AppPage.tsx - Signup param detected, showing signup form');
+      return;
+    }
+    
+    // ログインパラメータがある場合
+    if (isLoginParam) {
+      sessionStorage.setItem('showAuthForm', 'true');
+      sessionStorage.removeItem('showSignupForm');
+      setGuestMode(false);
+      // URLからパラメータを削除
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('login');
+      window.history.replaceState({}, '', newUrl.toString());
+      console.log('AppPage.tsx - Login param detected, showing login form');
+      return;
+    }
+    
+    // ゲストパラメータがある場合
+    if (isGuestParam) {
+      setGuestMode(true);
+      setShowOnboarding(true);
+      // URLからパラメータを削除
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('guest');
+      window.history.replaceState({}, '', newUrl.toString());
+      console.log('AppPage.tsx - Guest param detected, enabling guest mode');
+      return;
+    }
+    
+    // ビューパラメータがあれば設定
+    if (viewParam) {
+      setCurrentView(viewParam);
+    }
+    
+    // 認証フォーム表示フラグをチェック
+    const showAuthForm = sessionStorage.getItem('showAuthForm') === 'true';
+    if (showAuthForm) {
+      setGuestMode(false);
+      sessionStorage.removeItem('showAuthForm');
+      console.log('AppPage.tsx - Auth form flag detected, showing auth form');
+      return;
+    }
+    
+    // デフォルトでゲストモードを有効化（認証フォームが表示されない場合のみ）
+    setGuestMode(true);
+    console.log('AppPage.tsx - Default guest mode enabled');
+    
+    // 期限切れのゲスト日記をクリーンアップ
+    cleanExpiredDiaries();
+    
+    // メンテナンスモードチェック
+    const checkMaintenanceMode = async () => {
+      try {
+        const { data } = await supabase
+          .from('maintenance_mode')
+          .select('is_enabled')
+          .single();
+        
+        if (data?.is_enabled) {
+          setIsMaintenanceMode(true);
+        }
+      } catch (error) {
+        console.log('Maintenance mode check failed:', error);
+      }
+    };
+    
+    checkMaintenanceMode();
+  }, [initialize, setGuestMode, cleanExpiredDiaries]);
+
+  // メンテナンスモード
+  if (isMaintenanceMode) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            メンテナンス中
+          </h1>
+          <p className="text-gray-600">
+            現在システムメンテナンス中です。しばらくお待ちください。
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ローディング中
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 認証フォーム表示
+  const showAuthForm = sessionStorage.getItem('showAuthForm') === 'true';
+  if (showAuthForm || (!user && !isGuestMode)) {
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <AuthForm />
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+  // ゲストモード
+  if (isGuestMode && !user) {
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <GuestBanner />
+        <div className="container mx-auto px-4 py-8">
+          <AnimatePresence mode="wait">
+            {showOnboarding ? (
+              <motion.div
+                key="onboarding"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <WelcomeGuide onComplete={() => setShowOnboarding(false)} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="guest-app"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="max-w-4xl mx-auto">
+                  <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                      音声日記を記録
+                    </h2>
+                    <VoiceRecorder />
+                  </div>
+                  <GuestDiaryList />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+  // メインアプリ
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {user?.user_metadata?.is_elderly ? (
+        <ElderlyNav currentView={currentView} onViewChange={setCurrentView} />
+      ) : (
+        <Header currentView={currentView} onViewChange={setCurrentView} />
+      )}
+      
+      <main className="container mx-auto px-4 py-8">
+        <AnimatePresence mode="wait">
+          {currentView === 'home' && (
+            <motion.div
+              key="home"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {user?.user_metadata?.is_elderly ? (
+                <ElderlyParentDashboard />
+              ) : (
+                <ParentDashboard />
+              )}
+            </motion.div>
+          )}
+          
+          {currentView === 'record' && (
+            <motion.div
+              key="record"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <VoiceRecorder />
+            </motion.div>
+          )}
+          
+          {currentView === 'diary' && (
+            <motion.div
+              key="diary"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {user?.user_metadata?.is_elderly ? (
+                <ElderlyDiaryList />
+              ) : (
+                <DiaryList />
+              )}
+            </motion.div>
+          )}
+          
+          {currentView === 'family' && (
+            <motion.div
+              key="family"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FamilyManager />
+            </motion.div>
+          )}
+          
+          {currentView === 'notifications' && (
+            <motion.div
+              key="notifications"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <NotificationSettings />
+            </motion.div>
+          )}
+          
+          {currentView === 'subscription' && (
+            <motion.div
+              key="subscription"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <SubscriptionPage />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+      
+      <PWAInstallPrompt />
+      <HelpButton />
+      <ApiUsageMonitor />
+      <Toaster position="top-center" />
+    </div>
+  );
+};

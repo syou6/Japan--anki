@@ -8,7 +8,10 @@ import { LogIn, UserPlus, UserCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const AuthForm: React.FC = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(() => {
+    // 新規登録フラグをチェック
+    return sessionStorage.getItem('showSignupForm') === 'true';
+  });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -27,11 +30,13 @@ export const AuthForm: React.FC = () => {
         toast.success('アカウントを作成しました！');
         // 認証成功時にフラグをクリア
         sessionStorage.removeItem('showAuthForm');
+        sessionStorage.removeItem('showSignupForm');
       } else {
         await signIn(email, password);
         toast.success('ログインしました！');
         // 認証成功時にフラグをクリア
         sessionStorage.removeItem('showAuthForm');
+        sessionStorage.removeItem('showSignupForm');
       }
     } catch (error: any) {
       toast.error(error.message || 'エラーが発生しました');
@@ -57,6 +62,7 @@ export const AuthForm: React.FC = () => {
   const handleGuestMode = () => {
     // 認証画面フラグをクリア
     sessionStorage.removeItem('showAuthForm');
+    sessionStorage.removeItem('showSignupForm');
     setGuestMode(true);
     window.location.reload(); // Routerが設定される前なのでreloadで対応
     toast.success('ゲストモードで開始しました（3回まで試せます）');

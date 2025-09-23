@@ -3,195 +3,363 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JavaGem - Mobile Coffee Shop</title>
+    <title>AI Voice Journal - 高齢者向け音声日記アプリ</title>
+    <meta name="description" content="高齢者の方でも簡単に使える音声日記アプリ。話すだけで日記を記録し、AIが感情や健康状態を分析。家族との共有機能も充実。">
+    <meta name="keywords" content="音声日記,高齢者,AI,家族共有,健康管理,日記アプリ">
+    <link rel="icon" type="image/png" href="/logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
         
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Noto Sans JP', sans-serif;
         }
         
-        .coffee-gradient {
-            background: linear-gradient(135deg, #B08968 0%, #7F5539 100%);
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
         
         .phone-mockup {
-            width: 320px;
-            height: 640px;
-            border-radius: 40px;
+            width: 300px;
+            height: 600px;
+            border-radius: 30px;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            background: #000;
         }
         
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: white;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .coffee-bean {
-            position: absolute;
-            opacity: 0.1;
-            animation: float 10s infinite ease-in-out;
+        .floating {
+            animation: float 6s ease-in-out infinite;
         }
         
         @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .blob {
+            animation: blob 7s infinite;
+        }
+        
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
         }
     </style>
 </head>
-<body class="coffee-gradient min-h-screen overflow-x-hidden">
-    <!-- Coffee beans background decoration -->
-    <div class="coffee-bean top-10 left-10 text-6xl">☕</div>
-    <div class="coffee-bean top-40 right-20 text-8xl" style="animation-delay: 2s;">☕</div>
-    <div class="coffee-bean bottom-20 left-1/4 text-7xl" style="animation-delay: 4s;">☕</div>
-    
-    <div class="container mx-auto px-4 py-8 max-w-7xl">
-        <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
-            
-            <!-- Left side - Text Content -->
-            <div class="flex-1 text-white">
-                <!-- Logo -->
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center">
-                        <span class="text-3xl">☕</span>
-                    </div>
-                    <h1 class="text-3xl font-bold">JavaGem</h1>
+<body class="bg-white">
+    <!-- ヘッダー -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <img src="/logo.png" alt="AI Voice Journal" class="w-10 h-10">
+                    <h1 class="text-2xl font-bold text-gray-800">AI Voice Journal</h1>
                 </div>
-                
-                <!-- Main heading -->
-                <h2 class="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                    Mobile<br>
-                    Coffee Shop
-                </h2>
-                
-                <p class="text-xl mb-12 opacity-90">
-                    Cozy coffee corner for all coffee lover's.
-                </p>
-                
-                <!-- Features -->
-                <div class="space-y-6 mb-12">
-                    <div class="flex items-center gap-4">
-                        <div class="feature-icon">
-                            <span class="text-2xl">📱</span>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-lg">Organized Layer</h3>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center gap-4">
-                        <div class="feature-icon">
-                            <span class="text-2xl">🎨</span>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-lg">Auto Layout</h3>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center gap-4">
-                        <div class="feature-icon">
-                            <span class="text-2xl">✨</span>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-lg">Modern Layout</h3>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Platform badges -->
-                <div class="flex gap-4">
-                    <a href="#" class="w-14 h-14 bg-white rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                        <svg class="w-8 h-8 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M22.46 6c-.85.38-1.75.64-2.7.76 1-.6 1.76-1.55 2.12-2.68-.93.55-1.96.95-3.06 1.17-.88-.94-2.13-1.53-3.51-1.53-2.66 0-4.81 2.16-4.81 4.81 0 .38.04.75.13 1.1-4-.2-7.54-2.11-9.91-5.02-.41.71-.65 1.53-.65 2.4 0 1.67.85 3.14 2.14 4.01-.79-.03-1.54-.24-2.19-.6v.06c0 2.33 1.66 4.28 3.86 4.72-.4.11-.83.17-1.27.17-.31 0-.62-.03-.92-.08.63 1.91 2.45 3.31 4.61 3.35-1.69 1.32-3.83 2.11-6.15 2.11-.4 0-.8-.02-1.19-.07 2.19 1.4 4.78 2.22 7.57 2.22 9.07 0 14.02-7.51 14.02-14.02 0-.21 0-.43-.01-.64.96-.69 1.79-1.56 2.45-2.55z"/>
-                        </svg>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#features" class="text-gray-600 hover:text-purple-600 transition-colors">機能</a>
+                    <a href="#pricing" class="text-gray-600 hover:text-purple-600 transition-colors">料金</a>
+                    <a href="#contact" class="text-gray-600 hover:text-purple-600 transition-colors">お問い合わせ</a>
+                </nav>
+                <div class="flex space-x-4">
+                    <a href="/app?guest=true" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+                        ゲスト体験
                     </a>
-                    <a href="#" class="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                        <span class="text-2xl font-bold text-black">M</span>
+                    <a href="/app?signup=true" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                        無料で始める
                     </a>
                 </div>
             </div>
-            
-            <!-- Right side - Phone Mockups -->
-            <div class="flex gap-8 items-center">
-                <!-- Main Phone -->
-                <div class="phone-mockup bg-black relative">
-                    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/50"></div>
-                    <div class="relative z-10 h-full flex flex-col items-center justify-center p-8 text-white">
-                        <!-- Coffee cup image placeholder -->
-                        <div class="w-48 h-48 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full mb-8 flex items-center justify-center">
-                            <span class="text-6xl">☕</span>
-                        </div>
-                        
-                        <h3 class="text-2xl font-bold text-center mb-2">
-                            Fall in Love with<br>
-                            Coffee in Blissful<br>
-                            Delight!
-                        </h3>
-                        
-                        <p class="text-sm text-center opacity-80 mb-8">
-                            Welcome to our cozy coffee corner, where<br>
-                            every cup is a delightful for you.
-                        </p>
-                        
-                        <button class="w-full bg-amber-600 text-white py-4 rounded-full font-semibold hover:bg-amber-700 transition-colors">
-                            Get Started
-                        </button>
+        </div>
+    </header>
+
+    <!-- ヒーローセクション -->
+    <section class="gradient-bg text-white py-20 relative overflow-hidden">
+        <!-- 背景装飾 -->
+        <div class="absolute inset-0">
+            <div class="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blob"></div>
+            <div class="absolute bottom-20 right-10 w-24 h-24 bg-white/10 rounded-full blob" style="animation-delay: 2s;"></div>
+            <div class="absolute top-1/2 left-1/4 w-16 h-16 bg-white/10 rounded-full blob" style="animation-delay: 4s;"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="flex-1 text-center lg:text-left">
+                    <h2 class="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                        話すだけで<br>
+                        <span class="text-yellow-300">日記が完成</span>
+                    </h2>
+                    <p class="text-xl mb-8 opacity-90 max-w-2xl">
+                        高齢者の方でも簡単に使える音声日記アプリ。<br>
+                        AIが感情や健康状態を分析し、家族と安心を共有できます。
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <a href="/app?signup=true" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-xl font-semibold hover:bg-yellow-300 transition-colors text-lg">
+                            無料で始める
+                        </a>
+                        <a href="/app?guest=true" class="bg-white/20 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/30 transition-colors text-lg border border-white/30">
+                            ゲストで体験
+                        </a>
                     </div>
                 </div>
                 
-                <!-- Secondary Phones (partially visible) -->
-                <div class="hidden lg:flex flex-col gap-4">
-                    <!-- Order screen preview -->
-                    <div class="w-64 h-32 bg-white rounded-2xl p-4 shadow-lg">
-                        <div class="flex items-center gap-2 mb-2">
-                            <div class="w-8 h-8 bg-amber-600 rounded-lg"></div>
-                            <span class="font-semibold">Caffe Mocha</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span>Price</span>
-                            <span class="font-bold">$ 4.53</span>
-                        </div>
-                        <button class="w-full bg-amber-600 text-white py-2 rounded-lg mt-2 text-sm">
-                            Order
-                        </button>
-                    </div>
-                    
-                    <!-- Promo preview -->
-                    <div class="w-64 h-32 bg-gradient-to-r from-amber-600 to-amber-700 rounded-2xl p-4 shadow-lg text-white">
-                        <p class="text-xs mb-1">Promo</p>
-                        <h4 class="font-bold text-lg">Buy one get<br>one FREE</h4>
-                        <div class="flex gap-2 mt-2">
-                            <div class="w-8 h-8 bg-white/20 rounded-lg"></div>
-                            <div class="w-8 h-8 bg-white/20 rounded-lg"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Menu preview -->
-                    <div class="w-64 h-32 bg-white rounded-2xl p-4 shadow-lg">
-                        <div class="flex gap-4">
-                            <div>
-                                <div class="w-16 h-16 bg-amber-100 rounded-lg mb-1"></div>
-                                <p class="text-xs">Caffe Mocha</p>
-                                <p class="text-xs font-bold">$ 4.53</p>
+                <div class="flex-1 flex justify-center">
+                    <div class="phone-mockup floating">
+                        <div class="h-full bg-gradient-to-b from-purple-500 to-pink-500 flex flex-col items-center justify-center p-8 text-white">
+                            <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mb-6">
+                                <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                                    <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                                </svg>
                             </div>
-                            <div>
-                                <div class="w-16 h-16 bg-amber-100 rounded-lg mb-1"></div>
-                                <p class="text-xs">Flat White</p>
-                                <p class="text-xs font-bold">$ 3.53</p>
-                            </div>
+                            <h3 class="text-2xl font-bold text-center mb-4">
+                                今日の気分は<br>
+                                いかがですか？
+                            </h3>
+                            <p class="text-center opacity-80 mb-6">
+                                ボタンを押して<br>
+                                お話しください
+                            </p>
+                            <button class="w-20 h-20 bg-white/30 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                                    <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- 機能セクション -->
+    <section id="features" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
+                    主な機能
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    高齢者の方でも簡単に使える、革新的な音声日記アプリ
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="feature-card bg-white rounded-2xl p-8 shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">音声入力</h3>
+                    <p class="text-gray-600">話すだけで日記を記録。手が不自由でも簡単操作</p>
+                </div>
+                
+                <div class="feature-card bg-white rounded-2xl p-8 shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">AI分析</h3>
+                    <p class="text-gray-600">感情や健康状態をAIが分析。家族に安心を提供</p>
+                </div>
+                
+                <div class="feature-card bg-white rounded-2xl p-8 shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">家族共有</h3>
+                    <p class="text-gray-600">家族と日記を共有。離れていても心配り</p>
+                </div>
+                
+                <div class="feature-card bg-white rounded-2xl p-8 shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">簡単操作</h3>
+                    <p class="text-gray-600">大きなボタンとシンプルな画面。高齢者に優しい設計</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 料金セクション -->
+    <section id="pricing" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
+                    料金プラン
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    シンプルで分かりやすい料金体系。高齢者の方にも安心してご利用いただけます
+                </p>
+            </div>
+            
+            <div class="max-w-lg mx-auto">
+                <div class="relative bg-white rounded-3xl shadow-2xl p-8 border border-gray-100 overflow-hidden">
+                    <!-- 人気バッジ -->
+                    <div class="absolute top-0 right-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-bl-2xl text-sm font-semibold">
+                        おすすめ
+                    </div>
+                    
+                    <!-- グラデーション背景 -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-50 to-pink-50 opacity-50"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="text-center mb-8">
+                            <h3 class="text-3xl font-bold text-gray-900 mb-4">
+                                ベーシックプラン
+                            </h3>
+                            <div class="mb-6">
+                                <span class="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                                    ¥500
+                                </span>
+                                <span class="text-xl text-gray-500 ml-2">/月</span>
+                            </div>
+                            <p class="text-gray-600">
+                                すべての機能を無制限でご利用いただけます
+                            </p>
+                        </div>
+                        
+                        <div class="space-y-4 mb-8">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mr-3">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-gray-700 font-medium">無制限の音声日記記録</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mr-3">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-gray-700 font-medium">AI感情分析・健康状態チェック</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mr-3">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-gray-700 font-medium">家族との安全な共有機能</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mr-3">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-gray-700 font-medium">プッシュ通知・リマインダー</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mr-3">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-gray-700 font-medium">データの自動バックアップ</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mr-3">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-gray-700 font-medium">24時間サポート対応</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <a href="/app?signup=true" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-6 rounded-2xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg block text-center">
+                                無料で始める
+                            </a>
+                            <a href="/app?guest=true" class="w-full bg-white text-gray-700 py-3 px-6 rounded-2xl font-semibold border-2 border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-all duration-300 block text-center">
+                                ゲストで体験
+                            </a>
+                        </div>
+                        
+                        <div class="mt-6 text-center">
+                            <p class="text-sm text-gray-500">
+                                <span class="font-semibold">7日間無料トライアル</span> いつでもキャンセル可能
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- フッター -->
+    <footer id="contact" class="bg-gray-900 text-white py-16">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <img src="/logo.png" alt="AI Voice Journal" class="w-10 h-10">
+                        <h3 class="text-2xl font-bold">AI Voice Journal</h3>
+                    </div>
+                    <p class="text-gray-300 mb-6 max-w-md">
+                        高齢者の方でも簡単に使える音声日記アプリ。AIが感情や健康状態を分析し、家族と安心を共有できます。
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M22.46 6c-.85.38-1.75.64-2.7.76 1-.6 1.76-1.55 2.12-2.68-.93.55-1.96.95-3.06 1.17-.88-.94-2.13-1.53-3.51-1.53-2.66 0-4.81 2.16-4.81 4.81 0 .38.04.75.13 1.1-4-.2-7.54-2.11-9.91-5.02-.41.71-.65 1.53-.65 2.4 0 1.67.85 3.14 2.14 4.01-.79-.03-1.54-.24-2.19-.6v.06c0 2.33 1.66 4.28 3.86 4.72-.4.11-.83.17-1.27.17-.31 0-.62-.03-.92-.08.63 1.91 2.45 3.31 4.61 3.35-1.69 1.32-3.83 2.11-6.15 2.11-.4 0-.8-.02-1.19-.07 2.19 1.4 4.78 2.22 7.57 2.22 9.07 0 14.02-7.51 14.02-14.02 0-.21 0-.43-.01-.64.96-.69 1.79-1.56 2.45-2.55z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">サービス</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#features" class="hover:text-white transition-colors">機能</a></li>
+                        <li><a href="#pricing" class="hover:text-white transition-colors">料金</a></li>
+                        <li><a href="/app?guest=true" class="hover:text-white transition-colors">ゲスト体験</a></li>
+                        <li><a href="/app?signup=true" class="hover:text-white transition-colors">無料で始める</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">サポート</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="/legal.html" class="hover:text-white transition-colors">特定商取引法</a></li>
+                        <li><a href="/terms.html" class="hover:text-white transition-colors">利用規約</a></li>
+                        <li><a href="/privacy.html" class="hover:text-white transition-colors">プライバシーポリシー</a></li>
+                        <li><a href="mailto:heartssh950@gmail.com" class="hover:text-white transition-colors">お問い合わせ</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 AI Voice Journal. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

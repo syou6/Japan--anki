@@ -11,10 +11,12 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        app: resolve(__dirname, 'index.html'),
-        main: resolve(__dirname, 'src/main.tsx'),
+        main: resolve(__dirname, 'index.html'),
       },
     },
   },
   publicDir: 'public',
+  server: {
+    historyApiFallback: true,
+  },
 });
