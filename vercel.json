@@ -40,14 +40,20 @@
       ]
     }
   ],
+  "rewrites": [
+    {
+      "source": "/app",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/app/(.*)",
+      "destination": "/index.html"
+    }
+  ],
   "routes": [
     {
       "src": "/lp.html",
       "dest": "/lp.html"
-    },
-    {
-      "src": "/company.html",
-      "dest": "/company.html"
     },
     {
       "src": "/legal.html",
@@ -62,20 +68,8 @@
       "dest": "/terms.html"
     },
     {
-      "src": "/app",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/app/(.*)",
-      "dest": "/index.html"
-    },
-    {
       "src": "/",
       "dest": "/lp.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
     }
   ]
 }
