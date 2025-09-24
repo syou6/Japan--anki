@@ -2,6 +2,44 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.js)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.css)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/css"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    }
+  ],
   "routes": [
     {
       "src": "/lp.html",
@@ -25,11 +63,11 @@
     },
     {
       "src": "/app",
-      "dest": "/app.html"
+      "dest": "/index.html"
     },
     {
       "src": "/app/(.*)",
-      "dest": "/app.html"
+      "dest": "/index.html"
     },
     {
       "src": "/",

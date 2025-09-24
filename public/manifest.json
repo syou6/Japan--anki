@@ -1,15 +1,15 @@
 {
-  "name": "日記AI",
-  "short_name": "日記AI",
-  "description": "AIを活用した家族の音声日記アプリ",
-  "theme_color": "#2563eb",
+  "name": "AI Voice Journal",
+  "short_name": "AI Voice Journal",
+  "description": "高齢者向け音声日記アプリ - 話すだけで日記が完成",
+  "theme_color": "#667eea",
   "background_color": "#ffffff",
   "display": "standalone",
   "orientation": "portrait",
   "scope": "/",
-  "start_url": "/",
-  "id": "nikki-ai-pwa",
-  "categories": ["lifestyle", "productivity"],
+  "start_url": "/lp.html",
+  "id": "ai-voice-journal-pwa",
+  "categories": ["lifestyle", "productivity", "health"],
   "icons": [
     {
       "src": "/icon-192x192.png",
