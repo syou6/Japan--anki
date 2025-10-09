@@ -9,6 +9,11 @@ const hasValidConfig = supabaseUrl && supabaseAnonKey &&
   supabaseAnonKey !== 'your_supabase_anon_key';
 
 console.log('Supabase初期化:', hasValidConfig ? '設定済み' : '未設定');
+console.log('Supabase詳細:', {
+  supabaseUrl: supabaseUrl,
+  supabaseAnonKey: supabaseAnonKey ? '***' + supabaseAnonKey.slice(-4) : '未設定',
+  hasValidConfig
+});
 
 let supabase: any = null;
 

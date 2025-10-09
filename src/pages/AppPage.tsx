@@ -33,6 +33,13 @@ export const AppPage: React.FC = () => {
 
   useEffect(() => {
     console.log('AppPage初期化開始');
+    console.log('環境変数デバッグ:', {
+      VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+      VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY ? '設定済み' : '未設定',
+      MODE: import.meta.env.MODE,
+      PROD: import.meta.env.PROD,
+      DEV: import.meta.env.DEV
+    });
 
     // 強制ゲストモードを無効化（普通の動作に戻す）
 
