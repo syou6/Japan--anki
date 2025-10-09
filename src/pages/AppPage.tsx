@@ -32,7 +32,12 @@ export const AppPage: React.FC = () => {
 
   useEffect(() => {
     // 環境変数が設定されていない場合は即座にゲストモードで開始
-    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+    const hasValidConfig = import.meta.env.VITE_SUPABASE_URL && 
+      import.meta.env.VITE_SUPABASE_ANON_KEY &&
+      import.meta.env.VITE_SUPABASE_URL !== 'your_supabase_url' &&
+      import.meta.env.VITE_SUPABASE_ANON_KEY !== 'your_supabase_anon_key';
+
+    if (!hasValidConfig) {
       console.log('環境変数が未設定のため、ゲストモードで開始します');
       setGuestMode(true);
       setShowOnboarding(true);

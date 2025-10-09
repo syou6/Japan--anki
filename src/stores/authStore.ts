@@ -162,7 +162,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   initialize: async () => {
     try {
       // 環境変数が設定されていない場合はゲストモードで開始
-      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+      const hasValidConfig = import.meta.env.VITE_SUPABASE_URL && 
+        import.meta.env.VITE_SUPABASE_ANON_KEY &&
+        import.meta.env.VITE_SUPABASE_URL !== 'your_supabase_url' &&
+        import.meta.env.VITE_SUPABASE_ANON_KEY !== 'your_supabase_anon_key';
+
+      if (!hasValidConfig) {
         console.log('Supabase環境変数が未設定のため、ゲストモードで開始します');
         set({ user: null, loading: false });
         return;
