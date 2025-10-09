@@ -13,7 +13,10 @@ console.log('Supabase初期化チェック:', {
   supabaseAnonKey: supabaseAnonKey ? '設定済み' : '未設定',
   hasValidConfig,
   urlValue: supabaseUrl,
-  keyValue: supabaseAnonKey ? '***' + supabaseAnonKey.slice(-4) : '未設定'
+  keyValue: supabaseAnonKey ? '***' + supabaseAnonKey.slice(-4) : '未設定',
+  urlLength: supabaseUrl?.length || 0,
+  keyLength: supabaseAnonKey?.length || 0,
+  allEnvVars: Object.keys(import.meta.env).filter(key => key.startsWith('VITE_'))
 });
 
 let supabase: any = null;

@@ -38,7 +38,13 @@ export const AppPage: React.FC = () => {
       VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL ? '設定済み' : '未設定',
       VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY ? '設定済み' : '未設定',
       URL_VALUE: import.meta.env.VITE_SUPABASE_URL,
-      KEY_VALUE: import.meta.env.VITE_SUPABASE_ANON_KEY ? '***' + import.meta.env.VITE_SUPABASE_ANON_KEY.slice(-4) : '未設定'
+      KEY_VALUE: import.meta.env.VITE_SUPABASE_ANON_KEY ? '***' + import.meta.env.VITE_SUPABASE_ANON_KEY.slice(-4) : '未設定',
+      URL_LENGTH: import.meta.env.VITE_SUPABASE_URL?.length || 0,
+      KEY_LENGTH: import.meta.env.VITE_SUPABASE_ANON_KEY?.length || 0,
+      ALL_ENV_VARS: Object.keys(import.meta.env).filter(key => key.startsWith('VITE_')),
+      MODE: import.meta.env.MODE,
+      DEV: import.meta.env.DEV,
+      PROD: import.meta.env.PROD
     });
 
     // 環境変数が設定されていない場合は即座にゲストモードで開始
@@ -135,7 +141,13 @@ export const AppPage: React.FC = () => {
     // 環境変数が設定されている場合は認証を試行
     if (hasValidConfig) {
       console.log('AppPage.tsx - Valid config found, initializing auth');
-      initialize().finally(() => {
+      initialize().catch((error) => {
+        console.error('認証初期化エラー:', error);
+        // エラーが発生した場合はゲストモードで開始
+        console.log('AppPage.tsx - Auth init failed, falling back to guest mode');
+        setGuestMode(true);
+        setShowOnboarding(true);
+      }).finally(() => {
         setIsInitialized(true);
       });
       return;
