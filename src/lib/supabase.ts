@@ -8,6 +8,14 @@ const hasValidConfig = supabaseUrl && supabaseAnonKey &&
   supabaseUrl !== 'your_supabase_url' && 
   supabaseAnonKey !== 'your_supabase_anon_key';
 
+console.log('Supabase初期化チェック:', {
+  supabaseUrl: supabaseUrl ? '設定済み' : '未設定',
+  supabaseAnonKey: supabaseAnonKey ? '設定済み' : '未設定',
+  hasValidConfig,
+  urlValue: supabaseUrl,
+  keyValue: supabaseAnonKey ? '***' + supabaseAnonKey.slice(-4) : '未設定'
+});
+
 let supabase: any = null;
 
 if (hasValidConfig) {
