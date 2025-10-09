@@ -51,7 +51,15 @@ export const AppPage: React.FC = () => {
     console.log('強制的にゲストモードで開始します（デバッグ用）');
     setGuestMode(true);
     setShowOnboarding(true);
-    setIsInitialized(true);
+    
+    // 期限切れのゲスト日記をクリーンアップ
+    cleanExpiredDiaries();
+    
+    // 初期化完了
+    setTimeout(() => {
+      setIsInitialized(true);
+      console.log('初期化完了: ゲストモードで開始');
+    }, 100);
     return;
 
     // 環境変数が設定されていない場合は即座にゲストモードで開始
@@ -212,7 +220,10 @@ export const AppPage: React.FC = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
           <p className="text-gray-600">読み込み中...</p>
           <p className="text-sm text-gray-500 mt-2">
-            環境変数未設定の場合は自動的にゲストモードで開始されます
+            強制ゲストモードで初期化中...
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            isInitialized: {isInitialized ? 'true' : 'false'}, loading: {loading ? 'true' : 'false'}
           </p>
         </div>
       </div>
