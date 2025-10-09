@@ -128,6 +128,7 @@ export const AppPage: React.FC = () => {
       setGuestMode(false);
       sessionStorage.removeItem('showAuthForm');
       console.log('AppPage.tsx - Auth form flag detected, showing auth form');
+      setIsInitialized(true);
       return;
     }
     
@@ -190,6 +191,13 @@ export const AppPage: React.FC = () => {
 
   // 認証フォーム表示
   const showAuthForm = sessionStorage.getItem('showAuthForm') === 'true';
+  console.log('認証フォーム表示チェック:', {
+    showAuthForm,
+    user: !!user,
+    isGuestMode,
+    shouldShowAuth: showAuthForm || (!user && !isGuestMode)
+  });
+  
   if (showAuthForm || (!user && !isGuestMode)) {
     return (
       <div className="min-h-screen bg-gray-100">

@@ -143,6 +143,7 @@ export const useGuestStore = create<GuestStore>()(
       },
 
       setGuestMode: (enabled: boolean) => {
+        console.log('setGuestMode called:', enabled);
         set({ isGuestMode: enabled });
       },
 
