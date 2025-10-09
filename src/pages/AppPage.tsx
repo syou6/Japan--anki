@@ -122,7 +122,7 @@ export const AppPage: React.FC = () => {
       setCurrentView(viewParam);
     }
     
-    // 認証フォーム表示フラグをチェック
+    // 認証フォーム表示フラグをチェック（最優先）
     const showAuthForm = sessionStorage.getItem('showAuthForm') === 'true';
     if (showAuthForm) {
       setGuestMode(false);
@@ -132,9 +132,20 @@ export const AppPage: React.FC = () => {
       return;
     }
     
-    // デフォルトでゲストモードを有効化（認証フォームが表示されない場合のみ）
+    // 環境変数が設定されている場合は認証を試行
+    if (hasValidConfig) {
+      console.log('AppPage.tsx - Valid config found, initializing auth');
+      initialize().finally(() => {
+        setIsInitialized(true);
+      });
+      return;
+    }
+    
+    // 環境変数が未設定の場合はゲストモードで開始
+    console.log('AppPage.tsx - No valid config, starting guest mode');
     setGuestMode(true);
-    console.log('AppPage.tsx - Default guest mode enabled');
+    setShowOnboarding(true);
+    setIsInitialized(true);
     
     // 期限切れのゲスト日記をクリーンアップ
     cleanExpiredDiaries();

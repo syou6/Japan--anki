@@ -173,6 +173,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         return Promise.resolve();
       }
 
+      console.log('認証ストア初期化開始');
+
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
