@@ -32,35 +32,9 @@ export const AppPage: React.FC = () => {
   const { isGuestMode, cleanExpiredDiaries, setGuestMode } = useGuestStore();
 
   useEffect(() => {
-    // デバッグ用ログ
     console.log('AppPage初期化開始');
-    console.log('環境変数チェック:', {
-      VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL ? '設定済み' : '未設定',
-      VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY ? '設定済み' : '未設定',
-      URL_VALUE: import.meta.env.VITE_SUPABASE_URL,
-      KEY_VALUE: import.meta.env.VITE_SUPABASE_ANON_KEY ? '***' + import.meta.env.VITE_SUPABASE_ANON_KEY.slice(-4) : '未設定',
-      URL_LENGTH: import.meta.env.VITE_SUPABASE_URL?.length || 0,
-      KEY_LENGTH: import.meta.env.VITE_SUPABASE_ANON_KEY?.length || 0,
-      ALL_ENV_VARS: Object.keys(import.meta.env).filter(key => key.startsWith('VITE_')),
-      MODE: import.meta.env.MODE,
-      DEV: import.meta.env.DEV,
-      PROD: import.meta.env.PROD
-    });
 
-    // 一時的に強制的にゲストモードで開始（デバッグ用）
-    console.log('強制的にゲストモードで開始します（デバッグ用）');
-    setGuestMode(true);
-    setShowOnboarding(true);
-    
-    // 期限切れのゲスト日記をクリーンアップ
-    cleanExpiredDiaries();
-    
-    // 初期化完了
-    setTimeout(() => {
-      setIsInitialized(true);
-      console.log('初期化完了: ゲストモードで開始');
-    }, 100);
-    return;
+    // 強制ゲストモードを無効化（普通の動作に戻す）
 
     // 環境変数が設定されていない場合は即座にゲストモードで開始
     const hasValidConfig = import.meta.env.VITE_SUPABASE_URL && 
@@ -219,12 +193,6 @@ export const AppPage: React.FC = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
           <p className="text-gray-600">読み込み中...</p>
-          <p className="text-sm text-gray-500 mt-2">
-            強制ゲストモードで初期化中...
-          </p>
-          <p className="text-xs text-gray-400 mt-1">
-            isInitialized: {isInitialized ? 'true' : 'false'}, loading: {loading ? 'true' : 'false'}
-          </p>
         </div>
       </div>
     );
@@ -232,12 +200,6 @@ export const AppPage: React.FC = () => {
 
   // 認証フォーム表示
   const showAuthForm = sessionStorage.getItem('showAuthForm') === 'true';
-  console.log('認証フォーム表示チェック:', {
-    showAuthForm,
-    user: !!user,
-    isGuestMode,
-    shouldShowAuth: showAuthForm || (!user && !isGuestMode)
-  });
   
   if (showAuthForm || (!user && !isGuestMode)) {
     return (

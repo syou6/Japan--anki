@@ -8,16 +8,7 @@ const hasValidConfig = supabaseUrl && supabaseAnonKey &&
   supabaseUrl !== 'your_supabase_url' && 
   supabaseAnonKey !== 'your_supabase_anon_key';
 
-console.log('Supabase初期化チェック:', {
-  supabaseUrl: supabaseUrl ? '設定済み' : '未設定',
-  supabaseAnonKey: supabaseAnonKey ? '設定済み' : '未設定',
-  hasValidConfig,
-  urlValue: supabaseUrl,
-  keyValue: supabaseAnonKey ? '***' + supabaseAnonKey.slice(-4) : '未設定',
-  urlLength: supabaseUrl?.length || 0,
-  keyLength: supabaseAnonKey?.length || 0,
-  allEnvVars: Object.keys(import.meta.env).filter(key => key.startsWith('VITE_'))
-});
+console.log('Supabase初期化:', hasValidConfig ? '設定済み' : '未設定');
 
 let supabase: any = null;
 
