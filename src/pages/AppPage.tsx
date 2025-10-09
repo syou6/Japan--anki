@@ -47,6 +47,13 @@ export const AppPage: React.FC = () => {
       PROD: import.meta.env.PROD
     });
 
+    // 一時的に強制的にゲストモードで開始（デバッグ用）
+    console.log('強制的にゲストモードで開始します（デバッグ用）');
+    setGuestMode(true);
+    setShowOnboarding(true);
+    setIsInitialized(true);
+    return;
+
     // 環境変数が設定されていない場合は即座にゲストモードで開始
     const hasValidConfig = import.meta.env.VITE_SUPABASE_URL && 
       import.meta.env.VITE_SUPABASE_ANON_KEY &&
