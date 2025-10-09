@@ -161,6 +161,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   initialize: async () => {
     try {
+      // 環境変数が設定されていない場合はゲストモードで開始
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        console.log('Supabase環境変数が未設定のため、ゲストモードで開始します');
+        set({ user: null, loading: false });
+        return;
+      }
+
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {

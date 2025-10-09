@@ -31,6 +31,14 @@ export const AppPage: React.FC = () => {
   const { isGuestMode, cleanExpiredDiaries, setGuestMode } = useGuestStore();
 
   useEffect(() => {
+    // 環境変数が設定されていない場合は即座にゲストモードで開始
+    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+      console.log('環境変数が未設定のため、ゲストモードで開始します');
+      setGuestMode(true);
+      setShowOnboarding(true);
+      return;
+    }
+
     initialize();
     
     // URLパラメータをチェック
