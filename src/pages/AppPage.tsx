@@ -27,6 +27,7 @@ export const AppPage: React.FC = () => {
   const [currentView, setCurrentView] = useState('home');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const { user, loading, initialize } = useAuthStore();
   const { isGuestMode, cleanExpiredDiaries, setGuestMode } = useGuestStore();
 
@@ -41,10 +42,14 @@ export const AppPage: React.FC = () => {
       console.log('環境変数が未設定のため、ゲストモードで開始します');
       setGuestMode(true);
       setShowOnboarding(true);
+      setIsInitialized(true);
       return;
     }
 
-    initialize();
+    // 環境変数が設定されている場合のみ初期化
+    initialize().finally(() => {
+      setIsInitialized(true);
+    });
     
     // URLパラメータをチェック
     const urlParams = new URLSearchParams(window.location.search);
@@ -157,13 +162,16 @@ export const AppPage: React.FC = () => {
     );
   }
 
-  // ローディング中
-  if (loading) {
+  // ローディング中（初期化が完了していない場合）
+  if (!isInitialized || loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
           <p className="text-gray-600">読み込み中...</p>
+          <p className="text-sm text-gray-500 mt-2">
+            環境変数未設定の場合は自動的にゲストモードで開始されます
+          </p>
         </div>
       </div>
     );

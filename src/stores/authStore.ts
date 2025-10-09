@@ -170,7 +170,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       if (!hasValidConfig) {
         console.log('Supabase環境変数が未設定のため、ゲストモードで開始します');
         set({ user: null, loading: false });
-        return;
+        return Promise.resolve();
       }
 
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -249,6 +249,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     } catch (error) {
       console.error('Auth初期化エラー:', error);
       set({ user: null, loading: false });
+      return Promise.resolve(); // エラーでもPromiseを返す
     }
   },
 }));
