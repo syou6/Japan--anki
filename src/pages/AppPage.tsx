@@ -139,23 +139,23 @@ export const AppPage: React.FC = () => {
     // 期限切れのゲスト日記をクリーンアップ
     cleanExpiredDiaries();
     
-    // メンテナンスモードチェック
-    const checkMaintenanceMode = async () => {
-      try {
-        const { data } = await supabase
-          .from('maintenance_mode')
-          .select('is_enabled')
-          .single();
-        
-        if (data?.is_enabled) {
-          setIsMaintenanceMode(true);
-        }
-      } catch (error) {
-        console.log('Maintenance mode check failed:', error);
-      }
-    };
-    
-    checkMaintenanceMode();
+    // メンテナンスモードチェック（無効化）
+    // const checkMaintenanceMode = async () => {
+    //   try {
+    //     const { data } = await supabase
+    //       .from('maintenance_mode')
+    //       .select('is_enabled')
+    //       .single();
+    //     
+    //     if (data?.is_enabled) {
+    //       setIsMaintenanceMode(true);
+    //     }
+    //   } catch (error) {
+    //     console.log('Maintenance mode check failed:', error);
+    //   }
+    // };
+    // 
+    // checkMaintenanceMode();
   }, [initialize, setGuestMode, cleanExpiredDiaries]);
 
   // メンテナンスモード
