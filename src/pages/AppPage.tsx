@@ -14,7 +14,7 @@ import { DiaryList } from '../components/diary/DiaryList';
 import { ElderlyDiaryList } from '../components/diary/ElderlyDiaryList';
 import { FamilyManager } from '../components/family/FamilyManager';
 import { NotificationSettings } from '../components/settings/NotificationSettings';
-import { SubscriptionPage } from '../components/subscription/SubscriptionPage';
+import { SubscriptionManager } from '../components/subscription/SubscriptionManager';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 import { GuestBanner } from '../components/guest/GuestBanner';
 import { GuestDiaryList } from '../components/guest/GuestDiaryList';
@@ -340,7 +340,7 @@ export const AppPage: React.FC = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <SubscriptionPage />
+              <SubscriptionManager />
             </motion.div>
           )}
         </AnimatePresence>
