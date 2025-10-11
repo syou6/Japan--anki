@@ -33,6 +33,9 @@ export const AppPage: React.FC = () => {
 
   useEffect(() => {
     console.log('AppPage初期化開始');
+    
+    // アプリを使用したことを記録
+    localStorage.setItem('hasUsedApp', 'true');
 
     // 強制ゲストモードを無効化（普通の動作に戻す）
 
