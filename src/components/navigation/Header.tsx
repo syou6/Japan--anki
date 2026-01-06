@@ -108,7 +108,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
         </div>
 
         {/* Mobile Navigation */}
-        <div className="md:hidden border-t border-gray-200">
+        <div className="md:hidden border-t border-white/20 bg-white">
           <div className="flex justify-around py-2">
             {navigation.filter(item => item.show).map(item => (
               <button
@@ -117,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
                 className={`flex flex-col items-center gap-1 py-2 px-3 rounded-lg transition-colors ${
                   currentView === item.id
                     ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 <item.icon className="w-6 h-6" />
