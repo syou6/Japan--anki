@@ -86,7 +86,8 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
             </div>
 
             <div className="flex items-center gap-1 sm:gap-2">
-              {!isGuestMode && (
+              {/* 設定ボタンは一時的に非表示 */}
+              {/* {!isGuestMode && (
                 <button
                   className="bg-white border-2 border-gray-300 rounded-lg p-2 sm:px-3 hover:bg-gray-100 flex items-center gap-1"
                   onClick={() => onViewChange('settings')}
@@ -94,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
                   <Settings className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: '#000000' }} />
                   <span className="hidden xl:inline text-black font-bold">設定</span>
                 </button>
-              )}
+              )} */}
               {!isGuestMode && (
                 <button
                   className="bg-white border-2 border-gray-300 rounded-lg p-2 sm:px-3 hover:bg-gray-100 flex items-center gap-1"
