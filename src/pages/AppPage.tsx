@@ -278,7 +278,7 @@ export const AppPage: React.FC = () => {
               {user?.user_metadata?.is_elderly ? (
                 <ElderlyParentDashboard />
               ) : (
-                <ParentDashboard />
+                <ParentDashboard onViewChange={setCurrentView} />
               )}
             </motion.div>
           )}
