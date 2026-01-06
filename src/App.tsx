@@ -7,13 +7,17 @@ import { SubscriptionCancel } from './pages/SubscriptionCancel';
 import { useAuthStore } from './stores/authStore';
 
 function App() {
-  const { user, loading } = useAuthStore();
-  const [showLanding, setShowLanding] = useState(true);
+  const { user, loading, initialize } = useAuthStore();
+  const [showLanding, setShowLanding] = useState(false);
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
 
   useEffect(() => {
     // ユーザーがログインしているか、ゲストモードで使用したことがある場合はアプリを表示
     const hasUsedApp = localStorage.getItem('hasUsedApp') === 'true';
-    
+
     if (user || hasUsedApp) {
       setShowLanding(false);
     } else {

@@ -2,7 +2,8 @@ import { loadStripe } from '@stripe/stripe-js';
 import { supabase } from './supabase';
 
 // Stripe公開キー（環境変数から取得）
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || '');
+const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : null;
 
 export interface PricingPlan {
   id: string;
