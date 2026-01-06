@@ -7,7 +7,7 @@ import { Button } from '../ui/Button';
 import { DiaryCard } from './DiaryCard';
 import { GuestDiaryCard } from '../guest/GuestDiaryCard';
 import { Calendar, List, Plus, Clock } from 'lucide-react';
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, formatDistanceToNow } from 'date-fns';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isSameMonth } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 type ViewMode = 'list' | 'calendar';
@@ -41,9 +41,13 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
   };
 
   const renderCalendarView = () => {
-    const start = startOfWeek(selectedDate, { weekStartsOn: 1 });
-    const end = endOfWeek(selectedDate, { weekStartsOn: 1 });
-    const days = eachDayOfInterval({ start, end });
+    // 月の最初と最後の日を取得
+    const monthStart = startOfMonth(selectedDate);
+    const monthEnd = endOfMonth(selectedDate);
+    // カレンダーグリッド用に、月初の週の月曜から月末の週の日曜まで取得
+    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
     return (
       <div className="space-y-4 sm:space-y-6">
@@ -54,75 +58,108 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
           <div className="flex gap-1 sm:gap-2">
             <button
               onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1, 1))}
-              className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-lg text-gray-600 hover:text-gray-900"
+              className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-lg text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               ← 前月
             </button>
             <button
               onClick={() => setSelectedDate(new Date())}
-              className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-lg text-blue-600 hover:text-blue-800 font-medium"
+              className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-lg text-blue-600 hover:text-blue-800 font-medium border border-blue-300 rounded-lg hover:bg-blue-50"
             >
               今月
             </button>
             <button
               onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1))}
-              className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-lg text-gray-600 hover:text-gray-900"
+              className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-lg text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               次月 →
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-7 gap-1 sm:gap-2">
-          {['月', '火', '水', '木', '金', '土', '日'].map(day => (
-            <div key={day} className="p-1 sm:p-3 text-center text-xs sm:text-lg font-medium text-gray-500">
-              {day}
-            </div>
-          ))}
-          
-          {days.map(day => {
-            const dayEntries = getEntriesForDate(day);
-            const isToday = isSameDay(day, new Date());
-            
-            return (
-              <motion.div
-                key={day.toISOString()}
-                whileHover={{ scale: 1.02 }}
-                className={`p-1 sm:p-2 border rounded-lg cursor-pointer transition-colors ${
-                  isToday 
-                    ? 'bg-blue-100 border-blue-300' 
-                    : 'bg-white border-gray-200 hover:bg-gray-50'
+        <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
+          <div className="grid grid-cols-7">
+            {['月', '火', '水', '木', '金', '土', '日'].map((day, index) => (
+              <div
+                key={day}
+                className={`p-2 sm:p-3 text-center text-xs sm:text-base font-bold border-b-2 border-gray-200 ${
+                  index === 5 ? 'text-blue-600 bg-blue-50' :
+                  index === 6 ? 'text-red-600 bg-red-50' :
+                  'text-gray-700 bg-gray-50'
                 }`}
-                onClick={() => setSelectedDate(day)}
               >
-                <div className="text-sm sm:text-lg font-medium text-gray-900">
-                  {format(day, 'd')}
-                </div>
-                {dayEntries.length > 0 && (
-                  <div className="mt-1 space-y-0.5 sm:space-y-1 hidden sm:block">
-                    {dayEntries.slice(0, 2).map(entry => (
-                      <div
-                        key={entry.id}
-                        className="text-xs bg-blue-500 text-white rounded px-1 py-0.5 truncate"
-                      >
-                        {entry.ai_summary || entry.content.slice(0, 10)}...
-                      </div>
-                    ))}
-                    {dayEntries.length > 2 && (
-                      <div className="text-xs text-gray-500">
-                        +{dayEntries.length - 2}件
-                      </div>
-                    )}
+                {day}
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-7">
+            {days.map((day, index) => {
+              const dayEntries = getEntriesForDate(day);
+              const isToday = isSameDay(day, new Date());
+              const isCurrentMonth = isSameMonth(day, selectedDate);
+              const isSelected = isSameDay(day, selectedDate);
+              const dayOfWeek = day.getDay();
+              const isSaturday = dayOfWeek === 6;
+              const isSunday = dayOfWeek === 0;
+
+              return (
+                <motion.div
+                  key={day.toISOString()}
+                  whileHover={{ scale: 1.02 }}
+                  className={`min-h-[60px] sm:min-h-[80px] p-1 sm:p-2 border-b border-r border-gray-100 cursor-pointer transition-colors ${
+                    isSelected
+                      ? 'bg-blue-100 border-blue-300'
+                      : isToday
+                        ? 'bg-yellow-50'
+                        : !isCurrentMonth
+                          ? 'bg-gray-50'
+                          : 'bg-white hover:bg-gray-50'
+                  }`}
+                  onClick={() => setSelectedDate(day)}
+                >
+                  <div className={`text-sm sm:text-base font-medium ${
+                    !isCurrentMonth
+                      ? 'text-gray-300'
+                      : isToday
+                        ? 'text-white bg-blue-500 rounded-full w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center mx-auto sm:mx-0'
+                        : isSunday
+                          ? 'text-red-500'
+                          : isSaturday
+                            ? 'text-blue-500'
+                            : 'text-gray-900'
+                  }`}>
+                    {format(day, 'd')}
                   </div>
-                )}
-                {dayEntries.length > 0 && (
-                  <div className="sm:hidden mt-1">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mx-auto"></div>
-                  </div>
-                )}
-              </motion.div>
-            );
-          })}
+                  {dayEntries.length > 0 && isCurrentMonth && (
+                    <div className="mt-1 space-y-0.5 hidden sm:block">
+                      {dayEntries.slice(0, 2).map(entry => (
+                        <div
+                          key={entry.id}
+                          className="text-xs bg-blue-500 text-white rounded px-1 py-0.5 truncate"
+                        >
+                          {entry.ai_summary?.slice(0, 8) || entry.content.slice(0, 8)}...
+                        </div>
+                      ))}
+                      {dayEntries.length > 2 && (
+                        <div className="text-xs text-gray-500">
+                          +{dayEntries.length - 2}件
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {dayEntries.length > 0 && isCurrentMonth && (
+                    <div className="sm:hidden mt-1 flex justify-center">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      {dayEntries.length > 1 && (
+                        <span className="text-xs text-blue-500 ml-0.5">{dayEntries.length}</span>
+                      )}
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Selected Date Entries */}
@@ -139,7 +176,7 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
               )
             ))}
             {getEntriesForDate(selectedDate).length === 0 && (
-              <div className="text-center py-6 sm:py-8 text-gray-500 text-base sm:text-lg">
+              <div className="text-center py-6 sm:py-8 text-gray-500 text-base sm:text-lg bg-gray-50 rounded-xl">
                 この日の日記はありません
               </div>
             )}
