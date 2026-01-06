@@ -346,6 +346,25 @@ export const AppPage: React.FC = () => {
               <SubscriptionManager />
             </motion.div>
           )}
+
+          {currentView === 'settings' && (
+            <motion.div
+              key="settings"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="max-w-4xl mx-auto space-y-6">
+                <h1 className="text-2xl font-bold text-gray-900">設定</h1>
+                <NotificationSettings />
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <h2 className="text-xl font-bold text-gray-900 mb-4">プラン設定</h2>
+                  <SubscriptionManager />
+                </div>
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
       </main>
       
