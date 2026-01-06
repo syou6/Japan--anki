@@ -14,16 +14,15 @@ function App() {
     initialize();
   }, [initialize]);
 
-  useEffect(() => {
-    // ユーザーがログインしているか、ゲストモードで使用したことがある場合はアプリを表示
-    const hasUsedApp = localStorage.getItem('hasUsedApp') === 'true';
-
-    if (user || hasUsedApp) {
-      setShowLanding(false);
-    } else {
-      setShowLanding(true);
-    }
-  }, [user]);
+  // LPは一旦スキップ - 常にアプリを表示
+  // useEffect(() => {
+  //   const hasUsedApp = localStorage.getItem('hasUsedApp') === 'true';
+  //   if (user || hasUsedApp) {
+  //     setShowLanding(false);
+  //   } else {
+  //     setShowLanding(true);
+  //   }
+  // }, [user]);
 
   // ローディング中は何も表示しない
   if (loading) {
