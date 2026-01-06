@@ -67,6 +67,7 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
             comments:comments(*, user:users(*))
           `)
           .eq('user_id', user.id)
+          .is('deleted_at', null)
           .order('created_at', { ascending: false })
           .limit(10)
       ]);
@@ -93,6 +94,7 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
             comments:comments(*, user:users(*))
           `)
           .in('user_id', Array.from(familyIds))
+          .is('deleted_at', null)
           .order('created_at', { ascending: false })
           .limit(50); // 最新50件に制限
 
@@ -287,20 +289,39 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
 
   deleteEntry: async (id: string) => {
     try {
+      console.log('deleteEntry開始:', id);
+
       // Soft delete - ゴミ箱に移動（deleted_atを設定）
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('diaries')
-        .update({ 
+        .update({
           deleted_at: new Date().toISOString(),
           delete_after: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30日後
         })
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
-      if (error) throw error;
-      
+      console.log('deleteEntry結果:', { data, error });
+
+      if (error) {
+        console.error('deleteEntry エラー詳細:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        console.warn('deleteEntry: 更新された行がありません。RLS権限を確認してください。');
+      }
+
       set(state => ({
         entries: state.entries.filter(entry => entry.id !== id)
       }));
+
+      console.log('deleteEntry完了');
     } catch (error) {
       console.error('Failed to delete entry:', error);
       throw error;
