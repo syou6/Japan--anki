@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Share2, Twitter, Facebook, Line, Copy, Check } from 'lucide-react';
+import { Share2, Twitter, Facebook, Copy, Check, MessageCircle } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 interface ShareButtonProps {
@@ -102,7 +102,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
               onClick={() => handleShare('line')}
               className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 rounded-md transition-colors"
             >
-              <Line className="w-5 h-5 text-green-500" />
+              <MessageCircle className="w-5 h-5 text-green-500" />
               <span className="text-sm">LINE</span>
             </button>
             
