@@ -53,10 +53,10 @@ export async function analyzeWithGemini(text: string): Promise<AnalysisResult> {
   
   while (retryCount < MAX_RETRIES) {
     try {
-      // Gemini 1.5 Flash モデルを初期化（無料枠が大きい）
+      // Gemini Pro モデルを初期化
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash'
+        model: 'gemini-pro'
       });
 
     // プロンプトを構成
@@ -153,7 +153,7 @@ export async function generateFamilySummaryWithGemini(text: string): Promise<str
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash'
+      model: 'gemini-pro'
     });
 
     const prompt = `
