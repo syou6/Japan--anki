@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Trash2, X } from 'lucide-react';
 import { Button } from './Button';
+import { EN } from '../../i18n/en';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -19,10 +20,10 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   isOpen,
   onClose,
   onConfirm,
-  title = '確認',
-  message = '本当によろしいですか？',
-  confirmText = '実行',
-  cancelText = 'キャンセル',
+  title = EN.dialog.confirmation,
+  message = EN.dialog.areYouSure,
+  confirmText = EN.dialog.execute,
+  cancelText = EN.dialog.cancel,
   type = 'warning',
   isLoading = false
 }) => {
@@ -117,7 +118,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                         className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                       />
-                      <span className="ml-2">処理中...</span>
+                      <span className="ml-2">{EN.dialog.processing}</span>
                     </div>
                   ) : (
                     confirmText

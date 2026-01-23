@@ -3,17 +3,18 @@ import { motion } from 'framer-motion';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { EN } from '../i18n/en';
 
 export const SubscriptionSuccess: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // URLパラメータからセッション情報を取得
+    // Get session info from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session_id');
-    
+
     if (sessionId) {
-      // セッションIDをローカルストレージに保存（必要に応じて）
+      // Save session ID to local storage if needed
       localStorage.setItem('stripe_session_id', sessionId);
     }
   }, []);
@@ -36,11 +37,11 @@ export const SubscriptionSuccess: React.FC = () => {
         </motion.div>
 
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          サブスクリプション開始完了！
+          {EN.subscriptionResult.successTitle}
         </h1>
-        
+
         <p className="text-gray-600 mb-8">
-          ご登録ありがとうございます。プレミアム機能をご利用いただけます。
+          {EN.subscriptionResult.successMessage}
         </p>
 
         <div className="space-y-4">
@@ -49,22 +50,22 @@ export const SubscriptionSuccess: React.FC = () => {
             variant="primary"
             className="w-full"
           >
-            アプリを開始する
+            {EN.subscriptionResult.startApp}
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
-          
+
           <Button
             onClick={() => navigate('/subscription')}
             variant="outline"
             className="w-full"
           >
-            サブスクリプション管理
+            {EN.subscriptionResult.manageSubscription}
           </Button>
         </div>
 
         <div className="mt-8 p-4 bg-blue-50 rounded-lg">
           <p className="text-sm text-blue-800">
-            💡 プレミアム機能が有効になりました。録音無制限、AI分析、家族共有などがご利用いただけます。
+            {EN.subscriptionResult.premiumActivated}
           </p>
         </div>
       </motion.div>

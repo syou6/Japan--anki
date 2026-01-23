@@ -4,6 +4,7 @@ import { Check, Loader2, Crown, Users } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useAuthStore } from '../../stores/authStore';
 import { pricingPlans, StripeService } from '../../lib/stripe';
+import { EN } from '../../i18n/en';
 import toast from 'react-hot-toast';
 
 interface PricingCardsProps {
@@ -16,12 +17,12 @@ export const PricingCards: React.FC<PricingCardsProps> = ({ currentPlan = 'free'
 
   const handleSubscribe = async (planId: string, priceId?: string) => {
     if (!user) {
-      toast.error('ログインが必要です');
+      toast.error(EN.pricing.loginRequired);
       return;
     }
 
     if (!priceId) {
-      toast.error('このプランは現在利用できません');
+      toast.error(EN.pricing.notAvailable);
       return;
     }
 
@@ -30,7 +31,7 @@ export const PricingCards: React.FC<PricingCardsProps> = ({ currentPlan = 'free'
       await StripeService.createCheckoutSession(priceId, user.id);
     } catch (error) {
       console.error('Subscription error:', error);
-      toast.error('エラーが発生しました。もう一度お試しください。');
+      toast.error(EN.pricing.error);
     } finally {
       setLoading(null);
     }
@@ -44,7 +45,7 @@ export const PricingCards: React.FC<PricingCardsProps> = ({ currentPlan = 'free'
       window.location.href = portalUrl;
     } catch (error) {
       console.error('Portal error:', error);
-      toast.error('エラーが発生しました');
+      toast.error(EN.pricing.error);
     }
   };
 
@@ -67,15 +68,13 @@ export const PricingCards: React.FC<PricingCardsProps> = ({ currentPlan = 'free'
               hover:shadow-xl transition-all duration-300
             `}
           >
-            {/* おすすめバッジ */}
             {isPremium && (
               <div className="absolute top-0 right-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-1 text-sm font-bold rounded-bl-lg">
-                人気No.1
+                {EN.pricing.popular}
               </div>
             )}
 
             <div className="p-8">
-              {/* プランアイコン */}
               <div className="flex justify-center mb-4">
                 {plan.id === 'free' && (
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
@@ -94,20 +93,17 @@ export const PricingCards: React.FC<PricingCardsProps> = ({ currentPlan = 'free'
                 )}
               </div>
 
-              {/* プラン名 */}
               <h3 className="text-2xl font-bold text-center mb-2 text-gray-800">
                 {plan.name}
               </h3>
 
-              {/* 価格 */}
               <div className="text-center mb-6">
                 <span className="text-4xl font-bold text-gray-900">
-                  ¥{plan.price.toLocaleString()}
+                  ${plan.price}
                 </span>
-                <span className="text-gray-600 ml-2">/{plan.interval === 'month' ? '月' : '年'}</span>
+                <span className="text-gray-600 ml-2">/{plan.interval === 'month' ? 'mo' : 'yr'}</span>
               </div>
 
-              {/* 機能リスト */}
               <ul className="space-y-3 mb-8">
                 {plan.features.map((feature, idx) => (
                   <li key={idx} className="flex items-start">
@@ -117,7 +113,6 @@ export const PricingCards: React.FC<PricingCardsProps> = ({ currentPlan = 'free'
                 ))}
               </ul>
 
-              {/* CTAボタン */}
               <div className="mt-auto">
                 {isCurrentPlan ? (
                   <Button
@@ -126,7 +121,7 @@ export const PricingCards: React.FC<PricingCardsProps> = ({ currentPlan = 'free'
                     className="w-full"
                     disabled
                   >
-                    現在のプラン
+                    {EN.pricing.currentPlan}
                   </Button>
                 ) : plan.id === 'free' ? (
                   <Button
@@ -135,7 +130,7 @@ export const PricingCards: React.FC<PricingCardsProps> = ({ currentPlan = 'free'
                     className="w-full"
                     disabled
                   >
-                    無料プラン
+                    {EN.pricing.freePlan}
                   </Button>
                 ) : (
                   <Button
@@ -148,16 +143,15 @@ export const PricingCards: React.FC<PricingCardsProps> = ({ currentPlan = 'free'
                     {loading === plan.id ? (
                       <>
                         <Loader2 className="w-5 h-5 animate-spin" />
-                        処理中...
+                        {EN.pricing.processing}
                       </>
                     ) : (
-                      <>今すぐ始める</>
+                      <>{EN.pricing.startNow}</>
                     )}
                   </Button>
                 )}
               </div>
 
-              {/* 現在有料プランの場合、管理ボタンを表示 */}
               {isCurrentPlan && plan.id !== 'free' && (
                 <Button
                   variant="outline"
@@ -165,7 +159,7 @@ export const PricingCards: React.FC<PricingCardsProps> = ({ currentPlan = 'free'
                   className="w-full mt-3"
                   onClick={handleManageSubscription}
                 >
-                  プランを管理
+                  {EN.pricing.managePlan}
                 </Button>
               )}
             </div>

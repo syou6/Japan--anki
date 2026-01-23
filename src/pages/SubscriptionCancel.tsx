@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { XCircle, ArrowLeft, RefreshCw } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { EN } from '../i18n/en';
 
 export const SubscriptionCancel: React.FC = () => {
   const navigate = useNavigate();
@@ -25,11 +26,11 @@ export const SubscriptionCancel: React.FC = () => {
         </motion.div>
 
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          サブスクリプションがキャンセルされました
+          {EN.subscriptionResult.cancelTitle}
         </h1>
-        
+
         <p className="text-gray-600 mb-8">
-          サブスクリプションの開始をキャンセルしました。いつでも再度お申し込みいただけます。
+          {EN.subscriptionResult.cancelMessage}
         </p>
 
         <div className="space-y-4">
@@ -38,23 +39,23 @@ export const SubscriptionCancel: React.FC = () => {
             variant="primary"
             className="w-full"
           >
-            アプリに戻る
+            {EN.subscriptionResult.backToApp}
             <ArrowLeft className="w-4 h-4 ml-2" />
           </Button>
-          
+
           <Button
             onClick={() => navigate('/subscription')}
             variant="outline"
             className="w-full"
           >
-            プランを見直す
+            {EN.subscriptionResult.reviewPlans}
             <RefreshCw className="w-4 h-4 ml-2" />
           </Button>
         </div>
 
         <div className="mt-8 p-4 bg-gray-50 rounded-lg">
           <p className="text-sm text-gray-600">
-            💡 無料プランでも基本的な機能をご利用いただけます。録音回数に制限がありますが、日記の記録は可能です。
+            {EN.subscriptionResult.freeFeatures}
           </p>
         </div>
       </motion.div>

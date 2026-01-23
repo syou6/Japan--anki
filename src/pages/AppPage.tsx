@@ -175,29 +175,29 @@ export const AppPage: React.FC = () => {
     // checkMaintenanceMode();
   }, [initialize, setGuestMode, cleanExpiredDiaries]);
 
-  // メンテナンスモード
+  // Maintenance mode
   if (isMaintenanceMode) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            メンテナンス中
+            Under Maintenance
           </h1>
           <p className="text-gray-600">
-            現在システムメンテナンス中です。しばらくお待ちください。
+            We're currently performing maintenance. Please check back soon.
           </p>
         </div>
       </div>
     );
   }
 
-  // ローディング中（初期化が完了していない場合）
+  // Loading state
   if (!isInitialized || loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">読み込み中...</p>
+          <p className="text-gray-600">{EN.common.loading}</p>
         </div>
       </div>
     );

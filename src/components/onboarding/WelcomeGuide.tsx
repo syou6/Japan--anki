@@ -1,51 +1,32 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../ui/Button';
-import { 
-  Mic, 
-  Heart, 
-  Users, 
+import { EN } from '../../i18n/en';
+import {
+  Mic,
+  Heart,
   Brain,
   Calendar,
-  MessageCircle,
   ChevronRight,
   X
 } from 'lucide-react';
 
 interface WelcomeGuideProps {
   onComplete: () => void;
-  show: boolean;
+  show?: boolean;
 }
 
-export const WelcomeGuide: React.FC<WelcomeGuideProps> = ({ onComplete, show }) => {
+export const WelcomeGuide: React.FC<WelcomeGuideProps> = ({ onComplete, show = true }) => {
   const [currentStep, setCurrentStep] = useState(0);
 
-  const steps = [
-    {
-      icon: <Heart className="w-16 h-16 text-red-500" />,
-      title: "離れた親の「今日」がわかる",
-      description: "親が毎日どんな風に過ごしているか、体調はどうか。話した日記から、AIが健康状態や感情を分析してお知らせします。",
-      benefit: "📱 毎日の安否確認が自動で完了"
-    },
-    {
-      icon: <Mic className="w-16 h-16 text-blue-500" />,
-      title: "親は話すだけでOK",
-      description: "スマホやタブレットに向かって3分話すだけ。文字入力は一切不要。孫の話、今日の散歩、なんでも気軽に。",
-      benefit: "👴👵 80代でも簡単に使える"
-    },
-    {
-      icon: <Brain className="w-16 h-16 text-purple-500" />,
-      title: "体調の変化を見逃さない",
-      description: "声のトーンや話の内容から、認知機能の変化や体調不良の兆候をAIが検知。早期発見で安心。",
-      benefit: "🏥 病院に行くタイミングがわかる"
-    },
-    {
-      icon: <MessageCircle className="w-16 h-16 text-green-500" />,
-      title: "家族みんなで見守り",
-      description: "兄弟姉妹で親の日記を共有。コメントで励ましたり、昔話に花を咲かせたり。距離を超えた温かい交流。",
-      benefit: "💬 LINEよりも深い家族の絆"
-    }
+  const icons = [
+    <Heart className="w-16 h-16 text-red-500" />,
+    <Mic className="w-16 h-16 text-blue-500" />,
+    <Brain className="w-16 h-16 text-purple-500" />,
+    <Calendar className="w-16 h-16 text-green-500" />
   ];
+
+  const steps = EN.onboarding.steps;
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -106,7 +87,7 @@ export const WelcomeGuide: React.FC<WelcomeGuideProps> = ({ onComplete, show }) 
             className="text-center"
           >
             <div className="flex justify-center mb-6">
-              {steps[currentStep].icon}
+              {icons[currentStep]}
             </div>
 
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -119,7 +100,7 @@ export const WelcomeGuide: React.FC<WelcomeGuideProps> = ({ onComplete, show }) 
 
             <div className="bg-green-50 rounded-xl p-4 mb-8">
               <p className="text-green-800 font-medium">
-                ✨ {steps[currentStep].benefit}
+                {steps[currentStep].benefit}
               </p>
             </div>
 
@@ -130,10 +111,10 @@ export const WelcomeGuide: React.FC<WelcomeGuideProps> = ({ onComplete, show }) 
                   onClick={() => setCurrentStep(currentStep - 1)}
                   className="flex-1"
                 >
-                  前へ
+                  {EN.onboarding.previous}
                 </Button>
               )}
-              
+
               <Button
                 variant="primary"
                 onClick={handleNext}
@@ -141,11 +122,11 @@ export const WelcomeGuide: React.FC<WelcomeGuideProps> = ({ onComplete, show }) 
               >
                 {currentStep < steps.length - 1 ? (
                   <>
-                    次へ
+                    {EN.onboarding.next}
                     <ChevronRight className="w-5 h-5 ml-1" />
                   </>
                 ) : (
-                  '始める'
+                  EN.onboarding.start
                 )}
               </Button>
             </div>
@@ -155,7 +136,7 @@ export const WelcomeGuide: React.FC<WelcomeGuideProps> = ({ onComplete, show }) 
                 onClick={handleSkip}
                 className="mt-4 text-gray-500 text-sm hover:text-gray-700"
               >
-                スキップ
+                {EN.onboarding.skip}
               </button>
             )}
           </motion.div>

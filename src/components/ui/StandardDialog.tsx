@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check } from 'lucide-react';
+import { EN } from '../../i18n/en';
 
 interface StandardDialogProps {
   isOpen: boolean;
@@ -21,8 +22,8 @@ export const StandardDialog: React.FC<StandardDialogProps> = ({
   onConfirm,
   title,
   children,
-  confirmLabel = '決定',
-  cancelLabel = 'キャンセル',
+  confirmLabel = EN.dialog.confirm,
+  cancelLabel = EN.dialog.cancel,
   showConfirm = true,
   confirmVariant = 'primary',
   isLoading = false
@@ -66,7 +67,7 @@ export const StandardDialog: React.FC<StandardDialogProps> = ({
                     disabled:opacity-50 disabled:cursor-not-allowed
                     font-bold
                   "
-                  aria-label="キャンセル"
+                  aria-label={EN.dialog.cancel}
                 >
                   <X className="w-6 h-6" />
                   <span className="hidden sm:inline">{cancelLabel}</span>
@@ -108,7 +109,7 @@ export const StandardDialog: React.FC<StandardDialogProps> = ({
                             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                             className="w-6 h-6 border-3 border-white border-t-transparent rounded-full"
                           />
-                          <span>処理中...</span>
+                          <span>{EN.dialog.processing}</span>
                         </>
                       ) : (
                         <>

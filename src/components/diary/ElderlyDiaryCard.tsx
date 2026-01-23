@@ -5,9 +5,9 @@ import { StandardDialog } from '../ui/StandardDialog';
 import { useAuthStore } from '../../stores/authStore';
 import { useDiaryStore } from '../../stores/diaryStore';
 import type { DiaryEntry } from '../../types';
-import { 
-  Play, 
-  Pause, 
+import {
+  Play,
+  Pause,
   Calendar,
   Volume2,
   Trash2,
@@ -15,7 +15,8 @@ import {
   Share2
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import { EN } from '../../i18n/en';
 import toast from 'react-hot-toast';
 
 interface ElderlyDiaryCardProps {
@@ -74,8 +75,8 @@ export const ElderlyDiaryCard: React.FC<ElderlyDiaryCardProps> = ({ entry }) => 
         await audio.play();
         setIsPlaying(true);
       } catch (error) {
-        console.error('音声の再生に失敗しました:', error);
-        toast.error('音声の再生に失敗しました');
+        console.error('Failed to play audio:', error);
+        toast.error(EN.elderly.playFailed);
       } finally {
         setIsLoadingAudio(false);
       }
@@ -89,51 +90,51 @@ export const ElderlyDiaryCard: React.FC<ElderlyDiaryCardProps> = ({ entry }) => 
     setIsDeleting(true);
     try {
       await deleteEntry(entry.id);
-      toast.success('日記を削除しました');
+      toast.success(EN.elderly.deleted);
       setShowDeleteConfirm(false);
     } catch (error) {
-      toast.error('削除に失敗しました');
+      toast.error(EN.elderly.deleteFailed);
     } finally {
       setIsDeleting(false);
     }
   };
 
   const handleShare = async () => {
-    const shareText = `${formatDate(entry.created_at)}の日記\n\n${entry.content || entry.ai_summary || ''}`;
-    
-    // Web Share APIが使える場合
+    const shareText = `Diary from ${formatDate(entry.created_at)}\n\n${entry.content || entry.ai_summary || ''}`;
+
+    // Web Share API available
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${formatDate(entry.created_at)}の日記`,
+          title: `Diary - ${formatDate(entry.created_at)}`,
           text: shareText,
         });
-        toast.success('共有しました');
+        toast.success(EN.elderly.shared);
       } catch (error) {
-        // ユーザーがキャンセルした場合は何もしない
+        // User cancelled - do nothing
         if ((error as Error).name !== 'AbortError') {
-          console.error('共有エラー:', error);
+          console.error('Share error:', error);
         }
       }
     } else {
-      // Web Share APIが使えない場合はクリップボードにコピー
+      // Fallback to clipboard
       try {
         await navigator.clipboard.writeText(shareText);
-        toast.success('クリップボードにコピーしました');
+        toast.success(EN.elderly.copiedToClipboard);
       } catch (error) {
-        toast.error('コピーに失敗しました');
+        toast.error(EN.elderly.copyFailed);
       }
     }
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return format(date, 'M月d日（E）', { locale: ja });
+    return format(date, 'MMM d (EEE)', { locale: enUS });
   };
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return format(date, 'HH時mm分', { locale: ja });
+    return format(date, 'h:mm a', { locale: enUS });
   };
 
   return (
@@ -170,15 +171,15 @@ export const ElderlyDiaryCard: React.FC<ElderlyDiaryCardProps> = ({ entry }) => 
             >
               {isLoadingAudio ? (
                 <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-white">
-                  読み込み中...
+                  {EN.elderly.loading}
                 </span>
               ) : isPlaying ? (
                 <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-white">
-                  ■ 停止する
+                  ■ {EN.elderly.stop}
                 </span>
               ) : (
                 <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-white">
-                  ▶ 再生する
+                  ▶ {EN.elderly.play}
                 </span>
               )}
             </button>
@@ -202,7 +203,7 @@ export const ElderlyDiaryCard: React.FC<ElderlyDiaryCardProps> = ({ entry }) => 
             disabled={isDeleting}
           >
             <span className="text-2xl sm:text-3xl font-black text-navy-900">
-              削除する
+              {EN.elderly.delete}
             </span>
           </button>
         )}
@@ -213,14 +214,14 @@ export const ElderlyDiaryCard: React.FC<ElderlyDiaryCardProps> = ({ entry }) => 
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleDelete}
-        title="日記を削除しますか？"
-        confirmLabel="削除する"
-        cancelLabel="やめる"
+        title={EN.elderly.deleteConfirm}
+        confirmLabel={EN.elderly.deleteButton}
+        cancelLabel={EN.elderly.cancelButton}
         confirmVariant="danger"
         isLoading={isDeleting}
       >
         <p className="text-2xl text-black font-bold">
-          この日記を削除してもよろしいですか？
+          {EN.elderly.deleteMessage}
         </p>
       </StandardDialog>
     </motion.div>

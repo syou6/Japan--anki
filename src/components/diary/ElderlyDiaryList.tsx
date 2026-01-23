@@ -6,7 +6,8 @@ import { useGuestStore } from '../../stores/guestStore';
 import { useAuthStore } from '../../stores/authStore';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import { EN } from '../../i18n/en';
 
 interface ElderlyDiaryListProps {
   isGuest?: boolean;
@@ -39,7 +40,7 @@ export const ElderlyDiaryList: React.FC<ElderlyDiaryListProps> = ({ isGuest = fa
         className="bg-navy-900 text-white rounded-3xl p-8 sm:p-10 border-4 border-navy-900"
       >
         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-center">
-          日記一覧
+          {EN.elderly.diaryList}
         </h1>
       </motion.div>
 
@@ -57,10 +58,10 @@ export const ElderlyDiaryList: React.FC<ElderlyDiaryListProps> = ({ isGuest = fa
           >
             <Calendar className="w-32 h-32 mx-auto mb-8 text-gray-400" />
             <p className="text-4xl sm:text-5xl font-black text-navy-900">
-              日記がありません
+              {EN.elderly.noDiaries}
             </p>
             <p className="text-3xl sm:text-4xl font-bold text-gray-600 mt-6">
-              録音してください
+              {EN.elderly.pleaseRecord}
             </p>
           </motion.div>
         )}

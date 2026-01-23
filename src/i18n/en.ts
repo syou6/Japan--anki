@@ -399,6 +399,191 @@ export const EN = {
     sharePrompt: 'Share your diary to connect with family',
     viewAllComments: 'View All Diaries & Comments',
   },
+  // Onboarding/Welcome
+  onboarding: {
+    steps: [
+      {
+        title: 'Practice English Every Day',
+        description: 'Record a short diary in English each day. Just 1-3 minutes of speaking practice helps you improve naturally.',
+        benefit: 'Build a daily English habit'
+      },
+      {
+        title: 'Just Speak - No Typing Required',
+        description: 'Press record and speak about your day. The app transcribes your speech automatically.',
+        benefit: 'Perfect for busy learners'
+      },
+      {
+        title: 'Get AI Feedback',
+        description: 'Receive personalized feedback on your grammar, vocabulary, and pronunciation from AI.',
+        benefit: 'Learn from your mistakes'
+      },
+      {
+        title: 'Track Your Progress',
+        description: 'Review past entries, see your CEFR level progress, and practice with Versant-style questions.',
+        benefit: 'Measure your improvement'
+      }
+    ],
+    previous: 'Previous',
+    next: 'Next',
+    start: 'Get Started',
+    skip: 'Skip',
+  },
+
+  // Help
+  help: {
+    title: 'Help',
+    subtitle: 'How to use guide',
+    home: {
+      title: 'Home Screen',
+      description: 'Record and view your diary entries',
+      tips: [
+        'Press the large record button to start recording',
+        'Scroll down to see your recent diary entries',
+        'Tap a diary entry to see details and AI feedback'
+      ]
+    },
+    recording: {
+      title: 'Recording Screen',
+      description: 'Record your voice diary in English',
+      tips: [
+        'Press the record button to start',
+        'Speak in English for 1-3 minutes',
+        'The volume meter shows if your voice is clear',
+        'Review and save your recording when done'
+      ]
+    },
+    diary: {
+      title: 'Diary List',
+      description: 'View your past diary entries',
+      tips: [
+        'Tap a diary to see full details',
+        'Press play to listen to your recording',
+        'View AI feedback for grammar and vocabulary'
+      ]
+    },
+    settings: {
+      title: 'Settings',
+      description: 'Configure your preferences',
+      tips: [
+        'Set your English level (CEFR)',
+        'Manage notifications',
+        'View your account details'
+      ]
+    },
+    faq: {
+      title: 'FAQ',
+      q1: "Recording doesn't work?",
+      q2: 'How to share with family?',
+      q3: 'How to recover deleted diary?',
+    },
+    support: {
+      title: "Need more help?",
+      description: 'Contact our support team',
+      button: 'Contact Support',
+    },
+  },
+
+  // PWA Install
+  pwa: {
+    useAsApp: 'Use as App',
+    install: 'Install App',
+    installDescription: 'Add English AI Diary to your home screen for the best experience. You\'ll also receive push notifications.',
+    iosInstructions: 'Add to home screen to enable push notifications',
+    step1: 'Tap the share button below',
+    step2: 'Select "Add to Home Screen"',
+    step3: 'Tap "Add" at the top right',
+    installButton: 'Install',
+    later: 'Later',
+  },
+
+  // Pricing
+  pricing: {
+    popular: 'Most Popular',
+    currentPlan: 'Current Plan',
+    freePlan: 'Free Plan',
+    processing: 'Processing...',
+    startNow: 'Start Now',
+    managePlan: 'Manage Plan',
+    loginRequired: 'Please login first',
+    notAvailable: 'This plan is not available',
+    error: 'An error occurred. Please try again.',
+  },
+
+  // Dialog defaults
+  dialog: {
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+    processing: 'Processing...',
+    confirmation: 'Confirmation',
+    areYouSure: 'Are you sure?',
+    execute: 'OK',
+    close: 'Close',
+    showMore: 'Show more',
+  },
+
+  // Elderly mode (simplified navigation)
+  elderly: {
+    nav: {
+      home: 'Home',
+      homeDesc: 'Main',
+      record: 'Record',
+      recordDesc: 'Speak',
+      listen: 'Listen',
+      listenDesc: 'Playback',
+    },
+    guestMode: 'Guest Mode (Trial)',
+    diaryList: 'Diary List',
+    noDiaries: 'No diaries yet',
+    pleaseRecord: 'Please record',
+    loading: 'Loading...',
+    stop: 'Stop',
+    play: 'Play',
+    delete: 'Delete',
+    deleteConfirm: 'Delete this diary?',
+    deleteButton: 'Delete',
+    cancelButton: 'Cancel',
+    deleteMessage: 'Are you sure you want to delete this diary?',
+    deleted: 'Diary deleted',
+    deleteFailed: 'Failed to delete',
+    shared: 'Shared',
+    copyFailed: 'Failed to copy',
+    copiedToClipboard: 'Copied to clipboard',
+    playFailed: 'Failed to play audio',
+  },
+
+  // Subscription pages
+  subscriptionPage: {
+    back: 'Back',
+    selectPlan: 'Choose a Plan',
+    chooseDescription: 'Select the plan that fits you best',
+    campaign: 'Limited Time Offer',
+    campaignDesc: 'Try Premium free for 30 days!',
+    securePayment: 'Secure Payment',
+    instantUpgrade: 'Instant Upgrade',
+    faq: 'FAQ',
+    faqCancelQ: 'Can I cancel anytime?',
+    faqCancelA: 'Yes, you can cancel anytime. Service continues until the end of billing period.',
+    faqPaymentQ: 'What payment methods are accepted?',
+    faqPaymentA: 'We accept Visa, Mastercard, American Express, and JCB credit cards.',
+    faqChangeQ: 'Can I change plans?',
+    faqChangeA: 'Yes, you can upgrade or downgrade anytime. Charges are prorated.',
+    sslEncrypted: 'SSL Encrypted',
+    poweredBy: 'Powered by',
+  },
+
+  // Subscription success/cancel
+  subscriptionResult: {
+    successTitle: 'Subscription Started!',
+    successMessage: 'Thank you for subscribing. You now have access to premium features.',
+    startApp: 'Start App',
+    manageSubscription: 'Manage Subscription',
+    premiumActivated: 'Premium features activated. Unlimited recordings, AI analysis, and family sharing are now available.',
+    cancelTitle: 'Subscription Cancelled',
+    cancelMessage: 'Your subscription has been cancelled. You can resubscribe anytime.',
+    backToApp: 'Back to App',
+    reviewPlans: 'Review Plans',
+    freeFeatures: 'You can still use basic features on the free plan. Recording limits apply.',
+  },
 } as const;
 
 export type TranslationKey = keyof typeof EN;

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { EN } from '../../i18n/en';
 
 interface Choice {
   id: string;
@@ -93,7 +94,7 @@ export const SimpleChoice: React.FC<SimpleChoiceProps> = ({
           ))}
         </AnimatePresence>
         
-        {/* その他ボタン */}
+        {/* Show more button */}
         {hasMore && (
           <motion.button
             whileTap={{ scale: 0.98 }}
@@ -108,12 +109,12 @@ export const SimpleChoice: React.FC<SimpleChoiceProps> = ({
             {showMore ? (
               <>
                 <ChevronUp className="w-5 h-5" />
-                <span>閉じる</span>
+                <span>{EN.dialog.close}</span>
               </>
             ) : (
               <>
                 <ChevronDown className="w-5 h-5" />
-                <span>その他 ({choices.length - maxVisible}件)</span>
+                <span>{EN.dialog.showMore} ({choices.length - maxVisible})</span>
               </>
             )}
           </motion.button>

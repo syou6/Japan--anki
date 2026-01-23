@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Home, Mic, Calendar } from 'lucide-react';
+import { EN } from '../../i18n/en';
 import './SimplifiedNav.css';
 
 interface SimplifiedNavProps {
@@ -9,28 +10,28 @@ interface SimplifiedNavProps {
   isGuest?: boolean;
 }
 
-// 最大3つの主要機能のみ表示
+// Main navigation - 3 primary actions
 const mainActions = [
   {
     id: 'home',
-    label: 'ホーム',
+    label: EN.elderly.nav.home,
     icon: Home,
     color: 'green',
-    description: 'メイン画面'
+    description: EN.elderly.nav.homeDesc
   },
   {
     id: 'record',
-    label: '録音する',
+    label: EN.elderly.nav.record,
     icon: Mic,
     color: 'red',
-    description: '日記を録音'
+    description: EN.elderly.nav.recordDesc
   },
   {
     id: 'diary',
-    label: '聞く',
+    label: EN.elderly.nav.listen,
     icon: Calendar,
     color: 'blue',
-    description: '日記を聞く'
+    description: EN.elderly.nav.listenDesc
   }
 ];
 
@@ -99,11 +100,11 @@ export const SimplifiedNav: React.FC<SimplifiedNavProps> = ({
           })}
         </div>
         
-        {/* ゲストモード表示 */}
+        {/* Guest mode indicator */}
         {isGuest && (
           <div className="text-center pb-2">
             <span className="text-xs text-gray-600 font-medium">
-              ゲストモード（お試し中）
+              {EN.elderly.guestMode}
             </span>
           </div>
         )}
