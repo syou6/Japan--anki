@@ -4,13 +4,15 @@ import { Button } from '../ui/Button';
 import { Logo } from '../ui/Logo';
 import { useAuthStore } from '../../stores/authStore';
 import { useGuestStore } from '../../stores/guestStore';
-import { 
-  LogOut, 
-  Settings, 
+import { EN } from '../../i18n/en';
+import {
+  LogOut,
+  Settings,
   Calendar,
   Home,
   Mic,
-  Users
+  Users,
+  BookOpen
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -25,10 +27,11 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
   const isParent = user?.role === 'parent';
 
   const navigation = [
-    { id: 'home', label: 'ホーム', icon: Home, show: true },
-    { id: 'record', label: '録音', icon: Mic, show: isParent || isGuestMode },
-    { id: 'diary', label: '日記', icon: Calendar, show: true },
-    { id: 'family', label: '共有', icon: Users, show: !isGuestMode },
+    { id: 'home', label: EN.nav.home, icon: Home, show: true },
+    { id: 'record', label: EN.nav.record, icon: Mic, show: isParent || isGuestMode },
+    { id: 'diary', label: EN.nav.diary, icon: Calendar, show: true },
+    { id: 'practice', label: EN.nav.practice, icon: BookOpen, show: true },
+    { id: 'settings', label: EN.nav.settings, icon: Settings, show: !isGuestMode },
   ];
 
   return (
@@ -36,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
       <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
-          <motion.div 
+          <motion.div
             className="flex items-center gap-1.5 sm:gap-2 md:gap-3 cursor-pointer flex-shrink-0"
             whileHover={{ scale: 1.05 }}
             onClick={() => onViewChange('home')}
@@ -44,10 +47,10 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
             <Logo size="sm" />
             <div>
               <h1 className="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-white whitespace-nowrap">
-                日記AI
+                {EN.app.name}
               </h1>
               <p className="text-[10px] sm:text-xs md:text-sm text-gray-200 hidden sm:block">
-                Voice Journal
+                {EN.header.voiceJournal}
               </p>
             </div>
           </motion.div>
@@ -72,10 +75,10 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
             <div className="hidden lg:flex items-center gap-2 md:gap-3">
               <div className="text-right">
                 <div className="text-sm md:text-base lg:text-lg font-medium text-gray-900 whitespace-nowrap">
-                  {isGuestMode ? 'ゲスト' : `${user?.name}さん`}
+                  {isGuestMode ? EN.user.guest : user?.name}
                 </div>
                 <div className="text-xs md:text-sm text-gray-500">
-                  {isGuestMode ? 'お試し利用' : isParent ? 'ご利用者' : '管理者'}
+                  {isGuestMode ? EN.user.trialMode : isParent ? EN.user.user : EN.user.admin}
                 </div>
               </div>
               <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-full flex items-center justify-center">
@@ -102,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
                   onClick={signOut}
                 >
                   <LogOut className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: '#000000' }} />
-                  <span className="hidden xl:inline text-black font-bold">ログアウト</span>
+                  <span className="hidden xl:inline text-black font-bold">{EN.header.logout}</span>
                 </button>
               )}
             </div>

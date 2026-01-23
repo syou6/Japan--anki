@@ -4,6 +4,7 @@ import { Check, Crown, Users, Zap, CreditCard, Calendar, AlertCircle } from 'luc
 import { Button } from '../ui/Button';
 import { StripeService, pricingPlans, PricingPlan } from '../../lib/stripe';
 import { useAuthStore } from '../../stores/authStore';
+import { EN } from '../../i18n/en';
 import toast from 'react-hot-toast';
 
 interface SubscriptionStatus {
@@ -27,13 +28,13 @@ export const SubscriptionManager: React.FC = () => {
 
   const loadSubscriptionStatus = async () => {
     if (!user) return;
-    
+
     try {
       const status = await StripeService.getSubscriptionStatus(user.id);
       setSubscription(status);
     } catch (error) {
       console.error('Failed to load subscription status:', error);
-      toast.error('サブスクリプション情報の取得に失敗しました');
+      toast.error(EN.subscription.error.loadStatus);
     } finally {
       setLoading(false);
     }
@@ -41,13 +42,13 @@ export const SubscriptionManager: React.FC = () => {
 
   const handleSubscribe = async (plan: PricingPlan) => {
     if (!user || !plan.stripePriceId) return;
-    
+
     setProcessing(plan.id);
     try {
       await StripeService.createCheckoutSession(plan.stripePriceId, user.id);
     } catch (error) {
       console.error('Failed to create checkout session:', error);
-      toast.error('決済処理の開始に失敗しました');
+      toast.error(EN.subscription.error.checkout);
     } finally {
       setProcessing(null);
     }
@@ -55,14 +56,14 @@ export const SubscriptionManager: React.FC = () => {
 
   const handleManageSubscription = async () => {
     if (!user) return;
-    
+
     setProcessing('manage');
     try {
       const portalUrl = await StripeService.getCustomerPortalUrl(user.id);
       window.open(portalUrl, '_blank');
     } catch (error) {
       console.error('Failed to open customer portal:', error);
-      toast.error('管理画面の表示に失敗しました');
+      toast.error(EN.subscription.error.portal);
     } finally {
       setProcessing(null);
     }
@@ -94,17 +95,17 @@ export const SubscriptionManager: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ヘッダー */}
+        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            サブスクリプション管理
+            {EN.subscription.title}
           </h1>
           <p className="text-xl text-gray-600">
-            あなたのプランと利用状況
+            {EN.subscription.subtitle}
           </p>
         </div>
 
-        {/* 現在のプラン */}
+        {/* Current Plan */}
         <div className="mb-12">
           <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-indigo-100">
             <div className="flex items-center justify-between mb-6">
@@ -117,16 +118,16 @@ export const SubscriptionManager: React.FC = () => {
                     {currentPlan.name}
                   </h2>
                   <p className="text-gray-600">
-                    {subscription?.status === 'active' ? 'アクティブ' : '無料プラン'}
+                    {subscription?.status === 'active' ? EN.subscription.active : EN.subscription.freePlan}
                   </p>
                 </div>
               </div>
               <div className="text-right">
                 <div className="text-3xl font-bold text-gray-900">
-                  ¥{currentPlan.price.toLocaleString()}
+                  ${currentPlan.price}
                 </div>
                 <div className="text-gray-600">
-                  /{currentPlan.interval === 'month' ? '月' : '年'}
+                  {currentPlan.interval === 'month' ? EN.subscription.perMonth : EN.subscription.perYear}
                 </div>
               </div>
             </div>
@@ -135,12 +136,12 @@ export const SubscriptionManager: React.FC = () => {
               <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
                 <Calendar className="w-4 h-4" />
                 <span>
-                  次回更新日: {new Date(subscription.current_period_end).toLocaleDateString('ja-JP')}
+                  {EN.subscription.nextRenewal}: {new Date(subscription.current_period_end).toLocaleDateString('en-US')}
                 </span>
                 {subscription.cancel_at_period_end && (
                   <span className="flex items-center gap-1 text-orange-600">
                     <AlertCircle className="w-4 h-4" />
-                    期間終了時にキャンセル予定
+                    {EN.subscription.cancelScheduled}
                   </span>
                 )}
               </div>
@@ -154,18 +155,18 @@ export const SubscriptionManager: React.FC = () => {
                 className="w-full sm:w-auto"
               >
                 <CreditCard className="w-4 h-4 mr-2" />
-                {processing === 'manage' ? '処理中...' : 'サブスクリプション管理'}
+                {processing === 'manage' ? EN.subscription.processing : EN.subscription.manage}
               </Button>
             )}
           </div>
         </div>
 
-        {/* プラン一覧 */}
+        {/* Plan List */}
         <div className="grid md:grid-cols-3 gap-8">
           {pricingPlans.map((plan) => {
             const isCurrentPlan = plan.id === currentPlan.id;
             const isPopular = plan.id === 'premium';
-            
+
             return (
               <motion.div
                 key={plan.id}
@@ -178,7 +179,7 @@ export const SubscriptionManager: React.FC = () => {
                 {isPopular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                     <span className="bg-indigo-500 text-white px-4 py-1 rounded-full text-sm font-medium">
-                      人気
+                      {EN.subscription.popular}
                     </span>
                   </div>
                 )}
@@ -197,10 +198,10 @@ export const SubscriptionManager: React.FC = () => {
                     {plan.name}
                   </h3>
                   <div className="text-4xl font-bold text-gray-900 mb-2">
-                    ¥{plan.price.toLocaleString()}
+                    ${plan.price}
                   </div>
                   <div className="text-gray-600">
-                    /{plan.interval === 'month' ? '月' : '年'}
+                    {plan.interval === 'month' ? EN.subscription.perMonth : EN.subscription.perYear}
                   </div>
                 </div>
 
@@ -219,32 +220,32 @@ export const SubscriptionManager: React.FC = () => {
                   variant={isPopular ? 'primary' : 'outline'}
                   className="w-full"
                 >
-                  {isCurrentPlan ? '現在のプラン' : 
-                   processing === plan.id ? '処理中...' :
-                   plan.id === 'free' ? '無料で開始' : 'プランを選択'}
+                  {isCurrentPlan ? EN.subscription.currentPlan :
+                   processing === plan.id ? EN.subscription.processing :
+                   plan.id === 'free' ? EN.subscription.startFree : EN.subscription.selectPlan}
                 </Button>
               </motion.div>
             );
           })}
         </div>
 
-        {/* 利用状況 */}
+        {/* Usage */}
         <div className="mt-12 bg-white rounded-2xl shadow-lg p-8">
           <h3 className="text-2xl font-bold text-gray-900 mb-6">
-            利用状況
+            {EN.subscription.usage}
           </h3>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-indigo-600 mb-2">0</div>
-              <div className="text-gray-600">今月の録音回数</div>
+              <div className="text-gray-600">{EN.subscription.recordings}</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-green-600 mb-2">0</div>
-              <div className="text-gray-600">保存された日記</div>
+              <div className="text-gray-600">{EN.subscription.savedDiaries}</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-purple-600 mb-2">0</div>
-              <div className="text-gray-600">共有メンバー</div>
+              <div className="text-gray-600">{EN.subscription.sharedMembers}</div>
             </div>
           </div>
         </div>

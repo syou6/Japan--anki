@@ -243,7 +243,7 @@ export const AppPage: React.FC = () => {
                 <div className="max-w-4xl mx-auto">
                   <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                      音声日記を記録
+                      Record Your Diary
                     </h2>
                     <VoiceRecorder />
                   </div>

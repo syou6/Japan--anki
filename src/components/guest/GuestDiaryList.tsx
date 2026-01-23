@@ -4,7 +4,8 @@ import { useGuestStore } from '../../stores/guestStore';
 import { Play, Pause, Trash2, AlertCircle, LogIn } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { format } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
+import { EN } from '../../i18n/en';
 import toast from 'react-hot-toast';
 
 export const GuestDiaryList: React.FC = () => {
@@ -17,13 +18,11 @@ export const GuestDiaryList: React.FC = () => {
     if (!voiceData) return;
 
     if (playingId === diaryId) {
-      // 停止
       if (audioElements[diaryId]) {
         audioElements[diaryId].pause();
       }
       setPlayingId(null);
     } else {
-      // 再生
       if (!audioElements[diaryId]) {
         const audio = new Audio(voiceData);
         audio.onended = () => setPlayingId(null);
@@ -37,19 +36,9 @@ export const GuestDiaryList: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('この日記を削除してもよろしいですか？')) {
+    if (window.confirm(EN.guestMode.deleteConfirm)) {
       deleteGuestDiary(id);
-      toast.success('日記を削除しました');
-    }
-  };
-
-  const getEmotionColor = (emotion: string) => {
-    switch (emotion) {
-      case '喜び': return 'text-yellow-600 bg-yellow-50';
-      case '悲しみ': return 'text-blue-600 bg-blue-50';
-      case '怒り': return 'text-red-600 bg-red-50';
-      case '不安': return 'text-purple-600 bg-purple-50';
-      default: return 'text-gray-600 bg-gray-50';
+      toast.success(EN.guestMode.deleted);
     }
   };
 
@@ -69,10 +58,10 @@ export const GuestDiaryList: React.FC = () => {
         >
           <AlertCircle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            ゲスト利用の上限に達しました
+            {EN.guestMode.limitReached}
           </h2>
           <p className="text-gray-600 mb-6">
-            無料アカウントを作成して、すべての機能をお使いください
+            {EN.guestMode.limitMessage}
           </p>
           <Button
             onClick={() => {
@@ -83,7 +72,7 @@ export const GuestDiaryList: React.FC = () => {
             className="mx-auto"
           >
             <LogIn className="w-5 h-5" />
-            無料アカウントを作成
+            {EN.guestMode.createAccount}
           </Button>
         </motion.div>
       </div>
@@ -98,13 +87,13 @@ export const GuestDiaryList: React.FC = () => {
           animate={{ opacity: 1 }}
           className="text-center py-12"
         >
-          <p className="text-xl text-gray-600 mb-2">まだ日記がありません</p>
+          <p className="text-xl text-gray-600 mb-2">{EN.guestMode.noDiaries}</p>
           <p className="text-lg text-gray-500">
-            音声録音または文章で最初の日記を作成してみましょう
+            {EN.guestMode.startRecording}
           </p>
           {remaining > 0 && (
             <p className="text-sm text-orange-600 mt-4">
-              ゲストモード：あと{remaining}回お試しできます
+              {EN.guestMode.banner}: {remaining} {EN.guestMode.remaining}
             </p>
           )}
         </motion.div>
@@ -120,10 +109,10 @@ export const GuestDiaryList: React.FC = () => {
                 <AlertCircle className="w-5 h-5 text-orange-600 flex-shrink-0" />
                 <div className="flex-1">
                   <p className="text-orange-800 font-medium">
-                    ゲスト利用の上限に達しました
+                    {EN.guestMode.limitReached}
                   </p>
                   <p className="text-orange-700 text-sm mt-1">
-                    無料アカウントを作成して日記を続けましょう
+                    {EN.guestMode.limitMessage}
                   </p>
                 </div>
                 <Button
@@ -134,7 +123,7 @@ export const GuestDiaryList: React.FC = () => {
                   size="sm"
                   variant="primary"
                 >
-                  ログイン
+                  {EN.guestMode.login}
                 </Button>
               </div>
             </motion.div>
@@ -153,15 +142,12 @@ export const GuestDiaryList: React.FC = () => {
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getEmotionColor(diary.emotion)}`}>
-                          {diary.emotion}
-                        </span>
                         <span className={`text-sm font-medium ${getHealthScoreColor(diary.health_score)}`}>
-                          健康スコア: {diary.health_score}
+                          {EN.guestMode.healthScore}: {diary.health_score}
                         </span>
                       </div>
                       <p className="text-sm text-gray-500">
-                        {format(new Date(diary.created_at), 'yyyy年MM月dd日 HH:mm', { locale: ja })}
+                        {format(new Date(diary.created_at), 'MMM d, yyyy HH:mm', { locale: enUS })}
                       </p>
                     </div>
                     <button
@@ -182,7 +168,7 @@ export const GuestDiaryList: React.FC = () => {
 
                   {diary.ai_summary && (
                     <div className="bg-blue-50 rounded-lg p-4 mb-4">
-                      <p className="text-sm font-medium text-blue-900 mb-1">AI要約</p>
+                      <p className="text-sm font-medium text-blue-900 mb-1">{EN.guestMode.aiSummary}</p>
                       <p className="text-sm text-blue-800">{diary.ai_summary}</p>
                     </div>
                   )}
@@ -195,12 +181,12 @@ export const GuestDiaryList: React.FC = () => {
                       {playingId === diary.id ? (
                         <>
                           <Pause className="w-5 h-5 text-gray-700" />
-                          <span className="text-gray-700">停止</span>
+                          <span className="text-gray-700">{EN.guestMode.stop}</span>
                         </>
                       ) : (
                         <>
                           <Play className="w-5 h-5 text-gray-700" />
-                          <span className="text-gray-700">音声を再生</span>
+                          <span className="text-gray-700">{EN.guestMode.playAudio}</span>
                         </>
                       )}
                     </button>

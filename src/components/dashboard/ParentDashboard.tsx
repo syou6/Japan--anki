@@ -3,18 +3,18 @@ import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { useDiaryStore } from '../../stores/diaryStore';
 import { useAuthStore } from '../../stores/authStore';
-import { 
-  Mic, 
-  Calendar, 
-  Heart, 
+import { EN } from '../../i18n/en';
+import {
+  Mic,
+  Calendar,
+  Heart,
   Users,
   TrendingUp,
   MessageCircle,
-  Sun,
-  Cloud
+  Sun
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 interface ParentDashboardProps {
   onViewChange: (view: string) => void;
@@ -28,23 +28,12 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
   const { entries, fetchEntries } = useDiaryStore();
   const { user } = useAuthStore();
   const today = new Date();
+
   const greeting = () => {
     const hour = today.getHours();
-    if (hour < 12) return 'おはようございます';
-    if (hour < 18) return 'こんにちは';
-    return 'こんばんは';
-  };
-
-  const getEmotionEmoji = (emotion: string): string => {
-    const emotionMap: { [key: string]: string } = {
-      '喜び': '😊',
-      '楽しい': '😄',
-      '普通': '😐',
-      '不安': '😟',
-      '悲しみ': '😢',
-      '疲れ': '😴',
-    };
-    return emotionMap[emotion] || '😊';
+    if (hour < 12) return EN.dashboard.greeting.morning;
+    if (hour < 18) return EN.dashboard.greeting.afternoon;
+    return EN.dashboard.greeting.evening;
   };
 
   useEffect(() => {
@@ -54,22 +43,19 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
   }, [user, fetchEntries]);
 
   useEffect(() => {
-    // ユーザーの日記に対するコメントを取得
     const userDiaries = entries.filter(entry => entry.user_id === user?.id);
     const allComments: any[] = [];
-    
-    // 今日の日記データを取得
+
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
-    
+
     const todayDiary = userDiaries.find(diary => {
       const diaryDate = new Date(diary.created_at);
       return diaryDate >= todayStart && diaryDate <= todayEnd;
     });
-    
-    // 今日の健康スコアと感情を設定
+
     if (todayDiary) {
       setTodayHealthScore(todayDiary.health_score || null);
       setTodayEmotion(todayDiary.emotion || null);
@@ -77,7 +63,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
       setTodayHealthScore(null);
       setTodayEmotion(null);
     }
-    
+
     userDiaries.forEach(diary => {
       if (diary.comments && diary.comments.length > 0) {
         diary.comments.forEach(comment => {
@@ -88,12 +74,11 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
         });
       }
     });
-    
-    // 最新順にソートして最新3件を取得
+
     const sortedComments = allComments
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 3);
-    
+
     setRecentComments(sortedComments);
     setCommentCount(allComments.length);
   }, [entries, user]);
@@ -109,49 +94,17 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex-1">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 break-keep">
-              {greeting()}
+              {greeting()}!
             </h1>
             <p className="text-lg sm:text-xl md:text-2xl opacity-90 whitespace-nowrap">
-              今日は{format(today, 'M月d日', { locale: ja })}<span className="hidden sm:inline">（{format(today, 'E', { locale: ja })}）</span>です
+              {EN.parentDashboard.todayDate} {format(today, 'MMMM d', { locale: enUS })}
             </p>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <Sun className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 opacity-80" />
             <div className="text-right">
-              <div className="text-base sm:text-lg md:text-xl font-bold">晴れ</div>
+              <div className="text-base sm:text-lg md:text-xl font-bold">{EN.parentDashboard.weather}</div>
               <div className="text-sm sm:text-base md:text-lg opacity-80">25°C</div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Value Proposition for Remote Families */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        delay={0.1}
-        className="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-6 border-2 border-red-200"
-      >
-        <div className="flex items-start gap-4">
-          <Heart className="w-8 h-8 text-red-500 flex-shrink-0 mt-1" />
-          <div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              離れた親の様子が毎日わかります
-            </h3>
-            <p className="text-gray-700 mb-3">
-              親御さんが話した3分の音声日記から、AIが健康状態や感情を分析。
-              体調の変化や認知機能の低下を早期に発見できます。
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-red-600">
-                🎯 認知症の早期発見
-              </span>
-              <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-red-600">
-                💊 服薬忘れの防止
-              </span>
-              <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-red-600">
-                🏥 受診タイミング
-              </span>
             </div>
           </div>
         </div>
@@ -170,19 +123,19 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
             <Mic className="w-10 h-10 sm:w-12 sm:h-12 text-red-600" />
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
-            今日の様子を話してください
+            {EN.parentDashboard.recordPrompt}
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-2">
-            3分でOK！気軽に話しかけて
+            {EN.parentDashboard.recordSubPrompt}
           </p>
           <div className="text-left bg-red-50 rounded-lg p-3 mb-4">
             <p className="text-sm text-gray-700">
-              💡 こんな話題でOK：
+              {EN.parentDashboard.topicIdeas}
             </p>
             <ul className="text-sm text-gray-600 mt-1">
-              <li>• 今日食べたもの、散歩の様子</li>
-              <li>• 体調、眠れたか</li>
-              <li>• 楽しかったこと、困ったこと</li>
+              <li>• {EN.parentDashboard.topics.food}</li>
+              <li>• {EN.parentDashboard.topics.feeling}</li>
+              <li>• {EN.parentDashboard.topics.activities}</li>
             </ul>
           </div>
           <Button
@@ -192,7 +145,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
             className="w-full text-base sm:text-lg"
           >
             <Mic className="w-6 h-6 sm:w-8 sm:h-8" />
-            録音を始める
+            {EN.parentDashboard.startRecording}
           </Button>
         </motion.div>
 
@@ -208,11 +161,10 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
             <Calendar className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600" />
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
-            過去の日記を見る
+            {EN.parentDashboard.viewDiaries}
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-4 sm:mb-6">
-            これまでの日記を<br className="sm:hidden" />
-            カレンダーで振り返る
+            {EN.parentDashboard.viewDiariesDesc}
           </p>
           <Button
             onClick={() => onViewChange('diary')}
@@ -221,7 +173,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
             className="w-full text-base sm:text-lg"
           >
             <Calendar className="w-6 h-6 sm:w-8 sm:h-8" />
-            日記を見る
+            {EN.parentDashboard.viewDiaryButton}
           </Button>
         </motion.div>
       </div>
@@ -234,9 +186,9 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
         className="bg-white rounded-2xl shadow-lg p-8"
       >
         <h2 className="text-2xl font-bold text-gray-900 mb-6">
-          今日のまとめ
+          {EN.parentDashboard.todaySummary}
         </h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center p-6 bg-green-50 rounded-xl">
             <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -245,7 +197,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
             <div className="text-3xl font-bold text-green-600 mb-2">
               {todayHealthScore !== null ? todayHealthScore : '-'}
             </div>
-            <div className="text-lg text-gray-700">健康スコア</div>
+            <div className="text-lg text-gray-700">{EN.parentDashboard.speakingScore}</div>
           </div>
 
           <div className="text-center p-6 bg-blue-50 rounded-xl">
@@ -253,9 +205,9 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
               <Heart className="w-8 h-8 text-blue-600" />
             </div>
             <div className="text-3xl font-bold text-blue-600 mb-2">
-              {todayEmotion ? getEmotionEmoji(todayEmotion) : '-'}
+              {todayEmotion || '-'}
             </div>
-            <div className="text-lg text-gray-700">今日の気分</div>
+            <div className="text-lg text-gray-700">{EN.parentDashboard.todayMood}</div>
           </div>
 
           <div className="text-center p-6 bg-purple-50 rounded-xl">
@@ -263,7 +215,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
               <MessageCircle className="w-8 h-8 text-purple-600" />
             </div>
             <div className="text-3xl font-bold text-purple-600 mb-2">{commentCount}</div>
-            <div className="text-lg text-gray-700">家族からの<br />コメント</div>
+            <div className="text-lg text-gray-700">{EN.parentDashboard.familyComments}</div>
           </div>
         </div>
       </motion.div>
@@ -277,7 +229,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
       >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
-            家族からのメッセージ
+            {EN.parentDashboard.familyMessages}
           </h2>
           <Users className="w-6 h-6 text-gray-500" />
         </div>
@@ -298,17 +250,17 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="font-bold text-gray-900 text-lg">
-                    {comment.user?.name || 'ユーザー'}
+                    {comment.user?.name || 'User'}
                   </span>
                   <span className="text-gray-500">
-                    {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: ja })}
+                    {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: enUS })}
                   </span>
                 </div>
                 <p className="text-gray-700 text-lg leading-relaxed">
                   {comment.content}
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
-                  日記: {comment.diaryTitle}
+                  Diary: {comment.diaryTitle}
                 </p>
               </div>
             </motion.div>
@@ -316,21 +268,21 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
           ) : (
             <div className="text-center py-8 text-gray-500">
               <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p className="text-lg">まだ家族からのメッセージはありません</p>
-              <p className="text-sm mt-2">日記を共有して、家族とつながりましょう</p>
+              <p className="text-lg">{EN.parentDashboard.noMessages}</p>
+              <p className="text-sm mt-2">{EN.parentDashboard.sharePrompt}</p>
             </div>
           )}
         </div>
 
         {recentComments.length > 0 && (
           <div className="mt-6 text-center">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="lg"
               onClick={() => onViewChange('diary')}
             >
               <MessageCircle className="w-5 h-5" />
-              すべての日記とコメントを見る
+              {EN.parentDashboard.viewAllComments}
             </Button>
           </div>
         )}

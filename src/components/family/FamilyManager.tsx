@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
 import { Users, UserPlus, X, Eye, EyeOff } from 'lucide-react';
+import { EN } from '../../i18n/en';
 import toast from 'react-hot-toast';
 
 interface FamilyMember {
@@ -34,7 +35,6 @@ export const FamilyManager: React.FC = () => {
     if (!user) return;
 
     try {
-      // 自分が共有している相手
       const { data: shared, error: sharedError } = await supabase
         .from('family_relationships')
         .select(`
@@ -45,13 +45,11 @@ export const FamilyManager: React.FC = () => {
         .eq('status', 'accepted');
 
       if (sharedError) {
-        console.error('共有先取得エラー:', sharedError);
+        console.error('Error fetching shared:', sharedError);
       } else {
         setSharedWith(shared || []);
-        console.log('共有先リスト更新:', shared);
       }
 
-      // 自分に共有してくれている相手
       const { data: sharedToMe, error: sharedToMeError } = await supabase
         .from('family_relationships')
         .select(`
@@ -62,13 +60,12 @@ export const FamilyManager: React.FC = () => {
         .eq('status', 'accepted');
 
       if (sharedToMeError) {
-        console.error('共有元取得エラー:', sharedToMeError);
+        console.error('Error fetching shared to me:', sharedToMeError);
       } else {
         setSharedFrom(sharedToMe || []);
-        console.log('共有元リスト更新:', sharedToMe);
       }
     } catch (error) {
-      console.error('家族メンバー取得エラー:', error);
+      console.error('Error fetching family members:', error);
     }
   };
 
@@ -77,7 +74,6 @@ export const FamilyManager: React.FC = () => {
 
     setLoading(true);
     try {
-      // メールアドレスからユーザーを検索
       const { data: targetUser } = await supabase
         .from('users')
         .select('id, name, email')
@@ -85,16 +81,15 @@ export const FamilyManager: React.FC = () => {
         .single();
 
       if (!targetUser) {
-        toast.error('ユーザーが見つかりません');
+        toast.error(EN.family.userNotFound);
         return;
       }
 
       if (targetUser.id === user.id) {
-        toast.error('自分自身は追加できません');
+        toast.error(EN.family.cannotAddSelf);
         return;
       }
 
-      // 既存の関係をチェック
       const { data: existing } = await supabase
         .from('family_relationships')
         .select('id')
@@ -103,11 +98,10 @@ export const FamilyManager: React.FC = () => {
         .single();
 
       if (existing) {
-        toast.error('既に共有済みです');
+        toast.error(EN.family.alreadyShared);
         return;
       }
 
-      // 新しい関係を作成
       const { error } = await supabase
         .from('family_relationships')
         .insert({
@@ -117,99 +111,43 @@ export const FamilyManager: React.FC = () => {
         });
 
       if (!error) {
-        toast.success(`${targetUser.name}さんに日記を共有しました`);
+        toast.success(`${EN.family.shareSuccess} ${targetUser.name}`);
         setEmailInput('');
         fetchFamilyMembers();
       }
     } catch (error) {
-      toast.error('追加に失敗しました');
+      toast.error(EN.family.addError);
     } finally {
       setLoading(false);
     }
   };
 
   const removeFamilyMember = async (relationshipId: string) => {
-    if (!window.confirm('共有を解除してもよろしいですか？')) {
+    if (!window.confirm(EN.family.removeConfirm)) {
       return;
     }
 
     setDeletingId(relationshipId);
-    
+
     try {
-      console.log('削除開始 - ID:', relationshipId);
-      console.log('現在のユーザー:', user?.id);
-      
-      // まず削除前の状態を確認
-      const { data: beforeDelete } = await supabase
-        .from('family_relationships')
-        .select('*')
-        .eq('id', relationshipId)
-        .single();
-      
-      console.log('削除対象のレコード:', beforeDelete);
-      
-      // 削除を実行 - RPC関数を使用
       const { data, error } = await supabase
         .rpc('delete_family_relationship', {
           relationship_id: relationshipId
         });
 
       if (error) {
-        console.error('削除エラー詳細:', {
-          error,
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        });
-        toast.error(`解除に失敗しました: ${error.message}`);
-        
-        // エラー時はリストを再取得して正しい状態を表示
+        console.error('Delete error:', error);
+        toast.error(`${EN.family.addError}: ${error.message}`);
         await fetchFamilyMembers();
       } else {
-        console.log('削除レスポンス:', data);
-        
-        // 削除後の確認
-        const { data: afterDelete } = await supabase
-          .from('family_relationships')
-          .select('*')
-          .eq('id', relationshipId);
-        
-        console.log('削除後の確認:', afterDelete);
-        
-        if (afterDelete && afterDelete.length > 0) {
-          console.error('削除が実行されていません！');
-          console.log('RPC関数での削除を試みます...');
-          
-          // 直接削除が失敗した場合、RPC関数を使用
-          const { error: rpcError } = await supabase
-            .rpc('delete_family_relationship', {
-              relationship_id: relationshipId
-            });
-            
-          if (rpcError) {
-            console.error('RPC削除エラー:', rpcError);
-            toast.error('削除に失敗しました。権限を確認してください。');
-          } else {
-            // UIから即座に削除
-            setSharedWith(prev => prev.filter(m => m.id !== relationshipId));
-            setSharedFrom(prev => prev.filter(m => m.id !== relationshipId));
-            toast.success('共有を解除しました');
-          }
-        } else {
-          // UIから即座に削除
-          setSharedWith(prev => prev.filter(m => m.id !== relationshipId));
-          setSharedFrom(prev => prev.filter(m => m.id !== relationshipId));
-          toast.success('共有を解除しました');
-        }
-        
-        // 最新のリストを取得
+        setSharedWith(prev => prev.filter(m => m.id !== relationshipId));
+        setSharedFrom(prev => prev.filter(m => m.id !== relationshipId));
+        toast.success(EN.family.removed);
         await fetchFamilyMembers();
       }
     } catch (error: any) {
-      console.error('予期しないエラー:', error);
-      toast.error(`解除に失敗しました: ${error.message || '不明なエラー'}`);
-      // エラー時はリストを再取得
+      console.error('Unexpected error:', error);
+      toast.error(`${EN.family.addError}: ${error.message || 'Unknown error'}`);
       await fetchFamilyMembers();
     } finally {
       setDeletingId(null);
@@ -225,17 +163,17 @@ export const FamilyManager: React.FC = () => {
       >
         <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
           <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900">日記の共有設定</h2>
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-900">{EN.family.title}</h2>
         </div>
 
-        {/* 日記を共有する */}
+        {/* Add recipient */}
         <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-blue-50 rounded-xl">
           <h3 className="text-lg sm:text-xl font-bold text-blue-900 mb-3 sm:mb-4">
             <Eye className="inline w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-            日記を見せる相手を追加
+            {EN.family.addRecipient}
           </h3>
           <p className="text-sm sm:text-lg text-blue-800 mb-3 sm:mb-4">
-            メールアドレスを入力して、あなたの日記を共有しましょう
+            {EN.family.addDescription}
           </p>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <input
@@ -252,16 +190,16 @@ export const FamilyManager: React.FC = () => {
               className="w-full sm:w-auto"
             >
               <UserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="text-sm sm:text-base">追加する</span>
+              <span className="text-sm sm:text-base">{EN.family.addButton}</span>
             </Button>
           </div>
         </div>
 
-        {/* 自分が共有している相手 */}
+        {/* Your viewers */}
         <div className="mb-8">
           <h3 className="text-xl font-bold text-gray-900 mb-4">
             <Eye className="inline w-5 h-5 mr-2" />
-            あなたの日記を見れる人
+            {EN.family.yourViewers}
           </h3>
           <div className="space-y-3">
             {sharedWith.map((member) => (
@@ -275,7 +213,7 @@ export const FamilyManager: React.FC = () => {
                   </div>
                   <div className="min-w-0">
                     <div className="font-medium text-base sm:text-lg truncate">
-                      {member.child?.name || 'ユーザー'}
+                      {member.child?.name || EN.family.user}
                     </div>
                     <div className="text-sm sm:text-base text-gray-500 truncate">
                       {member.child?.email}
@@ -294,23 +232,23 @@ export const FamilyManager: React.FC = () => {
                   ) : (
                     <X className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
                   )}
-                  <span className="hidden sm:inline">解除</span>
+                  <span className="hidden sm:inline">{EN.family.remove}</span>
                 </Button>
               </div>
             ))}
             {sharedWith.length === 0 && (
               <div className="text-center py-8 text-gray-500">
-                まだ誰にも共有していません
+                {EN.family.noSharing}
               </div>
             )}
           </div>
         </div>
 
-        {/* 自分に共有してくれている相手 */}
+        {/* Diaries you can view */}
         <div>
           <h3 className="text-xl font-bold text-gray-900 mb-4">
             <EyeOff className="inline w-5 h-5 mr-2" />
-            あなたが見れる人の日記
+            {EN.family.youCanView}
           </h3>
           <div className="space-y-3">
             {sharedFrom.map((member) => (
@@ -324,7 +262,7 @@ export const FamilyManager: React.FC = () => {
                   </div>
                   <div className="min-w-0">
                     <div className="font-medium text-base sm:text-lg truncate">
-                      {member.parent?.name || 'ユーザー'}
+                      {member.parent?.name || EN.family.user}
                     </div>
                     <div className="text-sm sm:text-base text-gray-500 truncate">
                       {member.parent?.email}
@@ -343,13 +281,13 @@ export const FamilyManager: React.FC = () => {
                   ) : (
                     <X className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
                   )}
-                  <span className="hidden sm:inline">解除</span>
+                  <span className="hidden sm:inline">{EN.family.remove}</span>
                 </Button>
               </div>
             ))}
             {sharedFrom.length === 0 && (
               <div className="text-center py-8 text-gray-500">
-                まだ誰もあなたに共有していません
+                {EN.family.noViewers}
               </div>
             )}
           </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Share2, Twitter, Facebook, Copy, Check, MessageCircle } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { EN } from '../../i18n/en';
 
 interface ShareButtonProps {
   title?: string;
@@ -11,8 +12,8 @@ interface ShareButtonProps {
 }
 
 export const ShareButton: React.FC<ShareButtonProps> = ({
-  title = "AI Voice Journal - 声で書くデジタル日記",
-  text = "手が不自由でも大丈夫。声だけで日記を書いて、AIが自動で文字起こし。大切な思い出を家族と共有。",
+  title = "English AI Diary - Speak English Every Day",
+  text = "Record your thoughts in English, get AI feedback, and improve your speaking skills. Perfect for English learners!",
   url = "https://www.journal-ai.cloud",
   className = ""
 }) => {
@@ -71,7 +72,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
         className="flex items-center gap-2"
       >
         <Share2 className="w-4 h-4" />
-        共有
+        {EN.share.button}
       </Button>
 
       {showShareMenu && (
@@ -118,7 +119,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
                 <Copy className="w-5 h-5 text-gray-500" />
               )}
               <span className="text-sm">
-                {copied ? 'コピーしました' : 'リンクをコピー'}
+                {copied ? EN.share.copied : EN.share.copyLink}
               </span>
             </button>
           </div>
