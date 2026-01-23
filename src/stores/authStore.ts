@@ -10,6 +10,7 @@ interface AuthStore {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
+  updateCefrLevel: (level: User['cefr_level']) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
@@ -235,13 +236,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
               name: session.user.user_metadata?.name || '',
               role: session.user.user_metadata?.role || 'parent',
             };
-            
+
             const { data: createdProfile } = await supabase
               .from('users')
               .insert(newUserProfile)
               .select()
               .single();
-            
+
             set({ user: createdProfile || newUserProfile });
           }
         } else {
@@ -252,6 +253,25 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       console.error('Auth初期化エラー:', error);
       set({ user: null, loading: false });
       return Promise.resolve(); // エラーでもPromiseを返す
+    }
+  },
+
+  updateCefrLevel: async (level: User['cefr_level']) => {
+    const user = get().user;
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ cefr_level: level })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      set({ user: { ...user, cefr_level: level } });
+    } catch (error) {
+      console.error('Failed to update CEFR level:', error);
+      throw error;
     }
   },
 }));

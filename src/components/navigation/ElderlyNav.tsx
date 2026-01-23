@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Home, Mic, Calendar, Users } from 'lucide-react';
+import { Home, Mic, Calendar, BookOpen } from 'lucide-react';
 import { colors, buttonStyles } from '../../styles/colorPalette';
+import { EN } from '../../i18n/en';
 import './ElderlyNav.css';
 
 interface ElderlyNavProps {
@@ -10,42 +11,42 @@ interface ElderlyNavProps {
   isGuest?: boolean;
 }
 
-// シンプルで分かりやすい4つの機能
+// Simple and clear 4 main actions
 const mainActions = [
   {
     id: 'home',
-    label: 'ホーム',
+    label: EN.nav.home,
     icon: Home,
     feature: 'home' as const,
-    description: 'トップ'
+    description: EN.nav.homeDesc
   },
   {
     id: 'record',
-    label: '録音',
+    label: EN.nav.record,
     icon: Mic,
     feature: 'record' as const,
-    description: '話す'
+    description: EN.nav.recordDesc
   },
   {
     id: 'diary',
-    label: '再生',
+    label: EN.nav.diary,
     icon: Calendar,
     feature: 'play' as const,
-    description: '聞く'
+    description: EN.nav.diaryDesc
   },
   {
-    id: 'family',
-    label: '家族',
-    icon: Users,
+    id: 'practice',
+    label: EN.nav.practice,
+    icon: BookOpen,
     feature: 'home' as const,
-    description: '共有'
+    description: EN.nav.practiceDesc
   }
 ];
 
-export const ElderlyNav: React.FC<ElderlyNavProps> = ({ 
-  currentView, 
+export const ElderlyNav: React.FC<ElderlyNavProps> = ({
+  currentView,
   onViewChange,
-  isGuest = false 
+  isGuest = false
 }) => {
   return (
     <nav className="elderly-nav">
@@ -53,7 +54,7 @@ export const ElderlyNav: React.FC<ElderlyNavProps> = ({
         {mainActions.map((action) => {
           const isActive = currentView === action.id;
           const Icon = action.icon;
-          
+
           return (
             <motion.button
               key={action.id}
@@ -71,23 +72,23 @@ export const ElderlyNav: React.FC<ElderlyNavProps> = ({
                 borderStyle: 'solid',
               }}
             >
-              {/* 大きなアイコン */}
+              {/* Large icon */}
               <div className="icon-wrapper">
-                <Icon 
-                  size={isActive ? 44 : 40} 
+                <Icon
+                  size={isActive ? 44 : 40}
                   strokeWidth={isActive ? 3.5 : 3}
                   style={{ color: isActive ? 'white' : '#000000' }}
                 />
               </div>
-              
-              {/* 大きな文字 */}
+
+              {/* Large text */}
               <div className="label-wrapper" style={{ color: isActive ? '#ffffff' : '#000000' }}>
-                <span 
+                <span
                   data-active={isActive}
                   className="elderly-nav-label-main"
-                  style={{ 
+                  style={{
                     color: isActive ? '#ffffff' : '#000000',
-                    fontSize: '20px',
+                    fontSize: '18px',
                     fontWeight: '900',
                     display: 'block',
                     lineHeight: '1.2',
@@ -96,12 +97,12 @@ export const ElderlyNav: React.FC<ElderlyNavProps> = ({
                 >
                   {action.label}
                 </span>
-                <span 
+                <span
                   data-active={isActive}
                   className="elderly-nav-label-sub"
-                  style={{ 
+                  style={{
                     color: isActive ? '#ffffff' : '#333333',
-                    fontSize: '14px',
+                    fontSize: '12px',
                     fontWeight: '700',
                     display: 'block',
                     opacity: isActive ? 1 : 0.8,
@@ -111,8 +112,8 @@ export const ElderlyNav: React.FC<ElderlyNavProps> = ({
                   {action.description}
                 </span>
               </div>
-              
-              {/* アクティブ表示 */}
+
+              {/* Active indicator */}
               {isActive && (
                 <motion.div
                   className="active-indicator"
@@ -121,18 +122,18 @@ export const ElderlyNav: React.FC<ElderlyNavProps> = ({
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.2 }}
                 >
-                  選択中
+                  {EN.nav.active}
                 </motion.div>
               )}
             </motion.button>
           );
         })}
       </div>
-      
-      {/* ゲストモード表示 */}
+
+      {/* Guest mode indicator */}
       {isGuest && (
         <div className="guest-indicator">
-          <span>お試し中</span>
+          <span>{EN.guest.tryMode}</span>
         </div>
       )}
     </nav>

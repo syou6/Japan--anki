@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Mic, Brain, Users, Shield, Star, ArrowRight, Play, CheckCircle } from 'lucide-react';
+import { Mic, Brain, Users, Shield, Star, ArrowRight, Play, CheckCircle, BookOpen } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { ShareButton } from '../components/sharing/ShareButton';
+import { EN } from '../i18n/en';
 import { useNavigate } from 'react-router-dom';
 
 export const LandingPage: React.FC = () => {
@@ -11,44 +12,44 @@ export const LandingPage: React.FC = () => {
   const features = [
     {
       icon: <Mic className="w-8 h-8" />,
-      title: "音声で簡単記録",
-      description: "ボタンを押すだけで、声で日記を記録できます。手が不自由でも大丈夫。"
+      title: "Easy Voice Recording",
+      description: "Just press a button and speak to record your diary. Perfect for practicing English speaking."
     },
     {
       icon: <Brain className="w-8 h-8" />,
-      title: "AIが自動文字起こし",
-      description: "録音した音声をAIが自動で文字に変換。高齢者にも読みやすい文章に。"
+      title: "AI-Powered Feedback",
+      description: "Get instant feedback on your grammar, vocabulary, and pronunciation to improve your English."
     },
     {
-      icon: <Users className="w-8 h-8" />,
-      title: "家族で共有",
-      description: "大切な思い出を家族みんなで共有。離れて住んでいても繋がれます。"
+      icon: <BookOpen className="w-8 h-8" />,
+      title: "Versant Practice",
+      description: "Practice Part E and Part F questions to prepare for speaking tests and boost your confidence."
     },
     {
       icon: <Shield className="w-8 h-8" />,
-      title: "プライバシー保護",
-      description: "あなたの大切な思い出は安全に保護されます。家族だけがアクセス可能。"
+      title: "Track Your Progress",
+      description: "See your CEFR level and track improvement over time with detailed analytics."
     }
   ];
 
   const testimonials = [
     {
-      name: "田中さん（75歳）",
-      text: "手が震えて字が書けなくても、声で日記が書けるようになりました。"
+      name: "Yuki S. (TOEIC 520)",
+      text: "Recording a diary every day helped me speak English more naturally. The AI feedback is super helpful!"
     },
     {
-      name: "佐藤さん（50歳）",
-      text: "母の思い出を家族みんなで共有できるようになり、とても嬉しいです。"
+      name: "Takeshi M. (TOEIC 480)",
+      text: "The Versant practice feature really helped me prepare for my company's speaking test."
     },
     {
-      name: "山田さん（60歳）",
-      text: "AIが文字起こししてくれるので、後で読み返すのが楽になりました。"
+      name: "Mika T. (TOEIC 550)",
+      text: "I love how the app suggests better vocabulary. My English is improving day by day!"
     }
   ];
 
   return (
     <div className="min-h-screen bg-white">
-      {/* ヘッダー */}
+      {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
@@ -56,14 +57,14 @@ export const LandingPage: React.FC = () => {
               <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
                 <Mic className="w-6 h-6 text-white" />
               </div>
-              <span className="ml-3 text-2xl font-bold text-gray-900">AI Voice Journal</span>
+              <span className="ml-3 text-2xl font-bold text-gray-900">{EN.app.name}</span>
             </div>
             <div className="flex items-center gap-4">
               <Button
                 onClick={() => navigate('/app')}
                 variant="primary"
               >
-                アプリを開始
+                Get Started
               </Button>
               <ShareButton />
             </div>
@@ -71,7 +72,7 @@ export const LandingPage: React.FC = () => {
         </div>
       </header>
 
-      {/* ヒーローセクション */}
+      {/* Hero Section */}
       <section className="bg-gradient-to-br from-indigo-50 to-purple-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -81,8 +82,8 @@ export const LandingPage: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="text-5xl md:text-6xl font-bold text-gray-900 mb-6"
             >
-              声で書く
-              <span className="text-indigo-600"> デジタル日記</span>
+              Speak English
+              <span className="text-indigo-600"> Every Day</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -90,8 +91,8 @@ export const LandingPage: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto"
             >
-              手が不自由でも、字が書けなくても大丈夫。声だけで日記を書いて、AIが自動で文字起こし。
-              大切な思い出を家族と共有しましょう。
+              Record your daily thoughts in English. Get AI-powered feedback to improve your speaking skills.
+              Practice Versant-style questions and track your CEFR level progress.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -105,7 +106,7 @@ export const LandingPage: React.FC = () => {
                 size="lg"
                 className="text-lg px-8 py-4"
               >
-                無料で始める
+                Start Free
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <Button
@@ -114,22 +115,22 @@ export const LandingPage: React.FC = () => {
                 className="text-lg px-8 py-4"
               >
                 <Play className="w-5 h-5 mr-2" />
-                デモを見る
+                Watch Demo
               </Button>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* 特徴セクション */}
+      {/* Features Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              なぜ選ばれるのか
+              Why Choose English AI Diary?
             </h2>
             <p className="text-xl text-gray-600">
-              高齢者に優しい、家族に優しい、使いやすい日記アプリ
+              The perfect tool for TOEIC 500-level learners who want to improve speaking
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -156,15 +157,15 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 利用者の声 */}
+      {/* Testimonials */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              利用者の声
+              What Our Users Say
             </h2>
             <p className="text-xl text-gray-600">
-              実際にご利用いただいている方々からの感想
+              Real feedback from English learners like you
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -193,7 +194,7 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* CTAセクション */}
+      {/* CTA Section */}
       <section className="py-20 bg-indigo-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.h2
@@ -202,7 +203,7 @@ export const LandingPage: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="text-4xl font-bold text-white mb-4"
           >
-            今すぐ始めませんか？
+            Ready to Start Speaking?
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -210,7 +211,7 @@ export const LandingPage: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl text-indigo-100 mb-8"
           >
-            無料で利用開始。登録は1分で完了します。
+            Start free today. Just 1 minute of English speaking per day can make a difference.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -223,14 +224,14 @@ export const LandingPage: React.FC = () => {
               size="lg"
               className="text-lg px-8 py-4"
             >
-              無料で始める
+              Start Free
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </motion.div>
         </div>
       </section>
 
-      {/* フッター */}
+      {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
@@ -239,43 +240,43 @@ export const LandingPage: React.FC = () => {
                 <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
                   <Mic className="w-5 h-5 text-white" />
                 </div>
-                <span className="ml-2 text-xl font-bold">AI Voice Journal</span>
+                <span className="ml-2 text-xl font-bold">{EN.app.name}</span>
               </div>
               <p className="text-gray-400">
-                声で書くデジタル日記。大切な思い出を家族と共有。
+                Speak English every day. Improve your skills with AI feedback.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">機能</h3>
+              <h3 className="font-semibold mb-4">Features</h3>
               <ul className="space-y-2 text-gray-400">
-                <li>音声録音</li>
-                <li>AI文字起こし</li>
-                <li>家族共有</li>
-                <li>プライバシー保護</li>
+                <li>Voice Recording</li>
+                <li>AI Feedback</li>
+                <li>Versant Practice</li>
+                <li>Progress Tracking</li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">サポート</h3>
+              <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-gray-400">
-                <li>ヘルプセンター</li>
-                <li>お問い合わせ</li>
-                <li>プライバシーポリシー</li>
-                <li>利用規約</li>
+                <li>Help Center</li>
+                <li>Contact Us</li>
+                <li>Privacy Policy</li>
+                <li>Terms of Service</li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">今すぐ開始</h3>
+              <h3 className="font-semibold mb-4">Get Started</h3>
               <Button
                 onClick={() => navigate('/app')}
                 variant="primary"
                 className="w-full"
               >
-                アプリを開始
+                Open App
               </Button>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 AI Voice Journal. All rights reserved.</p>
+            <p>&copy; 2024 {EN.app.name}. All rights reserved.</p>
           </div>
         </div>
       </footer>

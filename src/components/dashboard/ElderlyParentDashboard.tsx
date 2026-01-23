@@ -4,15 +4,16 @@ import { Button } from '../ui/Button';
 import { useDiaryStore } from '../../stores/diaryStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useGuestStore } from '../../stores/guestStore';
-import { 
-  Mic, 
-  Calendar, 
-  Heart,
+import { EN } from '../../i18n/en';
+import {
+  Mic,
+  Calendar,
+  BookOpen,
   Sun,
   LogOut
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 interface ElderlyParentDashboardProps {
   onViewChange: (view: string) => void;
@@ -26,12 +27,12 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
   const { user } = useAuthStore();
   const authStore = useAuthStore();
   const today = new Date();
-  
+
   const greeting = () => {
     const hour = today.getHours();
-    if (hour < 12) return 'おはようございます';
-    if (hour < 18) return 'こんにちは';
-    return 'こんばんは';
+    if (hour < 12) return EN.dashboard.greeting.morning;
+    if (hour < 18) return EN.dashboard.greeting.afternoon;
+    return EN.dashboard.greeting.evening;
   };
 
   useEffect(() => {
@@ -46,25 +47,25 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
     todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
-    
+
     const diariesToCheck = isGuest ? guestDiaries : entries;
-    
-    // null/undefined チェックを追加
+
+    // null/undefined check
     if (!diariesToCheck) {
       setTodayRecorded(false);
       return;
     }
-    
+
     const todayDiary = diariesToCheck.find(diary => {
       const diaryDate = new Date(diary.created_at);
       return diaryDate >= todayStart && diaryDate <= todayEnd;
     });
-    
+
     setTodayRecorded(!!todayDiary);
   }, [entries, guestDiaries, isGuest]);
 
   const handleLogout = async () => {
-    if (window.confirm('ログアウトしますか？')) {
+    if (window.confirm(EN.dashboard.logoutConfirm)) {
       try {
         if (isGuest) {
           setGuestMode(false);
@@ -73,12 +74,10 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
         } else if (authStore.signOut) {
           await authStore.signOut();
         } else {
-          // signOut関数が利用できない場合の代替処理
           window.location.href = '/';
         }
       } catch (error) {
-        console.error('ログアウトエラー:', error);
-        // エラーが発生しても強制的にログアウト
+        console.error('Logout error:', error);
         window.location.href = '/';
       }
     }
@@ -98,7 +97,7 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
               {greeting()}
             </h1>
             <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">
-              {format(today, 'M月d日（E）', { locale: ja })}
+              {format(today, 'EEEE, MMMM d', { locale: enUS })}
             </p>
           </div>
           <div className="flex items-center gap-4">
@@ -106,7 +105,7 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
           </div>
         </div>
       </motion.div>
-      
+
       {/* Logout Button - Big and Clear */}
       <motion.button
         initial={{ opacity: 0, scale: 0.95 }}
@@ -117,7 +116,7 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
         <div className="flex items-center justify-center gap-4">
           <LogOut className="w-10 h-10 sm:w-12 sm:h-12" />
           <span className="text-2xl sm:text-3xl font-black">
-            ログアウト
+            {EN.dashboard.logout}
           </span>
         </div>
       </motion.button>
@@ -135,16 +134,10 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
               <Mic className="w-16 h-16 sm:w-20 sm:h-20 text-white" />
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-navy-900 mb-4">
-              今日の日記を
-            </h2>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-navy-900 mb-6">
-              録音しましょう
+              {EN.dashboard.todayPrompt}
             </h2>
             <p className="text-2xl sm:text-3xl text-navy-700 mb-8 font-bold">
-              マイクボタンを押して
-            </p>
-            <p className="text-2xl sm:text-3xl text-navy-700 mb-8 font-bold">
-              お話しください
+              {EN.recording.instruction}
             </p>
             <Button
               onClick={() => onViewChange('record')}
@@ -153,7 +146,7 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
               className="w-full sm:w-3/4 mx-auto h-24 sm:h-28 text-2xl sm:text-3xl bg-red-500 hover:bg-red-600 border-4 border-navy-900"
             >
               <Mic className="w-10 h-10 sm:w-12 sm:h-12" />
-              録音を始める
+              {EN.dashboard.recordButton}
             </Button>
           </>
         ) : (
@@ -162,13 +155,10 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
               <span className="text-6xl sm:text-7xl">✓</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-navy-900 mb-6">
-              今日の日記は
+              {EN.dashboard.alreadyRecorded}
             </h2>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-green-600 mb-8">
-              録音済みです
-            </h2>
-            <p className="text-2xl sm:text-3xl text-navy-700 font-bold">
-              お疲れさまでした！
+            <p className="text-2xl sm:text-3xl text-green-600 font-bold">
+              {EN.dashboard.greatJob}
             </p>
           </>
         )}
@@ -187,22 +177,22 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
         >
           <Calendar className="w-16 h-16 sm:w-20 sm:h-20 text-blue-600 mx-auto mb-4" />
           <h3 className="text-2xl sm:text-3xl font-black text-navy-900">
-            過去の日記
+            {EN.dashboard.viewDiary}
           </h3>
         </motion.button>
 
-        {/* Family Connection */}
+        {/* Practice Speaking */}
         <motion.button
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          onClick={() => onViewChange('family')}
+          onClick={() => onViewChange('practice')}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="bg-white rounded-2xl border-4 border-navy-900 p-6 sm:p-8 text-center hover:bg-pink-50 transition-colors"
+          className="bg-white rounded-2xl border-4 border-navy-900 p-6 sm:p-8 text-center hover:bg-purple-50 transition-colors"
         >
-          <Heart className="w-16 h-16 sm:w-20 sm:h-20 text-red-500 mx-auto mb-4" />
+          <BookOpen className="w-16 h-16 sm:w-20 sm:h-20 text-purple-600 mx-auto mb-4" />
           <h3 className="text-2xl sm:text-3xl font-black text-navy-900">
-            家族の声
+            {EN.dashboard.practice}
           </h3>
         </motion.button>
       </div>
@@ -216,12 +206,12 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
           className="bg-yellow-50 rounded-2xl border-4 border-navy-900 p-6 sm:p-8"
         >
           <h3 className="text-2xl sm:text-3xl font-black text-navy-900 mb-4">
-            💡 今日のヒント
+            💡 {EN.dashboard.tips.title}
           </h3>
           <ul className="space-y-3 text-xl sm:text-2xl text-navy-700 font-bold">
-            <li>• 今日食べたものは？</li>
-            <li>• 体調はいかがですか？</li>
-            <li>• 楽しかったことは？</li>
+            <li>• {EN.dashboard.tips.tip1}</li>
+            <li>• {EN.dashboard.tips.tip2}</li>
+            <li>• {EN.dashboard.tips.tip3}</li>
           </ul>
         </motion.div>
       )}

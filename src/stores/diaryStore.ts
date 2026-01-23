@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { analyzeText, generateFamilySummary, analyzeHealthScore } from '../lib/gemini';
+import { generateEnglishFeedback } from '../lib/gemini-feedback';
 import { toast } from 'sonner';
-import type { DiaryEntry } from '../types';
+import type { DiaryEntry, CEFRLevel } from '../types';
 
 // ファイルサイズのフォーマット関数（インライン定義）
 const formatFileSize = (bytes: number): string => {
@@ -207,19 +208,33 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
         }
       }
 
-      // 無料AI分析機能（APIコストゼロ）
+      // AI分析機能
       let analysisResult: any = null;
       let aiSummary = '';
       let healthScore = 75;
-      
-      // テキストコンテンツがある場合は無料分析を実行
+      let englishFeedback: any = null;
+
+      // テキストコンテンツがある場合は分析を実行
       if (content && content.trim()) {
         try {
+          // 基本分析
           analysisResult = await analyzeText(content);
           aiSummary = await generateFamilySummary(content);
           healthScore = await analyzeHealthScore(content);
+
+          // English feedback generation (for English learning app)
+          // Get user's CEFR level from profile
+          const { data: userProfile } = await supabase
+            .from('users')
+            .select('cefr_level')
+            .eq('id', user.id)
+            .single();
+
+          const cefrLevel: CEFRLevel = userProfile?.cefr_level || 'B1';
+          englishFeedback = await generateEnglishFeedback(content, cefrLevel);
+          console.log('English feedback generated:', englishFeedback);
         } catch (analysisError) {
-          console.warn('無料分析エラー:', analysisError);
+          console.warn('Analysis error:', analysisError);
         }
       }
 
@@ -232,10 +247,11 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
           content: content,
           voice_url: voiceUrl,
           duration: audioBlob ? Math.round(audioBlob.size / 1000) : null,
-          emotion: analysisResult?.emotion || '普通',
+          emotion: englishFeedback?.cefrLevel ? 'neutral' : (analysisResult?.emotion || 'neutral'),
           health_score: healthScore,
-          ai_summary: aiSummary || analysisResult?.summary || '',
+          ai_summary: englishFeedback?.summary || aiSummary || analysisResult?.summary || '',
           ai_keywords: analysisResult?.keywords || [],
+          ai_feedback: englishFeedback || null,
           tags: [],
           visibility: 'family'
         })

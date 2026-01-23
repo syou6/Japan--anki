@@ -6,9 +6,10 @@ import { useGuestStore } from '../../stores/guestStore';
 import { Button } from '../ui/Button';
 import { DiaryCard } from './DiaryCard';
 import { GuestDiaryCard } from '../guest/GuestDiaryCard';
+import { EN } from '../../i18n/en';
 import { Calendar, List, Plus, Clock } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isSameMonth } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 type ViewMode = 'list' | 'calendar';
 
@@ -31,20 +32,18 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
     }
   }, [isGuest]);
 
-  // ゲストモードの場合はゲスト日記、通常モードは通常の日記を使用
+  // Use guest diaries in guest mode, otherwise use normal entries
   const displayEntries = isGuest ? guestDiaries : entries;
-  
+
   const getEntriesForDate = (date: Date) => {
-    return displayEntries.filter(entry => 
+    return displayEntries.filter(entry =>
       isSameDay(new Date(entry.created_at), date)
     );
   };
 
   const renderCalendarView = () => {
-    // 月の最初と最後の日を取得
     const monthStart = startOfMonth(selectedDate);
     const monthEnd = endOfMonth(selectedDate);
-    // カレンダーグリッド用に、月初の週の月曜から月末の週の日曜まで取得
     const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
     const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
     const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
@@ -53,33 +52,33 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
-            {format(selectedDate, 'yyyy年M月', { locale: ja })}
+            {format(selectedDate, 'MMMM yyyy', { locale: enUS })}
           </h3>
           <div className="flex gap-1 sm:gap-2">
             <button
               onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1, 1))}
               className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-lg text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
-              ← 前月
+              ← Prev
             </button>
             <button
               onClick={() => setSelectedDate(new Date())}
               className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-lg text-blue-600 hover:text-blue-800 font-medium border border-blue-300 rounded-lg hover:bg-blue-50"
             >
-              今月
+              Today
             </button>
             <button
               onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1))}
               className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-lg text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
-              次月 →
+              Next →
             </button>
           </div>
         </div>
 
         <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
           <div className="grid grid-cols-7">
-            {['月', '火', '水', '木', '金', '土', '日'].map((day, index) => (
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => (
               <div
                 key={day}
                 className={`p-2 sm:p-3 text-center text-xs sm:text-base font-bold border-b-2 border-gray-200 ${
@@ -143,7 +142,7 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
                       ))}
                       {dayEntries.length > 2 && (
                         <div className="text-xs text-gray-500">
-                          +{dayEntries.length - 2}件
+                          +{dayEntries.length - 2} more
                         </div>
                       )}
                     </div>
@@ -165,7 +164,7 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
         {/* Selected Date Entries */}
         <div className="mt-6 sm:mt-8">
           <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">
-            {format(selectedDate, 'M月d日（E）', { locale: ja })}の日記
+            {format(selectedDate, 'EEEE, MMMM d', { locale: enUS })}
           </h4>
           <div className="space-y-4">
             {getEntriesForDate(selectedDate).map(entry => (
@@ -177,7 +176,7 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
             ))}
             {getEntriesForDate(selectedDate).length === 0 && (
               <div className="text-center py-6 sm:py-8 text-gray-500 text-base sm:text-lg bg-gray-50 rounded-xl">
-                この日の日記はありません
+                No diary entries for this day
               </div>
             )}
           </div>
@@ -199,7 +198,7 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          {isGuest ? 'ゲストの日記' : user?.role === 'parent' ? 'あなたの日記' : `${user?.name}さんの日記`}
+          {isGuest ? 'Guest Diary' : user?.role === 'parent' ? 'My Diary' : `${user?.name}'s Diary`}
         </h1>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -213,7 +212,7 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
               }`}
             >
               <List className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="sm:inline">リスト</span>
+              <span className="sm:inline">List</span>
             </button>
             <button
               onClick={() => setViewMode('calendar')}
@@ -224,18 +223,18 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
               }`}
             >
               <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="sm:inline">カレンダー</span>
+              <span className="sm:inline">Calendar</span>
             </button>
           </div>
 
           {(user?.role === 'parent' || isGuest) && (
-            <Button 
-              onClick={() => setShowRecorder(true)} 
+            <Button
+              onClick={() => setShowRecorder(true)}
               variant="primary"
               className="w-full sm:w-auto"
             >
               <Plus className="w-5 h-5" />
-              新しい日記
+              New Diary
             </Button>
           )}
         </div>
@@ -262,15 +261,15 @@ export const DiaryList: React.FC<DiaryListProps> = ({ isGuest }) => {
             >
               <div className="text-6xl mb-4">📝</div>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                まだ日記がありません
+                {EN.diary.empty}
               </h3>
               <p className="text-lg text-gray-600 mb-6">
-                最初の日記を録音してみましょう
+                {EN.diary.startFirst}
               </p>
               {(user?.role === 'parent' || isGuest) && (
                 <Button onClick={() => setShowRecorder(true)} size="lg">
                   <Plus className="w-6 h-6" />
-                  録音を始める
+                  {EN.dashboard.recordButton}
                 </Button>
               )}
             </motion.div>

@@ -4,12 +4,12 @@ import { Button } from '../ui/Button';
 import { LogoWithText } from '../ui/Logo';
 import { useAuthStore } from '../../stores/authStore';
 import { useGuestStore } from '../../stores/guestStore';
+import { EN } from '../../i18n/en';
 import { LogIn, UserPlus, UserCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const AuthForm: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(() => {
-    // 新規登録フラグをチェック
     return sessionStorage.getItem('showSignupForm') === 'true';
   });
   const [email, setEmail] = useState('');
@@ -27,19 +27,17 @@ export const AuthForm: React.FC = () => {
     try {
       if (isSignUp) {
         await signUp(email, password, { name });
-        toast.success('アカウントを作成しました！');
-        // 認証成功時にフラグをクリア
+        toast.success('Account created successfully!');
         sessionStorage.removeItem('showAuthForm');
         sessionStorage.removeItem('showSignupForm');
       } else {
         await signIn(email, password);
-        toast.success('ログインしました！');
-        // 認証成功時にフラグをクリア
+        toast.success('Logged in successfully!');
         sessionStorage.removeItem('showAuthForm');
         sessionStorage.removeItem('showSignupForm');
       }
     } catch (error: any) {
-      toast.error(error.message || 'エラーが発生しました');
+      toast.error(error.message || 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -49,23 +47,21 @@ export const AuthForm: React.FC = () => {
     setLoading(true);
     try {
       await signInWithGoogle();
-      toast.success('Googleアカウントでログインしています...');
-      // 認証成功時にフラグをクリア
+      toast.success('Signing in with Google...');
       sessionStorage.removeItem('showAuthForm');
     } catch (error: any) {
-      toast.error(error.message || 'Googleログインに失敗しました');
+      toast.error(error.message || 'Google sign-in failed');
     } finally {
       setLoading(false);
     }
   };
 
   const handleGuestMode = () => {
-    // 認証画面フラグをクリア
     sessionStorage.removeItem('showAuthForm');
     sessionStorage.removeItem('showSignupForm');
     setGuestMode(true);
-    window.location.reload(); // Routerが設定される前なのでreloadで対応
-    toast.success('ゲストモードで開始しました（3回まで試せます）');
+    window.location.reload();
+    toast.success('Started guest mode (3 tries available)');
   };
 
   return (
@@ -78,33 +74,30 @@ export const AuthForm: React.FC = () => {
         <div className="text-center mb-5 sm:mb-8">
           <LogoWithText size="lg" className="mb-3 sm:mb-4" />
           <p className="text-gray-600 text-sm sm:text-lg">
-            {isSignUp ? 'アカウントを作成' : 'ログイン'}
+            {isSignUp ? EN.auth.signup : EN.auth.login}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {isSignUp && (
-            <>
-              <div>
-                <label className="block text-lg font-medium text-gray-700 mb-2">
-                  お名前
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                  autoComplete="name"
-                />
-              </div>
-
-            </>
+            <div>
+              <label className="block text-lg font-medium text-gray-700 mb-2">
+                Name
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+                autoComplete="name"
+              />
+            </div>
           )}
 
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
-              メールアドレス
+              {EN.auth.email}
             </label>
             <input
               type="email"
@@ -118,7 +111,7 @@ export const AuthForm: React.FC = () => {
 
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
-              パスワード
+              {EN.auth.password}
             </label>
             <input
               type="password"
@@ -137,29 +130,29 @@ export const AuthForm: React.FC = () => {
             disabled={loading}
           >
             {loading ? (
-              <span className="text-base sm:text-2xl">処理中...</span>
+              <span className="text-base sm:text-2xl">{EN.common.loading}</span>
             ) : isSignUp ? (
               <>
                 <UserPlus className="w-5 h-5 sm:w-6 sm:h-6" />
-                <span className="text-base sm:text-2xl">アカウント作成</span>
+                <span className="text-base sm:text-2xl">{EN.auth.signup}</span>
               </>
             ) : (
               <>
                 <LogIn className="w-5 h-5 sm:w-6 sm:h-6" />
-                <span className="text-base sm:text-2xl">ログイン</span>
+                <span className="text-base sm:text-2xl">{EN.auth.login}</span>
               </>
             )}
           </Button>
         </form>
 
-        {/* Googleログインボタン */}
+        {/* Google Sign In */}
         <div className="mt-5 sm:mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-xs sm:text-sm">
-              <span className="px-2 bg-white text-gray-500">または</span>
+              <span className="px-2 bg-white text-gray-500">{EN.auth.or}</span>
             </div>
           </div>
 
@@ -190,27 +183,27 @@ export const AuthForm: React.FC = () => {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              <span className="text-base sm:text-3xl">Googleでログイン</span>
+              <span className="text-base sm:text-3xl">{EN.auth.loginWithGoogle}</span>
             </Button>
           </div>
         </div>
 
         <div className="mt-5 sm:mt-6 text-center">
           <p className="text-xs sm:text-sm text-gray-600 mb-2">
-            {isSignUp ? 'すでにアカウントをお持ちの方' : 'まだアカウントをお持ちでない方'}
+            {isSignUp ? EN.auth.hasAccount : EN.auth.noAccount}
           </p>
           <button
             onClick={() => setIsSignUp(!isSignUp)}
             className="px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl text-sm sm:text-lg font-bold shadow-md hover:shadow-lg transition-all duration-200"
           >
-            {isSignUp 
-              ? '→ ログインはこちら' 
-              : '→ 新規登録はこちら'
+            {isSignUp
+              ? `→ ${EN.auth.login}`
+              : `→ ${EN.auth.signup}`
             }
           </button>
         </div>
 
-        {/* ゲストモードボタン */}
+        {/* Guest Mode Button */}
         <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-gray-200">
           <Button
             onClick={handleGuestMode}
@@ -220,8 +213,8 @@ export const AuthForm: React.FC = () => {
           >
             <span className="flex items-center justify-center gap-2 whitespace-nowrap">
               <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="text-base sm:text-2xl">ゲストで試してみる</span>
-              <span className="text-xs sm:text-sm text-gray-500">（3回まで）</span>
+              <span className="text-base sm:text-2xl">Try as Guest</span>
+              <span className="text-xs sm:text-sm text-gray-500">(3 tries)</span>
             </span>
           </Button>
         </div>

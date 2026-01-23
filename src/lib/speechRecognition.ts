@@ -62,7 +62,7 @@ export class VoiceTranscriber {
       // 設定
       this.recognition.continuous = true;  // 継続的に音声を認識
       this.recognition.interimResults = true;  // 途中結果も取得
-      this.recognition.lang = 'ja-JP';  // 日本語
+      this.recognition.lang = 'en-US';  // English
       this.recognition.maxAlternatives = 1;
 
       // イベントハンドラ
@@ -88,7 +88,7 @@ export class VoiceTranscriber {
       };
 
       this.recognition.onerror = (event: any) => {
-        console.error('音声認識エラー:', event.error);
+        console.error('Speech recognition error:', event.error);
         if (this.onErrorCallback) {
           this.onErrorCallback(event.error);
         }
@@ -96,21 +96,21 @@ export class VoiceTranscriber {
 
       this.recognition.onend = () => {
         this.isListening = false;
-        console.log('音声認識終了');
+        console.log('Speech recognition ended');
       };
 
       this.recognition.onstart = () => {
         this.isListening = true;
-        console.log('音声認識開始');
+        console.log('Speech recognition started');
       };
     }
   }
 
-  // 音声認識を開始
+  // Start speech recognition
   start(onResult?: (text: string, isFinal: boolean) => void, onError?: (error: string) => void): void {
     if (!this.recognition) {
-      console.error('音声認識がサポートされていません');
-      if (onError) onError('音声認識がサポートされていません');
+      console.error('Speech recognition is not supported');
+      if (onError) onError('Speech recognition is not supported');
       return;
     }
 
@@ -121,12 +121,12 @@ export class VoiceTranscriber {
     try {
       this.recognition.start();
     } catch (error) {
-      console.error('音声認識の開始に失敗:', error);
-      if (onError) onError('音声認識の開始に失敗しました');
+      console.error('Failed to start speech recognition:', error);
+      if (onError) onError('Failed to start speech recognition');
     }
   }
 
-  // 音声認識を停止
+  // Stop speech recognition
   stop(): string {
     if (this.recognition && this.isListening) {
       this.recognition.stop();
@@ -134,7 +134,7 @@ export class VoiceTranscriber {
     return this.finalTranscript.trim();
   }
 
-  // 音声認識をキャンセル
+  // Cancel speech recognition
   abort(): void {
     if (this.recognition && this.isListening) {
       this.recognition.abort();
@@ -142,17 +142,17 @@ export class VoiceTranscriber {
     this.finalTranscript = '';
   }
 
-  // 音声認識がサポートされているかチェック
+  // Check if speech recognition is supported
   static isSupported(): boolean {
     return 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
   }
 
-  // リスニング中かどうか
+  // Check if currently listening
   getIsListening(): boolean {
     return this.isListening;
   }
 
-  // 現在のテキストを取得
+  // Get current transcript
   getCurrentTranscript(): string {
     return this.finalTranscript.trim();
   }

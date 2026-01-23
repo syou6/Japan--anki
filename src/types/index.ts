@@ -1,3 +1,5 @@
+export type CEFRLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
+
 export interface User {
   id: string;
   email: string;
@@ -5,7 +7,43 @@ export interface User {
   role: 'parent' | 'child';
   avatar_url?: string;
   family_id?: string;
+  cefr_level?: CEFRLevel;
   created_at: string;
+}
+
+export interface GrammarCorrection {
+  original: string;
+  corrected: string;
+  explanation: string;
+}
+
+export interface VocabularySuggestion {
+  original: string;
+  suggestion: string;
+  example: string;
+}
+
+export interface PronunciationTip {
+  word: string;
+  phonetic: string;
+  tip: string;
+}
+
+export interface ReadingMaterial {
+  title: string;
+  description: string;
+  url?: string;
+}
+
+export interface EnglishFeedback {
+  overallScore: number;
+  cefrLevel: CEFRLevel;
+  summary: string;
+  grammarCorrections: GrammarCorrection[];
+  vocabularySuggestions: VocabularySuggestion[];
+  pronunciationTips: PronunciationTip[];
+  readingMaterials: ReadingMaterial[];
+  encouragement: string;
 }
 
 export interface DiaryEntry {
@@ -21,6 +59,7 @@ export interface DiaryEntry {
   tags: string[];
   visibility: 'private' | 'family' | 'custom';
   ai_summary?: string;
+  ai_feedback?: EnglishFeedback;
   created_at: string;
   user?: User;
   comments?: Comment[];

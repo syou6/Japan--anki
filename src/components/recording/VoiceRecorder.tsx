@@ -6,6 +6,7 @@ import { useGuestStore } from '../../stores/guestStore';
 import { VoiceTranscriber } from '../../lib/speechRecognition';
 import { VolumeIndicator } from '../audio/VolumeIndicator';
 import { colors } from '../../styles/colorPalette';
+import { EN } from '../../i18n/en';
 import { Mic, MicOff, Play, Pause, Save, X, Trash2, Home, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -37,7 +38,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
     clearRecording,
     createEntry
   } = useDiaryStore();
-  
+
   const { createGuestDiary, canCreateMore } = useGuestStore();
 
   useEffect(() => {
@@ -67,36 +68,36 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
     }
   }, [currentAudio, isRecording]);
 
-  // 音量レベルを分析する関数
+  // Analyze volume level
   const analyzeVolume = () => {
     if (!analyserRef.current) return;
-    
+
     const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
     analyserRef.current.getByteFrequencyData(dataArray);
-    
-    // 平均音量を計算
+
+    // Calculate average volume
     const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
     const normalizedVolume = Math.min(100, (average / 128) * 100);
-    
+
     setVolumeLevel(normalizedVolume);
-    
+
     if (isRecording) {
       animationFrameRef.current = requestAnimationFrame(analyzeVolume);
     }
   };
 
   const handleStartRecording = async () => {
-    // ゲストモードの場合、作成可能か確認
+    // Check if guest can create more
     if (isGuest && !canCreateMore()) {
-      toast.error('ゲスト利用の上限に達しました。ログインしてください。');
+      toast.error(EN.recording.guestLimit);
       return;
     }
 
     try {
-      // 音声録音を開始
+      // Start audio recording
       await startRecording();
-      
-      // 音量レベル分析を開始
+
+      // Start volume level analysis
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -104,63 +105,62 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
         const source = audioContextRef.current.createMediaStreamSource(stream);
         source.connect(analyserRef.current);
         analyserRef.current.fftSize = 256;
-        
+
         analyzeVolume();
       } catch (error) {
-        console.warn('音量分析の初期化に失敗しました:', error);
+        console.warn('Failed to initialize volume analysis:', error);
       }
-      
-      // 音声認識も開始
+
+      // Start speech recognition
       if (VoiceTranscriber.isSupported()) {
-        console.log('音声認識サポート: あり');
+        console.log('Speech recognition supported: yes');
         transcriberRef.current = new VoiceTranscriber();
         setIsTranscribing(true);
         transcriberRef.current.start(
           (text, isFinal) => {
             setTranscribedText(text);
-            console.log('認識中:', text, 'Final:', isFinal);
+            console.log('Transcribing:', text, 'Final:', isFinal);
           },
           (error) => {
-            console.error('音声認識エラー:', error);
+            console.error('Speech recognition error:', error);
             setIsTranscribing(false);
-            // エラーをユーザーに通知
             if (error === 'not-allowed') {
-              toast.error('マイクへのアクセスが拒否されました。ブラウザの設定を確認してください。');
+              toast.error(EN.recording.micPermissionDenied);
             }
           }
         );
       } else {
-        console.log('音声認識サポート: なし');
-        toast.warning('お使いのブラウザは音声認識に対応していません');
+        console.log('Speech recognition supported: no');
+        toast.error(EN.recording.notSupported);
       }
-      
-      toast.success('録音を開始しました');
-      
-      // ゲストモードは30秒で自動停止
+
+      toast.success(EN.recording.startSuccess);
+
+      // Guest mode auto-stop after 30 seconds
       if (isGuest) {
         setTimeout(() => {
           if (isRecording) {
             handleStopRecording();
-            toast.info('ゲストモードは30秒までです');
+            toast(EN.recording.guestTimeLimit);
           }
         }, 30000);
       }
     } catch (error) {
-      toast.error('録音の開始に失敗しました');
+      toast.error(EN.recording.saveError);
     }
   };
 
   const handleStopRecording = async () => {
-    console.log('handleStopRecording開始');
+    console.log('handleStopRecording started');
     try {
-      // 録音を停止
+      // Stop recording
       const audioBlob = await stopRecording();
-      console.log('録音停止完了:', {
+      console.log('Recording stopped:', {
         blobSize: audioBlob?.size,
         blobType: audioBlob?.type
       });
-      
-      // 音量分析を停止
+
+      // Stop volume analysis
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
@@ -170,21 +170,21 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
         audioContextRef.current = null;
       }
       setVolumeLevel(0);
-      
-      // 音声認識を停止して最終テキストを取得
+
+      // Stop speech recognition and get final text
       if (transcriberRef.current) {
         const finalText = transcriberRef.current.stop();
         setTranscribedText(finalText);
         setIsTranscribing(false);
-        console.log('最終認識結果:', finalText);
+        console.log('Final transcription:', finalText);
       }
-      
-      toast.success('録音を停止しました');
+
+      toast.success(EN.recording.stopSuccess);
       setShowSaveDialog(true);
-      console.log('保存ダイアログを表示');
+      console.log('Save dialog shown');
     } catch (error) {
-      console.error('録音停止エラー:', error);
-      toast.error('録音の停止に失敗しました: ' + (error as Error).message);
+      console.error('Stop recording error:', error);
+      toast.error(EN.recording.saveError + ': ' + (error as Error).message);
     }
   };
 
@@ -200,7 +200,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
   };
 
   const handleSave = async () => {
-    console.log('handleSave開始:', {
+    console.log('handleSave started:', {
       hasCurrentAudio: !!currentAudio,
       audioSize: currentAudio?.size,
       isSaving,
@@ -208,104 +208,102 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
     });
 
     if (!currentAudio) {
-      toast.error('録音データがありません');
+      toast.error(EN.recording.noRecordingData);
       return;
     }
 
     if (isSaving) {
-      console.log('既に保存処理中です');
-      return; // 既に保存処理中の場合は何もしない
+      console.log('Already saving');
+      return;
     }
 
     setIsSaving(true);
-    
+
+    let contentToSave = '';
+
     try {
-      // 音声認識されたテキストと追加メモを結合
-      let contentToSave = '';
-      
+      // Combine transcribed text and additional notes
       if (transcribedText.trim()) {
         contentToSave = transcribedText.trim();
         if (additionalText.trim()) {
-          contentToSave += '\n\n【追加メモ】\n' + additionalText.trim();
+          contentToSave += '\n\n[Additional Notes]\n' + additionalText.trim();
         }
       } else if (additionalText.trim()) {
         contentToSave = additionalText.trim();
       } else {
-        contentToSave = '音声日記（テキスト認識できませんでした）';
+        contentToSave = EN.recording.noTranscription;
       }
-      
-      console.log('保存開始:', { 
+
+      console.log('Saving:', {
         transcribedLength: transcribedText.length,
         additionalLength: additionalText.length,
-        contentLength: contentToSave.length, 
-        audioSize: currentAudio.size 
+        contentLength: contentToSave.length,
+        audioSize: currentAudio.size
       });
-      
-      // 保存処理中のトーストを表示
-      const loadingToast = toast.loading('日記を保存中です...');
-      
-      // タイムアウト設定（30秒）
+
+      // Show loading toast
+      const loadingToast = toast.loading(EN.recording.saving);
+
+      // Timeout setting (30 seconds)
       const timeoutId = setTimeout(() => {
         toast.dismiss(loadingToast);
-        toast.error('保存がタイムアウトしました。もう一度お試しください。');
+        toast.error(EN.recording.saveTimeout);
         setIsSaving(false);
       }, 30000);
-      
-      // ゲストモードとして通常モードで保存
+
+      // Save as guest or normal mode
       let saveResult;
-      console.log('保存処理開始:', {
+      console.log('Save processing:', {
         isGuest,
         contentLength: contentToSave.length,
         audioSize: currentAudio.size
       });
-      
+
       if (isGuest) {
-        console.log('ゲストモードで保存');
+        console.log('Saving as guest');
         await createGuestDiary(contentToSave, currentAudio);
-        saveResult = true; // ゲストモードは戻り値なし
+        saveResult = true;
       } else {
-        console.log('通常モードで保存');
+        console.log('Saving as normal user');
         saveResult = await createEntry(contentToSave, currentAudio);
       }
-      
-      console.log('保存結果:', saveResult);
-      
-      // タイムアウトをクリア
+
+      console.log('Save result:', saveResult);
+
+      // Clear timeout
       clearTimeout(timeoutId);
-      
-      // 保存に成功したかチェック
+
+      // Check if save was successful
       if (saveResult !== undefined) {
-        // 成功トーストに切り替え
         toast.dismiss(loadingToast);
-        toast.success('日記を保存しました！');
-        
+        toast.success(EN.recording.saveSuccess);
+
         clearRecording();
         setShowSaveDialog(false);
         setAdditionalText('');
         setTranscribedText('');
-        
-        // ホーム画面に戻る
+
+        // Return to home
         if (onViewChange) {
           setTimeout(() => {
             onViewChange('home');
           }, 1000);
         }
       } else {
-        throw new Error('保存処理が完了しませんでした');
+        throw new Error('Save process did not complete');
       }
     } catch (error) {
-      console.error('保存エラーの詳細:', {
+      console.error('Save error details:', {
         error,
         message: (error as Error).message,
         stack: (error as Error).stack,
         audioSize: currentAudio?.size,
         contentLength: contentToSave?.length
       });
-      // loadingToastが定義されている場合のみdismiss
       try {
         toast.dismiss();
       } catch {}
-      toast.error('保存に失敗しました: ' + (error as Error).message);
+      toast.error(EN.recording.saveError + ': ' + (error as Error).message);
     } finally {
       setIsSaving(false);
     }
@@ -319,7 +317,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
     if (transcriberRef.current) {
       transcriberRef.current.abort();
     }
-    toast.success('録音を削除しました');
+    toast.success(EN.recording.discardSuccess);
   };
 
   const formatTime = (seconds: number) => {
@@ -334,11 +332,11 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
         {/* Header with Instructions */}
         <div className="text-center mb-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            音声日記を録音
+            {EN.recording.title}
           </h2>
           {!isRecording && !currentAudio && (
             <p className="text-xl text-gray-600">
-              下のマイクボタンを押して、今日の出来事をお話しください
+              {EN.recording.instruction}
             </p>
           )}
         </div>
@@ -354,9 +352,9 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                 className="mb-8"
               >
                 <div className="rounded-2xl p-8 mb-6" style={{ backgroundColor: colors.record.light }}>
-                  {/* 音量メーター */}
+                  {/* Volume meter */}
                   <VolumeIndicator volume={volumeLevel} isRecording={isRecording} />
-                  
+
                   <div className="flex justify-center mb-4">
                     <motion.div
                       animate={{ scale: [1, 1.3, 1] }}
@@ -368,22 +366,22 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                     </motion.div>
                   </div>
                   <div className="text-red-600 text-3xl font-bold mb-2">
-                    録音中...
+                    {EN.recording.recording}
                   </div>
                   <div className="text-4xl font-bold text-gray-800">
                     {formatTime(recordingTime)}
                   </div>
-                  
-                  {/* リアルタイム音声認識表示 */}
+
+                  {/* Real-time speech recognition display */}
                   {isTranscribing && transcribedText && (
                     <div className="mt-4 p-4 bg-white rounded-lg">
-                      <p className="text-sm text-gray-500 mb-2">認識中のテキスト:</p>
+                      <p className="text-sm text-gray-500 mb-2">{EN.recording.transcribing}</p>
                       <p className="text-base text-gray-700">{transcribedText}</p>
                     </div>
                   )}
-                  
+
                   <p className="text-lg text-gray-600 mt-4">
-                    お話が終わったら、下の「録音を止める」ボタンを押してください
+                    {EN.recording.whenDone}
                   </p>
                 </div>
               </motion.div>
@@ -399,13 +397,13 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                   variant="secondary"
                   size="xl"
                   className="w-full sm:w-64 h-24 text-white rounded-2xl"
-                  style={{ 
+                  style={{
                     backgroundColor: colors.record.dark,
                     ':hover': { backgroundColor: colors.record.darker }
                   }}
                 >
                   <MicOff className="w-10 h-10" />
-                  <span className="text-2xl font-bold ml-3">録音を止める</span>
+                  <span className="text-2xl font-bold ml-3">{EN.recording.stopButton}</span>
                 </Button>
               ) : (
                 <div className="space-y-6">
@@ -416,10 +414,10 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                     className="w-48 h-48 sm:w-56 sm:h-56 mx-auto bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-full shadow-xl flex flex-col items-center justify-center gap-3"
                   >
                     <Mic className="w-20 h-20 sm:w-24 sm:h-24" />
-                    <span className="text-2xl sm:text-3xl font-bold">録音開始</span>
+                    <span className="text-2xl sm:text-3xl font-bold">{EN.recording.startButton}</span>
                   </motion.button>
                   <p className="text-lg text-gray-500">
-                    マイクボタンを押すと録音が始まります
+                    {EN.recording.pressToStart}
                   </p>
                 </div>
               )}
@@ -435,14 +433,14 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
             >
               <div className="bg-green-50 rounded-2xl p-8 mb-6">
                 <div className="text-3xl font-bold text-green-600 mb-4">
-                  ✓ 録音が完了しました！
+                  ✓ {EN.recording.completed}
                 </div>
                 <p className="text-xl text-gray-700 mb-6">
-                  録音した内容を確認してから保存してください
+                  {EN.recording.reviewAndSave}
                 </p>
-                
+
                 <div className="space-y-4">
-                  {/* 再生ボタン */}
+                  {/* Play button */}
                   <Button
                     onClick={handlePlayPause}
                     variant="outline"
@@ -452,17 +450,17 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                     {isPlaying ? (
                       <>
                         <Pause className="w-8 h-8 mr-3" />
-                        <span className="font-bold">一時停止</span>
+                        <span className="font-bold">{EN.recording.pause}</span>
                       </>
                     ) : (
                       <>
                         <Play className="w-8 h-8 mr-3" />
-                        <span className="font-bold">録音を聞く</span>
+                        <span className="font-bold">{EN.recording.play}</span>
                       </>
                     )}
                   </Button>
 
-                  {/* 保存ボタン */}
+                  {/* Save button */}
                   <Button
                     onClick={() => setShowSaveDialog(true)}
                     variant="primary"
@@ -470,10 +468,10 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                     className="w-full sm:w-80 h-20 text-xl bg-green-500 hover:bg-green-600"
                   >
                     <Save className="w-8 h-8 mr-3" />
-                    <span className="font-bold">日記を保存する</span>
+                    <span className="font-bold">{EN.recording.save}</span>
                   </Button>
 
-                  {/* やり直しボタン */}
+                  {/* Re-record button */}
                   <Button
                     onClick={handleDiscard}
                     variant="ghost"
@@ -481,7 +479,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                     className="w-full sm:w-80 text-lg text-gray-600"
                   >
                     <Trash2 className="w-6 h-6 mr-2" />
-                    録音をやり直す
+                    {EN.recording.discard}
                   </Button>
                 </div>
               </div>
@@ -500,29 +498,29 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
             >
               <div className="rounded-2xl p-8" style={{ backgroundColor: colors.record.light }}>
                 <h3 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-                  日記の保存
+                  {EN.recording.saveTitle}
                 </h3>
-                
-                {/* 音声認識されたテキスト */}
+
+                {/* Transcribed text */}
                 {transcribedText && (
                   <div className="mb-6 p-4 bg-white rounded-xl">
                     <label className="block text-lg font-bold text-gray-700 mb-2">
-                      音声から認識されたテキスト
+                      {EN.recording.transcribedText}
                     </label>
                     <p className="text-base text-gray-700 whitespace-pre-wrap">
                       {transcribedText}
                     </p>
                   </div>
                 )}
-                
+
                 <div className="mb-8">
                   <label className="block text-xl font-bold text-gray-700 mb-3">
-                    追加メモを入力できます（省略可）
+                    {EN.recording.additionalNotes}
                   </label>
                   <textarea
                     value={additionalText}
                     onChange={(e) => setAdditionalText(e.target.value)}
-                    placeholder="例：今日は孫と公園に行きました..."
+                    placeholder={EN.recording.notesPlaceholder}
                     className="w-full px-5 py-4 text-xl border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     rows={4}
                   />
@@ -545,12 +543,12 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                         >
                           <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full" />
                         </motion.div>
-                        <span className="font-bold">保存中...</span>
+                        <span className="font-bold">{EN.recording.saving}</span>
                       </>
                     ) : (
                       <>
                         <Save className="w-8 h-8 mr-3" />
-                        <span className="font-bold">保存する</span>
+                        <span className="font-bold">{EN.recording.saveButton}</span>
                       </>
                     )}
                   </Button>
@@ -563,7 +561,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                     disabled={isSaving}
                   >
                     <X className="w-6 h-6 mr-2" />
-                    戻る
+                    {EN.recording.back}
                   </Button>
                 </div>
               </div>

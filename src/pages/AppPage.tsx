@@ -14,7 +14,9 @@ import { DiaryList } from '../components/diary/DiaryList';
 import { ElderlyDiaryList } from '../components/diary/ElderlyDiaryList';
 import { FamilyManager } from '../components/family/FamilyManager';
 import { NotificationSettings } from '../components/settings/NotificationSettings';
+import { SettingsView } from '../components/settings/SettingsView';
 import { SubscriptionManager } from '../components/subscription/SubscriptionManager';
+import { VersantHome } from '../components/versant/VersantHome';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 import { GuestBanner } from '../components/guest/GuestBanner';
 import { GuestDiaryList } from '../components/guest/GuestDiaryList';
@@ -347,6 +349,18 @@ export const AppPage: React.FC = () => {
             </motion.div>
           )}
 
+          {currentView === 'practice' && (
+            <motion.div
+              key="practice"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <VersantHome />
+            </motion.div>
+          )}
+
           {currentView === 'settings' && (
             <motion.div
               key="settings"
@@ -355,14 +369,7 @@ export const AppPage: React.FC = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="max-w-4xl mx-auto space-y-6">
-                <h1 className="text-2xl font-bold text-gray-900">設定</h1>
-                <NotificationSettings />
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">プラン設定</h2>
-                  <SubscriptionManager />
-                </div>
-              </div>
+              <SettingsView />
             </motion.div>
           )}
         </AnimatePresence>

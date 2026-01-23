@@ -2,23 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { StandardDialog } from '../ui/StandardDialog';
+import { FeedbackCard } from '../feedback/FeedbackCard';
 import { useAuthStore } from '../../stores/authStore';
 import { useDiaryStore } from '../../stores/diaryStore';
 import { supabase } from '../../lib/supabase';
+import { EN } from '../../i18n/en';
 import type { DiaryEntry } from '../../types';
-import { 
-  Play, 
-  Pause, 
-  MessageCircle, 
-  Heart, 
-  ThumbsUp, 
+import {
+  Play,
+  Pause,
+  MessageCircle,
+  Heart,
+  ThumbsUp,
   Smile,
   Calendar,
   Volume2,
-  Trash2
+  Trash2,
+  Brain,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { ja } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 
 interface DiaryCardProps {
@@ -29,6 +34,7 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const [newComment, setNewComment] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -65,7 +71,7 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
         const audio = new Audio();
         audio.preload = 'none';
         audio.src = entry.voice_url;
-        
+
         await new Promise((resolve, reject) => {
           audio.oncanplaythrough = resolve;
           audio.onerror = reject;
@@ -74,13 +80,13 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
           };
           audio.load();
         });
-        
+
         setAudioElement(audio);
         await audio.play();
         setIsPlaying(true);
       } catch (error) {
-        console.error('音声の再生に失敗しました:', error);
-        toast.error('音声の再生に失敗しました');
+        console.error('Failed to play audio:', error);
+        toast.error('Failed to play audio');
       } finally {
         setIsLoadingAudio(false);
       }
@@ -94,10 +100,10 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
     setIsDeleting(true);
     try {
       await deleteEntry(entry.id);
-      toast.success('日記をゴミ箱に移動しました（30日間保管されます）');
+      toast.success('Diary moved to trash (kept for 30 days)');
       setShowDeleteConfirm(false);
     } catch (error) {
-      toast.error('削除に失敗しました');
+      toast.error('Failed to delete');
     } finally {
       setIsDeleting(false);
     }
@@ -118,10 +124,9 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
 
       if (error) throw error;
 
-      // 日記の投稿者に通知を送信（自分の日記でない場合）
+      // Send notification to diary owner (if not self)
       if (!isOwner) {
         try {
-          // 現在のユーザー名を取得
           const { data: userData } = await supabase
             .from('users')
             .select('name')
@@ -129,12 +134,11 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
             .single();
 
           if (userData?.name) {
-            // Edge Function経由でバックグラウンド通知を送信
             await supabase.functions.invoke('send-push-notification', {
               body: {
                 userId: entry.user_id,
-                title: '新しいコメントが投稿されました',
-                body: `${userData.name}さんがあなたの日記にコメントしました`,
+                title: 'New comment on your diary',
+                body: `${userData.name} commented on your diary`,
                 type: 'new_comment',
                 data: {
                   url: `https://journal-ai.cloud/diary#${entry.id}`
@@ -144,16 +148,14 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
           }
         } catch (notifyError) {
           console.error('Failed to send comment notification:', notifyError);
-          // 通知エラーは無視して続行
         }
       }
 
-      toast.success('コメントを投稿しました');
+      toast.success('Comment posted');
       setNewComment('');
-      // 日記一覧を再取得してコメントを反映
       await fetchEntries();
     } catch (error) {
-      toast.error('コメントの投稿に失敗しました');
+      toast.error('Failed to post comment');
     } finally {
       setIsSubmittingComment(false);
     }
@@ -161,6 +163,16 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
 
   const getEmotionEmoji = (emotion: string) => {
     const emotionMap: { [key: string]: string } = {
+      'happy': '😊',
+      'excited': '😄',
+      'sad': '😢',
+      'anxious': '😰',
+      'calm': '😌',
+      'angry': '😤',
+      'satisfied': '😇',
+      'grateful': '🙏',
+      'love': '❤️',
+      // Japanese emotion mappings (for backward compatibility)
       '喜び': '😊',
       '楽しい': '😄',
       '悲しみ': '😢',
@@ -196,13 +208,13 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
             </div>
             <div className="flex-1">
               <h3 className="text-lg sm:text-xl font-bold text-gray-900">
-                {entry.user?.name || 'ユーザー'}
+                {entry.user?.name || 'User'}
               </h3>
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-gray-500">
                 <div className="flex items-center gap-1">
                   <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="text-sm sm:text-lg">
-                    {format(new Date(entry.created_at), 'M/d HH:mm', { locale: ja })}
+                    {format(new Date(entry.created_at), 'MMM d, HH:mm', { locale: enUS })}
                   </span>
                 </div>
                 {entry.emotion && (
@@ -213,7 +225,7 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
                 )}
                 {entry.health_score && (
                   <div className={`text-sm sm:text-lg font-medium ${getHealthColor(entry.health_score)}`}>
-                    <span className="hidden sm:inline">健康度: </span>
+                    <span className="hidden sm:inline">Health: </span>
                     <span>{entry.health_score}/100</span>
                   </div>
                 )}
@@ -222,8 +234,8 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
           </div>
 
           {isOwner && (
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               onClick={() => setShowDeleteConfirm(true)}
               disabled={isDeleting}
@@ -240,7 +252,7 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
         {entry.ai_summary && (
           <div className="mb-4 p-3 sm:p-4 bg-blue-50 rounded-xl">
             <div className="text-base sm:text-lg font-medium text-blue-900 mb-1 sm:mb-2">
-              📋 AI要約
+              📋 AI Summary
             </div>
             <p className="text-sm sm:text-lg text-blue-800">
               {entry.ai_summary}
@@ -266,23 +278,23 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                         className="w-5 h-5 border-2 border-gray-600 border-t-transparent rounded-full"
                       />
-                      読込中
+                      Loading
                     </>
                   ) : isPlaying ? (
                     <>
                       <Pause className="w-5 h-5" />
-                      停止
+                      Pause
                     </>
                   ) : (
                     <>
                       <Play className="w-5 h-5" />
-                      再生
+                      Play
                     </>
                   )}
                 </Button>
                 <div className="flex items-center gap-2 text-gray-600">
                   <Volume2 className="w-4 h-4" />
-                  <span className="text-lg">音声日記</span>
+                  <span className="text-lg">Voice Diary</span>
                 </div>
               </div>
               {entry.duration && (
@@ -297,8 +309,8 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
         {/* Text Content */}
         <div className="prose prose-sm sm:prose-lg max-w-none">
           <p className="text-sm sm:text-base text-gray-800 leading-relaxed whitespace-pre-wrap">
-            {showFullContent || entry.content.length <= 150 
-              ? entry.content 
+            {showFullContent || entry.content.length <= 150
+              ? entry.content
               : `${entry.content.substring(0, 150)}...`}
           </p>
           {entry.content.length > 150 && (
@@ -306,7 +318,7 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
               onClick={() => setShowFullContent(!showFullContent)}
               className="mt-2 text-blue-600 hover:text-blue-700 font-medium text-sm sm:text-base transition-colors"
             >
-              {showFullContent ? '▲ 閉じる' : '▼ もっと見る'}
+              {showFullContent ? '▲ Show less' : '▼ Show more'}
             </button>
           )}
         </div>
@@ -324,29 +336,65 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
             ))}
           </div>
         )}
+
+        {/* AI Feedback Toggle */}
+        {entry.ai_feedback && (
+          <div className="mt-4">
+            <button
+              onClick={() => setShowFeedback(!showFeedback)}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-xl transition-colors w-full sm:w-auto"
+            >
+              <Brain className="w-5 h-5" />
+              <span className="font-medium">AI Feedback</span>
+              {entry.ai_feedback.overallScore && (
+                <span className="ml-2 px-2 py-0.5 bg-indigo-200 rounded-full text-sm">
+                  Score: {entry.ai_feedback.overallScore}
+                </span>
+              )}
+              {showFeedback ? (
+                <ChevronUp className="w-4 h-4 ml-auto" />
+              ) : (
+                <ChevronDown className="w-4 h-4 ml-auto" />
+              )}
+            </button>
+
+            <AnimatePresence>
+              {showFeedback && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-4"
+                >
+                  <FeedbackCard feedback={entry.ai_feedback} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
 
       {/* Actions */}
       <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100">
         <div className="flex items-center justify-around sm:justify-between">
           <div className="flex items-center gap-3 sm:gap-4">
-            {/* いいねボタン */}
+            {/* Like button */}
             <button
               className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 hover:bg-gray-50 rounded-lg transition-colors"
             >
               <Heart className="w-6 h-6 sm:w-5 sm:h-5 text-red-500" />
-              <span className="hidden sm:inline text-lg">いいね</span>
+              <span className="hidden sm:inline text-lg">Like</span>
             </button>
-            
-            {/* 応援ボタン */}
+
+            {/* Support button */}
             <button
               className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 hover:bg-gray-50 rounded-lg transition-colors"
             >
               <ThumbsUp className="w-6 h-6 sm:w-5 sm:h-5 text-blue-500" />
-              <span className="hidden sm:inline text-lg">応援</span>
+              <span className="hidden sm:inline text-lg">Support</span>
             </button>
-            
-            {/* コメントボタン */}
+
+            {/* Comment button */}
             <button
               onClick={() => setShowComments(!showComments)}
               className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 hover:bg-gray-50 rounded-lg transition-colors relative"
@@ -358,11 +406,11 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
                 </span>
               )}
               <span className="hidden sm:inline text-lg">
-                コメント{entry.comments && entry.comments.length > 0 && ` ${entry.comments.length}`}
+                Comments{entry.comments && entry.comments.length > 0 && ` ${entry.comments.length}`}
               </span>
             </button>
-            
-            {/* スマイルボタン */}
+
+            {/* Smile button */}
             <button
               className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 hover:bg-gray-50 rounded-lg transition-colors sm:ml-auto"
             >
@@ -382,7 +430,7 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
             className="border-t border-gray-100 p-6 bg-gray-50"
           >
             <h4 className="text-xl font-bold text-gray-900 mb-4">
-              コメント
+              Comments
             </h4>
 
             {/* Comment Form */}
@@ -390,18 +438,18 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="温かいコメントを残しましょう..."
+                placeholder="Leave a supportive comment..."
                 className="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 rows={3}
               />
               <div className="mt-3 flex justify-end">
-                <Button 
-                  variant="primary" 
+                <Button
+                  variant="primary"
                   size="sm"
                   onClick={handleSubmitComment}
                   disabled={isSubmittingComment || !newComment.trim()}
                 >
-                  {isSubmittingComment ? '投稿中...' : 'コメントする'}
+                  {isSubmittingComment ? 'Posting...' : 'Post Comment'}
                 </Button>
               </div>
             </div>
@@ -418,10 +466,10 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="font-medium text-gray-900">
-                            {comment.user?.name || 'ユーザー'}
+                            {comment.user?.name || 'User'}
                           </span>
                           <span className="text-gray-500 text-sm">
-                            {format(new Date(comment.created_at), 'M月d日 HH:mm', { locale: ja })}
+                            {format(new Date(comment.created_at), 'MMM d, HH:mm', { locale: enUS })}
                           </span>
                         </div>
                         <p className="text-gray-800">
@@ -433,27 +481,27 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
                 ))
               ) : (
                 <div className="text-center py-8 text-gray-500">
-                  まだコメントがありません
+                  No comments yet
                 </div>
               )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       {/* Delete Confirmation Dialog */}
       <StandardDialog
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleDelete}
-        title="日記を削除しますか？"
-        confirmLabel="ゴミ箱に移動"
-        cancelLabel="キャンセル"
+        title="Delete this diary?"
+        confirmLabel="Move to Trash"
+        cancelLabel="Cancel"
         confirmVariant="danger"
         isLoading={isDeleting}
       >
         <p className="text-lg text-black">
-          この日記はゴミ箱に移動され、30日間は復元可能です。他の日記は影響を受けません。
+          This diary will be moved to trash and can be restored for 30 days. Other diaries won't be affected.
         </p>
       </StandardDialog>
     </motion.div>
