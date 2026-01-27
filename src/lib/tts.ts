@@ -109,6 +109,11 @@ class TextToSpeech {
 
       utterance.onerror = (event) => {
         this.currentUtterance = null;
+        // "interrupted" and "canceled" are intentional stops, not errors
+        if (event.error === 'interrupted' || event.error === 'canceled') {
+          resolve();
+          return;
+        }
         reject(new Error(`Speech error: ${event.error}`));
       };
 
