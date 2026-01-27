@@ -413,8 +413,8 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
                     whileTap={{ scale: 0.95 }}
                     className="w-48 h-48 sm:w-56 sm:h-56 mx-auto bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-full shadow-xl flex flex-col items-center justify-center gap-3"
                   >
-                    <Mic className="w-20 h-20 sm:w-24 sm:h-24" />
-                    <span className="text-2xl sm:text-3xl font-bold">{EN.recording.startButton}</span>
+                    <Mic className="w-16 h-16 sm:w-20 sm:h-20" />
+                    <span className="text-base sm:text-xl font-bold">{EN.recording.startButton}</span>
                   </motion.button>
                   <p className="text-lg text-gray-500">
                     {EN.recording.pressToStart}
