@@ -222,6 +222,7 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
           health_score: 75,
           ai_summary: '',
           ai_keywords: [],
+          ai_feedback: null,
           tags: [],
           visibility: 'family'
         })
@@ -280,6 +281,7 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
                 health_score: health,
                 ai_summary: feedback?.summary || summary || analysis?.summary || '',
                 ai_keywords: analysis?.keywords || [],
+                ai_feedback: feedback || null,
               })
               .eq('id', diaryId);
 
