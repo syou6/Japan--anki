@@ -208,36 +208,7 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
         }
       }
 
-      // AI分析機能
-      let analysisResult: any = null;
-      let aiSummary = '';
-      let healthScore = 75;
-      let englishFeedback: any = null;
-
-      // テキストコンテンツがある場合は分析を実行
-      if (content && content.trim()) {
-        try {
-          // 基本分析
-          analysisResult = await analyzeText(content);
-          aiSummary = await generateFamilySummary(content);
-          healthScore = await analyzeHealthScore(content);
-
-          // English feedback generation (for English learning app)
-          // Get user's CEFR level from profile
-          const { data: userProfile } = await supabase
-            .from('users')
-            .select('cefr_level')
-            .eq('id', user.id)
-            .single();
-
-          const cefrLevel: CEFRLevel = userProfile?.cefr_level || 'B1';
-          englishFeedback = await generateEnglishFeedback(content, cefrLevel);
-          console.log('English feedback generated:', englishFeedback);
-        } catch (analysisError) {
-          console.warn('Analysis error:', analysisError);
-        }
-      }
-
+      // Save diary immediately without waiting for AI analysis
       console.log('Inserting diary entry...');
       const { data: insertedData, error } = await supabase
         .from('diaries')
@@ -247,11 +218,11 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
           content: content,
           voice_url: voiceUrl,
           duration: audioBlob ? Math.round(audioBlob.size / 1000) : null,
-          emotion: englishFeedback?.cefrLevel ? 'neutral' : (analysisResult?.emotion || 'neutral'),
-          health_score: healthScore,
-          ai_summary: englishFeedback?.summary || aiSummary || analysisResult?.summary || '',
-          ai_keywords: analysisResult?.keywords || [],
-          ai_feedback: englishFeedback || null,
+          emotion: 'neutral',
+          health_score: 75,
+          ai_summary: '',
+          ai_keywords: [],
+          ai_feedback: null,
           tags: [],
           visibility: 'family'
         })
@@ -273,24 +244,74 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
 
       // Refresh entries
       await get().fetchEntries();
-      
-      // 家族に通知を送信
-      try {
-        // ユーザー名を取得
-        const { data: userData } = await supabase
-          .from('users')
-          .select('name')
-          .eq('id', user.id)
-          .single();
-        
-        if (userData?.name) {
-          await get().notifyFamilyMembers(user.id, userData.name);
-        }
-      } catch (notifyError) {
-        console.error('Failed to send notifications:', notifyError);
-        // 通知エラーは無視して続行
+
+      // Run AI analysis in background (don't block save)
+      if (content && content.trim() && insertedData?.id) {
+        const diaryId = insertedData.id;
+        (async () => {
+          try {
+            console.log('Background AI analysis started for diary:', diaryId);
+
+            // Get user's CEFR level
+            const { data: userProfile } = await supabase
+              .from('users')
+              .select('cefr_level')
+              .eq('id', user.id)
+              .single();
+            const cefrLevel: CEFRLevel = userProfile?.cefr_level || 'B1';
+
+            // Run all AI calls in parallel
+            const [analysisResult, aiSummary, healthScore, englishFeedback] = await Promise.allSettled([
+              analyzeText(content),
+              generateFamilySummary(content),
+              analyzeHealthScore(content),
+              generateEnglishFeedback(content, cefrLevel),
+            ]);
+
+            const analysis = analysisResult.status === 'fulfilled' ? analysisResult.value : null;
+            const summary = aiSummary.status === 'fulfilled' ? aiSummary.value : '';
+            const health = healthScore.status === 'fulfilled' ? healthScore.value : 75;
+            const feedback = englishFeedback.status === 'fulfilled' ? englishFeedback.value : null;
+
+            // Update diary with AI results
+            await supabase
+              .from('diaries')
+              .update({
+                emotion: feedback?.cefrLevel ? 'neutral' : (analysis?.emotion || 'neutral'),
+                health_score: health,
+                ai_summary: feedback?.summary || summary || analysis?.summary || '',
+                ai_keywords: analysis?.keywords || [],
+                ai_feedback: feedback || null,
+              })
+              .eq('id', diaryId);
+
+            console.log('Background AI analysis completed for diary:', diaryId);
+
+            // Refresh entries to show AI results
+            await get().fetchEntries();
+          } catch (bgError) {
+            console.warn('Background AI analysis failed:', bgError);
+          }
+        })();
       }
-      
+
+      // Send family notification in background
+      (async () => {
+        try {
+          const { data: userData } = await supabase
+            .from('users')
+            .select('name')
+            .eq('id', user.id)
+            .single();
+
+          if (userData?.name) {
+            await get().notifyFamilyMembers(user.id, userData.name);
+          }
+        } catch (notifyError) {
+          console.error('Failed to send notifications:', notifyError);
+        }
+      })();
+
       return insertedData;
     } catch (error: any) {
       console.error('Failed to create entry:', error);
