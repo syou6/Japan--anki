@@ -106,32 +106,7 @@ export const NotificationSettings: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Subscription Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl shadow-lg p-6 max-w-2xl mx-auto text-white"
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-              <CreditCard className="w-7 h-7" />
-              {EN.notifications.premium}
-            </h2>
-            <p className="text-lg opacity-90">
-              {EN.notifications.premiumDesc}
-            </p>
-          </div>
-          <Button
-            onClick={() => window.location.href = '/app?view=subscription'}
-            variant="outline"
-            size="lg"
-            className="bg-white text-purple-600 hover:bg-gray-100 border-white"
-          >
-            {EN.notifications.viewPlans}
-          </Button>
-        </div>
-      </motion.div>
+      {/* Subscription Card - hidden for now */}
 
       {/* Notification Settings Card */}
       <motion.div

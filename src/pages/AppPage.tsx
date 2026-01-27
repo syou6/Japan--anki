@@ -338,17 +338,7 @@ export const AppPage: React.FC = () => {
             </motion.div>
           )}
           
-          {currentView === 'subscription' && (
-            <motion.div
-              key="subscription"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <SubscriptionManager />
-            </motion.div>
-          )}
+          {/* Subscription view hidden for now */}
 
           {currentView === 'practice' && (
             <motion.div

@@ -34,13 +34,7 @@ export const SettingsView: React.FC = () => {
       {/* Notification Settings */}
       <NotificationSettings />
 
-      {/* Subscription Settings */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">
-          Subscription
-        </h2>
-        <SubscriptionManager />
-      </div>
+      {/* Subscription Settings - hidden for now */}
     </div>
   );
 };
