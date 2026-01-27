@@ -24,6 +24,7 @@ import { WelcomeGuide } from '../components/onboarding/WelcomeGuide';
 import { HelpButton } from '../components/help/HelpButton';
 import { ApiUsageMonitor } from '../components/ApiUsageMonitor';
 import { supabase } from '../lib/supabase';
+import { EN } from '../i18n/en';
 
 export const AppPage: React.FC = () => {
   const [currentView, setCurrentView] = useState('home');
