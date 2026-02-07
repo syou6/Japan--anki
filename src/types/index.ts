@@ -11,48 +11,11 @@ export interface User {
   created_at: string;
 }
 
-export interface GrammarCorrection {
-  original: string;
-  corrected: string;
-  explanation: string;
-}
-
-export interface VocabularySuggestion {
-  original: string;
-  suggestion: string;
-  example: string;
-}
-
-export interface PronunciationTip {
-  word: string;
-  phonetic: string;
-  tip: string;
-}
-
-export interface KeyVocabulary {
-  word: string;
-  phonetic: string;
-  meaningJa: string;
-  example: string;
-}
-
-export interface TopicExtension {
-  topic: string;
-  article: string;
-  articleSummaryJa: string;
-  keyVocabulary: KeyVocabulary[];
-}
-
+// Markdown形式のフィードバック
 export interface EnglishFeedback {
-  overallScore: number;
   cefrLevel: CEFRLevel;
   targetLevel: CEFRLevel;
-  summary: string;
-  grammarCorrections: GrammarCorrection[];
-  vocabularySuggestions: VocabularySuggestion[];
-  pronunciationTips: PronunciationTip[];
-  topicExtension: TopicExtension | null;
-  encouragement: string;
+  markdownContent: string;  // 全フィードバックをMarkdownで保存
 }
 
 export interface DiaryEntry {

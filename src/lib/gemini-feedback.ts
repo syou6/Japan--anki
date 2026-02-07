@@ -5,48 +5,11 @@ const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
 export type CEFRLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 
-export interface GrammarCorrection {
-  original: string;
-  corrected: string;
-  explanation: string;
-}
-
-export interface VocabularySuggestion {
-  original: string;
-  suggestion: string;
-  example: string;
-}
-
-export interface PronunciationTip {
-  word: string;
-  phonetic: string;
-  tip: string;
-}
-
-export interface KeyVocabulary {
-  word: string;
-  phonetic: string;
-  meaningJa: string;
-  example: string;
-}
-
-export interface TopicExtension {
-  topic: string;
-  article: string;
-  articleSummaryJa: string;
-  keyVocabulary: KeyVocabulary[];
-}
-
+// Markdown形式のフィードバック
 export interface EnglishFeedback {
-  overallScore: number;
   cefrLevel: CEFRLevel;
   targetLevel: CEFRLevel;
-  summary: string;
-  grammarCorrections: GrammarCorrection[];
-  vocabularySuggestions: VocabularySuggestion[];
-  pronunciationTips: PronunciationTip[];
-  topicExtension: TopicExtension | null;
-  encouragement: string;
+  markdownContent: string;  // 全フィードバックをMarkdownで保存
 }
 
 /**
@@ -57,21 +20,20 @@ export async function generateEnglishFeedback(
   userCefrLevel: CEFRLevel = 'B1'
 ): Promise<EnglishFeedback> {
   // Target level is i+1 (one level higher than current)
-  const levelProgressionDefault: Record<CEFRLevel, CEFRLevel> = {
+  const levelProgression: Record<CEFRLevel, CEFRLevel> = {
     'A1': 'A2', 'A2': 'B1', 'B1': 'B2', 'B2': 'C1', 'C1': 'C2', 'C2': 'C2'
   };
+  const targetLevel = levelProgression[userCefrLevel];
 
   // Default fallback response
   const defaultFeedback: EnglishFeedback = {
-    overallScore: 70,
     cefrLevel: userCefrLevel,
-    targetLevel: levelProgressionDefault[userCefrLevel],
-    summary: 'Your diary entry has been recorded.',
-    grammarCorrections: [],
-    vocabularySuggestions: [],
-    pronunciationTips: [],
-    topicExtension: null,
-    encouragement: 'Keep practicing your English every day!'
+    targetLevel: targetLevel,
+    markdownContent: `## 📊 Feedback & Corrections
+Your diary entry has been recorded. Keep practicing your English every day!
+
+## 💪 Encouragement
+頑張って英語の練習を続けてください！毎日少しずつ上達しています。`
   };
 
   if (!apiKey) {
@@ -103,128 +65,67 @@ export async function generateEnglishFeedback(
     const prompt = `# Role
 You are an expert English language coach designed to help users improve their English skills through their diary entries.
 
-# Inputs
-- **User Level:** ${userCefrLevel} (CEFR)
-- **Target Level:** ${targetLevel} (i+1 - one level higher)
-- **Diary Transcript:**
+# Inputs provided by the system
+1. **User Level:** ${userCefrLevel} (CEFR)
+2. **Diary Transcript:**
 ${content}
 
 # Your Task
-Analyze the diary transcript and provide comprehensive feedback.
+Analyze the diary transcript and provide output in two main sections.
 
-## Requirements:
-1. **Tone:** Encouraging, empathetic, and professional.
-2. **Language:** Explain feedback in **Japanese** so the user clearly understands, but show English examples.
-3. **Constraint:** All advice must be aimed at **${targetLevel} level** (one level higher than current).
+## Section 1: Feedback & Level Up
+Analyze the English based on the user's level.
+- **Tone:** Encouraging, empathetic, and professional.
+- **Language:** Explain the feedback in **Japanese** so the user clearly understands, but show English examples.
+- **Constraint:** The advice must be aimed at **one level slightly higher** than the User Level (i+1 = ${targetLevel}).
 
-## Analysis Points:
-1. **Grammar & Phrasing:** Correct unnatural phrasing. If the user uses simple grammar, suggest more sophisticated structures appropriate for ${targetLevel} level.
-2. **Vocabulary:** Identify basic words and suggest more precise or academic synonyms suitable for ${targetLevel}.
-3. **Pronunciation Advice:** Identify 2-3 words that are typically difficult for Japanese speakers to pronounce. Provide IPA phonetics and tips.
+**Analysis points:**
+1. **Grammar & Phrasing:** Correct unnatural phrasing. If the user uses simple grammar, suggest a more sophisticated structure appropriate for the next level.
+2. **Vocabulary:** Identify basic words used and suggest more precise or academic synonyms.
+3. **Pronunciation Advice:** Identify 2-3 words in the user's text that are typically difficult to pronounce. Provide phonetics or tips.
 
-## Topic Extension:
-Based on the diary content:
-1. Identify the main topic/theme
-2. Generate an engaging article (150-200 words) about this topic at ${targetLevel} level
-3. Extract 10 key vocabulary items from the article
+## Section 2: Topic Extension (Reading Material)
+Based on the content of the diary:
+1. **Identify the Main Topic:** Extract the core theme.
+2. **Generate an Article:** Write an engaging article (approx. 150-200 words) about this topic.
+   - **Difficulty:** The English level must be **slightly higher (i+1 = ${targetLevel})** than the User Level.
+   - **Content:** Include enough rich vocabulary to support the extraction of 10 key items.
+3. **Vocabulary List:** Extract **10 key words or phrases** from this generated article that are valuable for the user to learn.
 
-# Output Format (JSON only)
-Respond with ONLY valid JSON:
-{
-  "overallScore": <number 0-100 based on current level performance>,
-  "cefrLevel": "${userCefrLevel}",
-  "targetLevel": "${targetLevel}",
-  "summary": "<日本語で日記の内容を1-2文で要約>",
-  "grammarCorrections": [
-    {
-      "original": "<original phrase>",
-      "corrected": "<corrected phrase for ${targetLevel} level>",
-      "explanation": "<日本語で文法の説明と、なぜこの表現がより良いか>"
-    }
-  ],
-  "vocabularySuggestions": [
-    {
-      "original": "<basic word/phrase used>",
-      "suggestion": "<more sophisticated alternative for ${targetLevel}>",
-      "example": "<example sentence using the suggestion>"
-    }
-  ],
-  "pronunciationTips": [
-    {
-      "word": "<word from diary>",
-      "phonetic": "<IPA pronunciation>",
-      "tip": "<日本語で発音のコツ、日本人が間違えやすいポイント>"
-    }
-  ],
-  "topicExtension": {
-    "topic": "<main topic extracted from diary>",
-    "article": "<150-200 word article at ${targetLevel} level about the topic>",
-    "articleSummaryJa": "<記事の日本語要約（2-3文）>",
-    "keyVocabulary": [
-      {
-        "word": "<word/phrase from article>",
-        "phonetic": "<IPA pronunciation>",
-        "meaningJa": "<日本語の意味>",
-        "example": "<example sentence>"
-      }
-    ]
-  },
-  "encouragement": "<日本語で励ましのメッセージ。具体的に良かった点を褒め、次のステップを提案>"
-}
+# Output Format (Markdown)
 
-## Guidelines:
-- Provide 2-4 grammar corrections (focus on ${targetLevel} level improvements)
-- Suggest 3-5 vocabulary improvements (from basic to sophisticated)
-- Give 2-3 pronunciation tips for commonly mispronounced words
-- The topic extension article must contain exactly 10 key vocabulary items
-- Be specific about what the user did well
-- Make the encouragement personal and motivating`;
+## 📊 Feedback & Corrections
+(Provide corrections, grammar explanations in Japanese, and better vocabulary suggestions here)
+
+## 🗣️ Pronunciation Tips
+(List tricky words from the user's text and tips on how to say them)
+
+## 📖 Recommended Reading: [Insert Topic Name]
+(Insert the generated English article here)
+
+## 🇯🇵 Summary
+(Brief summary of the article in Japanese)
+
+## 🗝️ Key Vocabulary & Phrases
+(List **10** important words/phrases from the "Recommended Reading" article above. Use the format below:)
+- **[Word/Phrase]** \`[IPA Pronunciation]\` : [Japanese Meaning]
+
+## 💪 Encouragement
+(Write a personalized encouraging message in Japanese, praising specific good points and suggesting next steps)`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const responseText = response.text();
-
-    // Extract JSON from response
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in response');
-    }
-
-    const feedback = JSON.parse(jsonMatch[0]) as EnglishFeedback;
+    const markdownContent = response.text();
 
     // Record API usage
     const estimatedTokens = Math.ceil(content.length / 3) + 200;
     recordApiUsage(estimatedTokens);
     recordApiSuccess();
 
-    // Validate and sanitize response
-    const levelProgressionValidate: Record<CEFRLevel, CEFRLevel> = {
-      'A1': 'A2', 'A2': 'B1', 'B1': 'B2', 'B2': 'C1', 'C1': 'C2', 'C2': 'C2'
-    };
-
     return {
-      overallScore: Math.min(100, Math.max(0, feedback.overallScore || 70)),
-      cefrLevel: validateCefrLevel(feedback.cefrLevel) || userCefrLevel,
-      targetLevel: validateCefrLevel(feedback.targetLevel) || levelProgressionValidate[userCefrLevel],
-      summary: feedback.summary || defaultFeedback.summary,
-      grammarCorrections: Array.isArray(feedback.grammarCorrections)
-        ? feedback.grammarCorrections.slice(0, 5)
-        : [],
-      vocabularySuggestions: Array.isArray(feedback.vocabularySuggestions)
-        ? feedback.vocabularySuggestions.slice(0, 6)
-        : [],
-      pronunciationTips: Array.isArray(feedback.pronunciationTips)
-        ? feedback.pronunciationTips.slice(0, 4)
-        : [],
-      topicExtension: feedback.topicExtension ? {
-        topic: feedback.topicExtension.topic || '',
-        article: feedback.topicExtension.article || '',
-        articleSummaryJa: feedback.topicExtension.articleSummaryJa || '',
-        keyVocabulary: Array.isArray(feedback.topicExtension.keyVocabulary)
-          ? feedback.topicExtension.keyVocabulary.slice(0, 10)
-          : []
-      } : null,
-      encouragement: feedback.encouragement || defaultFeedback.encouragement
+      cefrLevel: userCefrLevel,
+      targetLevel: targetLevel,
+      markdownContent: markdownContent
     };
 
   } catch (error: any) {

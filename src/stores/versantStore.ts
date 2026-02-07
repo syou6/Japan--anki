@@ -109,13 +109,20 @@ export const useVersantStore = create<VersantStore>((set, get) => ({
 
           const aiFeedback = await generateEnglishFeedback(feedbackPrompt, userCefrLevel);
 
+          // Parse markdown content for Versant-specific feedback
+          // Extract encouragement section if present
+          const encouragementMatch = aiFeedback.markdownContent.match(/## 💪 Encouragement\n([\s\S]*?)(?=##|$)/);
+          const advice = encouragementMatch
+            ? encouragementMatch[1].trim()
+            : 'Keep practicing! Your English is improving.';
+
           feedback = {
             cefrLevel: aiFeedback.cefrLevel,
-            score: aiFeedback.overallScore,
-            advice: aiFeedback.encouragement,
+            score: 70, // Default score - Versant scoring is handled separately
+            advice,
             sampleAnswer: generateSampleAnswer(currentQuestion),
-            grammarNotes: aiFeedback.grammarCorrections.map(g => `${g.original} → ${g.corrected}: ${g.explanation}`),
-            vocabularyTips: aiFeedback.vocabularySuggestions.map(v => `${v.original} → ${v.suggestion}`)
+            grammarNotes: [],
+            vocabularyTips: []
           };
         } catch (feedbackError) {
           console.error('Failed to generate feedback:', feedbackError);

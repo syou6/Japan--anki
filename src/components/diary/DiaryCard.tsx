@@ -346,11 +346,9 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
             >
               <Brain className="w-5 h-5" />
               <span className="font-medium">AI Feedback</span>
-              {entry.ai_feedback.overallScore && (
-                <span className="ml-2 px-2 py-0.5 bg-indigo-200 rounded-full text-sm">
-                  Score: {entry.ai_feedback.overallScore}
-                </span>
-              )}
+              <span className="ml-2 px-2 py-0.5 bg-indigo-200 rounded-full text-sm">
+                {entry.ai_feedback.cefrLevel} → {entry.ai_feedback.targetLevel}
+              </span>
               {showFeedback ? (
                 <ChevronUp className="w-4 h-4 ml-auto" />
               ) : (
