@@ -73,11 +73,11 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
           {/* User Menu */}
           <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-shrink-0">
             <div className="hidden lg:flex items-center gap-2 md:gap-3">
-              <div className="text-right">
-                <div className="text-sm md:text-base lg:text-lg font-medium text-gray-900 whitespace-nowrap">
+              <div className="text-right header-user-info">
+                <div className="text-sm md:text-base lg:text-lg font-medium whitespace-nowrap">
                   {isGuestMode ? EN.user.guest : user?.name}
                 </div>
-                <div className="text-xs md:text-sm text-gray-500">
+                <div className="text-xs md:text-sm">
                   {isGuestMode ? EN.user.trialMode : isParent ? EN.user.user : EN.user.admin}
                 </div>
               </div>

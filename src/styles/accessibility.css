@@ -133,7 +133,8 @@ header, nav {
 /* ヘッダー内のテキストはクリーム色（ボタン以外） */
 header h1,
 header p,
-header > div > div > div > div > div {
+.header-user-info,
+.header-user-info div {
   color: #FFF5E1 !important;
 }
 
