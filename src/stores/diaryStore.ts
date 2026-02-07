@@ -160,16 +160,18 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
             userId: user.id
           });
           
-          // タイムアウト付きアップロード (30秒)
+          // タイムアウト付きアップロード (90秒 - 3分の録音に対応)
+          toast.loading('Uploading audio...', { id: 'audio-upload' });
+
           const uploadPromise = supabase.storage
             .from('voice-recordings')
             .upload(fileName, audioBlob, {
               contentType: 'audio/webm',
               upsert: false
             });
-            
-          const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('アップロードがタイムアウトしました（30秒）')), 30000)
+
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Upload timeout (90 seconds). Please try again with a shorter recording.')), 90000)
           );
           
           const { data: uploadData, error: uploadError } = await Promise.race([
@@ -187,6 +189,7 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
               .getPublicUrl(fileName);
             voiceUrl = publicUrl;
             console.log('音声URL取得成功:', publicUrl);
+            toast.success('Audio uploaded!', { id: 'audio-upload' });
           } else {
             console.error('音声アップロードエラー詳細:', {
               error: uploadError,
@@ -197,13 +200,13 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
               blobType: audioBlob.type
             });
             // エラーメッセージを詳細化
-            const errorMsg = uploadError?.message || '音声のアップロードに失敗しました';
-            toast.error(`音声アップロードエラー: ${errorMsg}`);
+            const errorMsg = uploadError?.message || 'Failed to upload audio';
+            toast.error(`Audio upload error: ${errorMsg}`, { id: 'audio-upload' });
             // 音声なしでも日記は保存を続行
           }
         } catch (storageError: any) {
           console.error('音声アップロードエラー:', storageError);
-          toast.error(storageError.message || '音声のアップロードに失敗しました');
+          toast.error(storageError.message || 'Failed to upload audio', { id: 'audio-upload' });
           // 音声なしでも日記は保存を続行
         }
       }
