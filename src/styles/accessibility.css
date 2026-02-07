@@ -130,10 +130,10 @@ header, nav {
   border-bottom: 4px solid var(--border-color) !important;
 }
 
-/* ヘッダー内のテキストは白 */
-header > div > div > div > h1,
-header > div > div > div > p {
-  color: #ffffff !important;
+/* ヘッダー内のテキストはクリーム色 */
+header h1,
+header p {
+  color: #FFF5E1 !important;
 }
 
 /* ナビゲーションボタンは白背景に黒文字 */
