@@ -130,11 +130,9 @@ header, nav {
   border-bottom: 4px solid var(--border-color) !important;
 }
 
-/* ヘッダー内のテキストはクリーム色（ナビボタン以外） */
+/* ヘッダー内のテキストはクリーム色（ボタン以外） */
 header h1,
-header p,
-header span,
-header > div > div > div:last-child div {
+header p {
   color: #FFF5E1 !important;
 }
 
@@ -144,6 +142,7 @@ header button, nav button {
   color: #000000 !important;
 }
 
+header button span, nav button span,
 header button svg, nav button svg {
   color: #000000 !important;
 }
