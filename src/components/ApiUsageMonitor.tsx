@@ -49,12 +49,12 @@ export const ApiUsageMonitor: React.FC<ApiUsageMonitorProps> = ({ embedded = tru
             )}
           </h3>
           {!isGuestMode && (
-            <button
+            <span
               onClick={() => setShowDetails(!showDetails)}
-              className="text-xs text-blue-600 hover:text-blue-800"
+              className="text-xs text-blue-600 hover:text-blue-800 cursor-pointer"
             >
               {showDetails ? EN.apiUsage.simple : EN.apiUsage.details}
-            </button>
+            </span>
           )}
         </div>
 
@@ -85,12 +85,17 @@ export const ApiUsageMonitor: React.FC<ApiUsageMonitorProps> = ({ embedded = tru
           ) : (
             <>
               {/* Normal mode progress bar */}
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="w-full h-2 overflow-hidden"
+                style={{ backgroundColor: '#e5e7eb', borderRadius: '4px', border: 'none' }}
+              >
                 <div
-                  className={`h-2 rounded-full transition-all ${
-                    isAtLimit ? 'bg-red-500' : isNearLimit ? 'bg-yellow-500' : 'bg-blue-500'
-                  }`}
-                  style={{ width: `${Math.min(100, usagePercentage)}%` }}
+                  className="h-2 transition-all"
+                  style={{
+                    width: `${Math.min(100, usagePercentage)}%`,
+                    backgroundColor: isAtLimit ? '#ef4444' : isNearLimit ? '#eab308' : '#3b82f6',
+                    borderRadius: '4px'
+                  }}
                 />
               </div>
 
