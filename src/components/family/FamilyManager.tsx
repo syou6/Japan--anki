@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
-import { Users, UserPlus, X, Eye, EyeOff } from 'lucide-react';
+import { GraduationCap, UserPlus, X, Eye, BookOpen } from 'lucide-react';
 import { EN } from '../../i18n/en';
 import toast from 'react-hot-toast';
 
@@ -162,7 +162,7 @@ export const FamilyManager: React.FC = () => {
         className="bg-white rounded-2xl shadow-xl p-6 sm:p-8"
       >
         <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
-          <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
+          <GraduationCap className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
           <h2 className="text-xl sm:text-3xl font-bold text-gray-900">{EN.family.title}</h2>
         </div>
 
@@ -195,10 +195,10 @@ export const FamilyManager: React.FC = () => {
           </div>
         </div>
 
-        {/* Your viewers */}
+        {/* Your teacher */}
         <div className="mb-8">
           <h3 className="text-xl font-bold text-gray-900 mb-4">
-            <Eye className="inline w-5 h-5 mr-2" />
+            <GraduationCap className="inline w-5 h-5 mr-2 text-blue-600" />
             {EN.family.yourViewers}
           </h3>
           <div className="space-y-3">
@@ -244,10 +244,10 @@ export const FamilyManager: React.FC = () => {
           </div>
         </div>
 
-        {/* Diaries you can view */}
+        {/* Students you teach */}
         <div>
           <h3 className="text-xl font-bold text-gray-900 mb-4">
-            <EyeOff className="inline w-5 h-5 mr-2" />
+            <BookOpen className="inline w-5 h-5 mr-2 text-green-600" />
             {EN.family.youCanView}
           </h3>
           <div className="space-y-3">

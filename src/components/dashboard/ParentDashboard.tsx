@@ -8,7 +8,7 @@ import {
   Mic,
   Calendar,
   Heart,
-  Users,
+  GraduationCap,
   TrendingUp,
   MessageCircle,
   Sun
@@ -220,7 +220,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
         </div>
       </motion.div>
 
-      {/* Family Messages */}
+      {/* Teacher Messages */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -231,7 +231,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onViewChange }
           <h2 className="text-2xl font-bold text-gray-900">
             {EN.parentDashboard.familyMessages}
           </h2>
-          <Users className="w-6 h-6 text-gray-500" />
+          <GraduationCap className="w-6 h-6 text-blue-600" />
         </div>
 
         <div className="space-y-4">
