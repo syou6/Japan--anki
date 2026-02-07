@@ -132,7 +132,8 @@ header, nav {
 
 /* ヘッダー内のテキストはクリーム色（ボタン以外） */
 header h1,
-header p {
+header p,
+header > div > div > div > div > div {
   color: #FFF5E1 !important;
 }
 
@@ -142,8 +143,7 @@ header button, nav button {
   color: #000000 !important;
 }
 
-header button span, nav button span,
-header button svg, nav button svg {
+header button *, nav button * {
   color: #000000 !important;
 }
 
