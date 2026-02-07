@@ -29,20 +29,29 @@ export interface PronunciationTip {
   tip: string;
 }
 
-export interface ReadingMaterial {
-  title: string;
-  description: string;
-  url?: string;
+export interface KeyVocabulary {
+  word: string;
+  phonetic: string;
+  meaningJa: string;
+  example: string;
+}
+
+export interface TopicExtension {
+  topic: string;
+  article: string;
+  articleSummaryJa: string;
+  keyVocabulary: KeyVocabulary[];
 }
 
 export interface EnglishFeedback {
   overallScore: number;
   cefrLevel: CEFRLevel;
+  targetLevel: CEFRLevel;
   summary: string;
   grammarCorrections: GrammarCorrection[];
   vocabularySuggestions: VocabularySuggestion[];
   pronunciationTips: PronunciationTip[];
-  readingMaterials: ReadingMaterial[];
+  topicExtension: TopicExtension | null;
   encouragement: string;
 }
 
