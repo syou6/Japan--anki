@@ -154,3 +154,87 @@ export function getCefrDescription(level: CEFRLevel): string {
   };
   return descriptions[level];
 }
+
+/**
+ * Generate a sample answer for Versant practice using Gemini API
+ */
+export async function generateVersantSampleAnswer(
+  question: string,
+  part: 'E' | 'F',
+  userCefrLevel: CEFRLevel = 'B1'
+): Promise<string> {
+  // Target level is i+1 (one level higher than current)
+  const levelProgression: Record<CEFRLevel, CEFRLevel> = {
+    'A1': 'A2', 'A2': 'B1', 'B1': 'B2', 'B2': 'C1', 'C1': 'C2', 'C2': 'C2'
+  };
+  const targetLevel = levelProgression[userCefrLevel];
+
+  // Default fallback
+  const defaultAnswer = part === 'E'
+    ? 'The passage discusses the main topic and key points. It mentions important details that support the central idea. In conclusion, this information is valuable for understanding the subject.'
+    : 'In my opinion, this is an important topic to consider. I believe that there are several factors we need to think about. First, we should consider the main aspects. Additionally, there are benefits and challenges to consider. Overall, I think this is something that affects many people in different ways.';
+
+  if (!apiKey) {
+    return defaultAnswer;
+  }
+
+  // Check API limits
+  const { allowed } = canCallApi();
+  if (!allowed) {
+    return defaultAnswer;
+  }
+
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash'
+    });
+
+    const timeLimit = part === 'E' ? 30 : 40;
+    const wordCount = part === 'E' ? '60-80' : '80-100';
+
+    const prompt = part === 'E'
+      ? `You are an English speaking test sample answer generator.
+
+**Task:** Generate a model summary answer for this passage:
+"${question}"
+
+**Requirements:**
+- CEFR Level: ${targetLevel} (target level for the learner)
+- Length: ${wordCount} words (speakable within ${timeLimit} seconds)
+- Include: Main idea, key supporting points, conclusion
+- Tone: Clear, organized, natural spoken English
+- Use appropriate transition words (First, Additionally, In conclusion, etc.)
+
+**Output:** Only the sample answer text, no explanations or labels.`
+      : `You are an English speaking test sample answer generator.
+
+**Task:** Generate a model opinion answer for this question:
+"${question}"
+
+**Requirements:**
+- CEFR Level: ${targetLevel} (target level for the learner)
+- Length: ${wordCount} words (speakable within ${timeLimit} seconds)
+- Structure: State opinion → Give 2-3 reasons with examples → Conclude
+- Tone: Natural spoken English, conversational but organized
+- Use appropriate phrases: "In my opinion", "I believe that", "For example", "Furthermore", "To sum up"
+
+**Output:** Only the sample answer text, no explanations or labels.`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const sampleAnswer = response.text().trim();
+
+    // Record API usage
+    const estimatedTokens = Math.ceil(question.length / 3) + 100;
+    recordApiUsage(estimatedTokens);
+    recordApiSuccess();
+
+    return sampleAnswer;
+
+  } catch (error: any) {
+    console.error('Gemini sample answer error:', error.message);
+    recordApiError();
+    return defaultAnswer;
+  }
+}

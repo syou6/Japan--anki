@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
-import { generateEnglishFeedback, type CEFRLevel } from '../lib/gemini-feedback';
+import { generateEnglishFeedback, generateVersantSampleAnswer, type CEFRLevel } from '../lib/gemini-feedback';
 import type { VersantQuestion } from '../lib/versant-questions';
 
 export interface VersantFeedback {
@@ -107,7 +107,11 @@ export const useVersantStore = create<VersantStore>((set, get) => ({
             ? `The user was asked to summarize the following passage:\n"${currentQuestion.text}"\n\nTheir summary was:\n"${transcribedText}"`
             : `The user was asked: "${currentQuestion.text}"\n\nTheir response was:\n"${transcribedText}"`;
 
-          const aiFeedback = await generateEnglishFeedback(feedbackPrompt, userCefrLevel);
+          // Generate feedback and sample answer in parallel
+          const [aiFeedback, sampleAnswer] = await Promise.all([
+            generateEnglishFeedback(feedbackPrompt, userCefrLevel),
+            generateVersantSampleAnswer(currentQuestion.text, currentQuestion.part, userCefrLevel)
+          ]);
 
           // Parse markdown content for Versant-specific feedback
           // Extract encouragement section if present
@@ -120,7 +124,7 @@ export const useVersantStore = create<VersantStore>((set, get) => ({
             cefrLevel: aiFeedback.cefrLevel,
             score: 70, // Default score - Versant scoring is handled separately
             advice,
-            sampleAnswer: generateSampleAnswer(currentQuestion),
+            sampleAnswer,
             grammarNotes: [],
             vocabularyTips: []
           };
@@ -249,21 +253,3 @@ export const useVersantStore = create<VersantStore>((set, get) => ({
     });
   }
 }));
-
-// Helper function to generate sample answers
-function generateSampleAnswer(question: VersantQuestion): string {
-  if (question.part === 'E') {
-    return 'The passage discusses key points about the topic. The main idea is... and it mentions that... In conclusion...';
-  }
-
-  // Part F sample answers based on category
-  const sampleAnswers: Record<string, string> = {
-    'Work': 'In my opinion, this is an important topic in today\'s workplace. I believe that... because... For example, in my experience...',
-    'Technology': 'Technology has both advantages and disadvantages. On one hand... On the other hand... Personally, I think...',
-    'Education': 'Education plays a crucial role in our society. I think that... This is because... Furthermore...',
-    'Lifestyle': 'This is something many people think about. My preference is... because... Additionally...',
-    'default': 'This is an interesting question. In my view... The reason I think this is... To conclude...'
-  };
-
-  return sampleAnswers[question.category || ''] || sampleAnswers.default;
-}
