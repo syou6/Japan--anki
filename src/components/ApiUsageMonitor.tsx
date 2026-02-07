@@ -4,7 +4,11 @@ import { useGuestStore } from '../stores/guestStore';
 import { AlertCircle, RefreshCw, Zap } from 'lucide-react';
 import { EN } from '../i18n/en';
 
-export const ApiUsageMonitor: React.FC = () => {
+interface ApiUsageMonitorProps {
+  embedded?: boolean;
+}
+
+export const ApiUsageMonitor: React.FC<ApiUsageMonitorProps> = ({ embedded = true }) => {
   const [stats, setStats] = useState(getCurrentUsageStats());
   const [showDetails, setShowDetails] = useState(false);
   const { isGuestMode, aiUsageCount } = useGuestStore();
@@ -22,12 +26,11 @@ export const ApiUsageMonitor: React.FC = () => {
   const isAtLimit = stats.remainingRequests === 0;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className={embedded ? '' : 'fixed bottom-4 right-4 z-50'}>
       <div
-        className={`bg-white rounded-lg shadow-lg p-4 ${
+        className={`bg-gray-50 rounded-lg p-4 ${
           isAtLimit ? 'border-2 border-red-500' : isNearLimit ? 'border-2 border-yellow-500' : 'border border-gray-200'
         }`}
-        style={{ minWidth: '250px' }}
       >
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-sm flex items-center gap-2">

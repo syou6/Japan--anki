@@ -134,6 +134,7 @@ export const EN = {
     language: 'Language',
     account: 'Account',
     logout: 'Logout',
+    apiUsage: 'AI Usage Statistics',
   },
 
   // CEFR levels

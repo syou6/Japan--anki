@@ -22,7 +22,6 @@ import { GuestBanner } from '../components/guest/GuestBanner';
 import { GuestDiaryList } from '../components/guest/GuestDiaryList';
 import { WelcomeGuide } from '../components/onboarding/WelcomeGuide';
 import { HelpButton } from '../components/help/HelpButton';
-import { ApiUsageMonitor } from '../components/ApiUsageMonitor';
 import { supabase } from '../lib/supabase';
 import { EN } from '../i18n/en';
 
@@ -368,7 +367,6 @@ export const AppPage: React.FC = () => {
       
       <PWAInstallPrompt />
       <HelpButton />
-      <ApiUsageMonitor />
       <Toaster position="top-center" />
     </div>
   );

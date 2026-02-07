@@ -46,10 +46,10 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
           >
             <Logo size="sm" />
             <div>
-              <h1 className="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-white whitespace-nowrap">
+              <h1 className="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-amber-100 whitespace-nowrap">
                 {EN.app.name}
               </h1>
-              <p className="text-[10px] sm:text-xs md:text-sm text-gray-200 hidden sm:block">
+              <p className="text-[10px] sm:text-xs md:text-sm text-amber-200 hidden sm:block">
                 {EN.header.voiceJournal}
               </p>
             </div>
