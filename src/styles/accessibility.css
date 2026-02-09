@@ -117,10 +117,21 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* カード・パネル */
-.card, .panel, [class*="rounded"] {
+.card, .panel {
   border: 3px solid var(--border-color) !important;
   background-color: #ffffff !important;
   box-shadow: none !important; /* 影を削除してクリアに */
+}
+
+/* CEFR設定ボタン - 選択状態を維持 */
+button[class*="border-indigo-500"] {
+  border-color: #6366f1 !important;
+  background-color: #eef2ff !important;
+}
+
+button[class*="border-gray-200"] {
+  border-color: #e5e7eb !important;
+  background-color: #ffffff !important;
 }
 
 /* ヘッダー・ナビゲーション */
