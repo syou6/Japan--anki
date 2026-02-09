@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Play, Mic, MicOff, Volume2, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Play, Mic, MicOff, Volume2, HelpCircle, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { ResultDisplay } from './ResultDisplay';
 import { useVersantStore } from '../../stores/versantStore';
@@ -212,6 +212,45 @@ export const PartFPractice: React.FC<PartFPracticeProps> = ({ onBack }) => {
               </p>
             </div>
 
+            {/* Collapsible Question Text */}
+            <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
+              <button
+                onClick={() => setShowQuestion(!showQuestion)}
+                className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  {showQuestion ? (
+                    <EyeOff className="w-5 h-5 text-gray-500" />
+                  ) : (
+                    <Eye className="w-5 h-5 text-gray-500" />
+                  )}
+                  <span className="font-medium text-gray-700">
+                    {showQuestion ? 'Hide Question Text' : 'Show Question Text'}
+                  </span>
+                </div>
+                {showQuestion ? (
+                  <ChevronUp className="w-5 h-5 text-gray-400" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                )}
+              </button>
+              <AnimatePresence>
+                {showQuestion && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="border-t border-gray-200"
+                  >
+                    <div className="p-4 bg-purple-50">
+                      <p className="text-sm text-purple-600 font-medium mb-1">Question:</p>
+                      <p className="text-lg text-gray-800">{currentQuestion.text}</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             {/* Question Card */}
             <div className="bg-white rounded-2xl border-2 border-gray-200 p-6">
               {state === 'ready' && (
@@ -244,23 +283,11 @@ export const PartFPractice: React.FC<PartFPracticeProps> = ({ onBack }) => {
                     <Volume2 className="w-10 h-10 text-purple-600" />
                   </motion.div>
                   <p className="text-xl font-medium text-gray-900 mb-4">Listening...</p>
-
-                  {/* Show question text */}
-                  {showQuestion && (
-                    <div className="bg-gray-50 rounded-lg p-4 text-left">
-                      <p className="text-lg text-gray-800">{currentQuestion.text}</p>
-                    </div>
-                  )}
                 </div>
               )}
 
               {state === 'recording' && (
                 <div className="text-center">
-                  {/* Question display */}
-                  <div className="bg-purple-50 rounded-lg p-4 mb-6 text-left">
-                    <p className="text-sm text-purple-600 font-medium mb-1">Question:</p>
-                    <p className="text-lg text-gray-800">{currentQuestion.text}</p>
-                  </div>
 
                   <div className="mb-6">
                     <motion.div

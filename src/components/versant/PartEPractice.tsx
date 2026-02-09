@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Play, Mic, MicOff, Volume2, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Play, Mic, MicOff, Volume2, RotateCcw, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { ResultDisplay } from './ResultDisplay';
 import { useVersantStore } from '../../stores/versantStore';
@@ -22,6 +22,7 @@ export const PartEPractice: React.FC<PartEPracticeProps> = ({ onBack }) => {
   const [transcribedText, setTranscribedText] = useState('');
   const [currentAnswer, setCurrentAnswer] = useState<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showPassage, setShowPassage] = useState(false);
 
   const transcriberRef = useRef<VoiceTranscriber | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -165,6 +166,7 @@ export const PartEPractice: React.FC<PartEPracticeProps> = ({ onBack }) => {
     setCurrentQuestion(question);
     setCurrentAnswer(null);
     setTranscribedText('');
+    setShowPassage(false);
     setState('ready');
   };
 
@@ -211,6 +213,45 @@ export const PartEPractice: React.FC<PartEPracticeProps> = ({ onBack }) => {
                 <strong>Instructions:</strong> Listen to the passage, then summarize
                 the main points in your own words. You have 30 seconds.
               </p>
+            </div>
+
+            {/* Collapsible Passage Text */}
+            <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
+              <button
+                onClick={() => setShowPassage(!showPassage)}
+                className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  {showPassage ? (
+                    <EyeOff className="w-5 h-5 text-gray-500" />
+                  ) : (
+                    <Eye className="w-5 h-5 text-gray-500" />
+                  )}
+                  <span className="font-medium text-gray-700">
+                    {showPassage ? 'Hide Passage Text' : 'Show Passage Text'}
+                  </span>
+                </div>
+                {showPassage ? (
+                  <ChevronUp className="w-5 h-5 text-gray-400" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                )}
+              </button>
+              <AnimatePresence>
+                {showPassage && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="border-t border-gray-200"
+                  >
+                    <div className="p-4 bg-blue-50">
+                      <p className="text-sm text-blue-600 font-medium mb-1">Passage:</p>
+                      <p className="text-lg text-gray-800 leading-relaxed">{currentQuestion.text}</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Question Card */}
