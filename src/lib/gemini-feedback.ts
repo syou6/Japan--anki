@@ -3,7 +3,7 @@ import { canCallApi, recordApiUsage, recordApiSuccess, recordApiError, showApiUs
 
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-export type CEFRLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
+export type CEFRLevel = 'A1' | 'A1+' | 'A2' | 'A2+' | 'B1' | 'B1+' | 'B2' | 'B2+' | 'C1' | 'C1+';
 
 // Markdown形式のフィードバック
 export interface EnglishFeedback {
@@ -21,7 +21,9 @@ export async function generateEnglishFeedback(
 ): Promise<EnglishFeedback> {
   // Target level is i+1 (one level higher than current)
   const levelProgression: Record<CEFRLevel, CEFRLevel> = {
-    'A1': 'A2', 'A2': 'B1', 'B1': 'B2', 'B2': 'C1', 'C1': 'C2', 'C2': 'C2'
+    'A1': 'A1+', 'A1+': 'A2', 'A2': 'A2+', 'A2+': 'B1',
+    'B1': 'B1+', 'B1+': 'B2', 'B2': 'B2+', 'B2+': 'C1',
+    'C1': 'C1+', 'C1+': 'C1+'
   };
   const targetLevel = levelProgression[userCefrLevel];
 
@@ -56,11 +58,6 @@ Your diary entry has been recorded. Keep practicing your English every day!
       model: 'gemini-2.0-flash'
     });
 
-    // Target level is i+1 (one level higher than current)
-    const levelProgression: Record<CEFRLevel, CEFRLevel> = {
-      'A1': 'A2', 'A2': 'B1', 'B1': 'B2', 'B2': 'C1', 'C1': 'C2', 'C2': 'C2'
-    };
-    const targetLevel = levelProgression[userCefrLevel];
 
     const prompt = `# Role
 You are an expert English language coach designed to help users improve their English skills through their diary entries.
@@ -136,7 +133,7 @@ Based on the content of the diary:
 }
 
 function validateCefrLevel(level: string): CEFRLevel | null {
-  const validLevels: CEFRLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+  const validLevels: CEFRLevel[] = ['A1', 'A1+', 'A2', 'A2+', 'B1', 'B1+', 'B2', 'B2+', 'C1', 'C1+'];
   return validLevels.includes(level as CEFRLevel) ? (level as CEFRLevel) : null;
 }
 
@@ -146,11 +143,15 @@ function validateCefrLevel(level: string): CEFRLevel | null {
 export function getCefrDescription(level: CEFRLevel): string {
   const descriptions: Record<CEFRLevel, string> = {
     'A1': 'Beginner - Basic phrases and simple expressions',
+    'A1+': 'Beginner High - Simple interactions and basic needs',
     'A2': 'Elementary - Routine tasks and simple conversations',
+    'A2+': 'Elementary High - Familiar situations and simple exchanges',
     'B1': 'Intermediate - Main points in clear standard speech',
+    'B1+': 'Intermediate High - Extended conversation on familiar topics',
     'B2': 'Upper Intermediate - Complex texts and fluent conversation',
+    'B2+': 'Upper Intermediate High - Nuanced discussion and debate',
     'C1': 'Advanced - Complex texts and spontaneous expression',
-    'C2': 'Proficient - Near-native understanding and expression'
+    'C1+': 'Proficient - Near-native fluency and precision'
   };
   return descriptions[level];
 }
@@ -165,7 +166,9 @@ export async function generateVersantSampleAnswer(
 ): Promise<string> {
   // Target level is i+1 (one level higher than current)
   const levelProgression: Record<CEFRLevel, CEFRLevel> = {
-    'A1': 'A2', 'A2': 'B1', 'B1': 'B2', 'B2': 'C1', 'C1': 'C2', 'C2': 'C2'
+    'A1': 'A1+', 'A1+': 'A2', 'A2': 'A2+', 'A2+': 'B1',
+    'B1': 'B1+', 'B1+': 'B2', 'B2': 'B2+', 'B2+': 'C1',
+    'C1': 'C1+', 'C1+': 'C1+'
   };
   const targetLevel = levelProgression[userCefrLevel];
 

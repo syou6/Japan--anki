@@ -137,14 +137,18 @@ export const EN = {
     apiUsage: 'AI Usage Statistics',
   },
 
-  // CEFR levels
+  // CEFR levels (10 stages)
   cefr: {
-    A1: 'A1 - Beginner',
-    A2: 'A2 - Elementary',
-    B1: 'B1 - Intermediate',
-    B2: 'B2 - Upper Intermediate',
-    C1: 'C1 - Advanced',
-    C2: 'C2 - Proficient',
+    'A1': 'A1 - Beginner',
+    'A1+': 'A1+ - Beginner High',
+    'A2': 'A2 - Elementary',
+    'A2+': 'A2+ - Elementary High',
+    'B1': 'B1 - Intermediate',
+    'B1+': 'B1+ - Intermediate High',
+    'B2': 'B2 - Upper Intermediate',
+    'B2+': 'B2+ - Upper Intermediate High',
+    'C1': 'C1 - Advanced',
+    'C1+': 'C1+ - Proficient',
   },
 
   // Feedback
