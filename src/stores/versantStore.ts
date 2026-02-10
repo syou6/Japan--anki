@@ -107,10 +107,30 @@ export const useVersantStore = create<VersantStore>((set, get) => ({
             ? `The user was asked to summarize the following passage:\n"${currentQuestion.text}"\n\nTheir summary was:\n"${transcribedText}"`
             : `The user was asked: "${currentQuestion.text}"\n\nTheir response was:\n"${transcribedText}"`;
 
-          // Generate feedback and sample answer in parallel
+          // Timeout wrapper for API calls (30 seconds)
+          const withTimeout = <T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> => {
+            return Promise.race([
+              promise,
+              new Promise<T>((_, reject) =>
+                setTimeout(() => reject(new Error('API timeout')), timeoutMs)
+              )
+            ]).catch(() => fallback);
+          };
+
+          // Default fallback values
+          const defaultFeedback = {
+            cefrLevel: userCefrLevel,
+            targetLevel: userCefrLevel,
+            markdownContent: '## 💪 Encouragement\nGreat effort! Keep practicing your English speaking skills.'
+          };
+          const defaultSampleAnswer = currentQuestion.part === 'E'
+            ? 'The passage discusses the main topic and provides key information. The speaker mentions several important points that support the central idea.'
+            : 'In my opinion, this is an important topic. I believe we should consider multiple perspectives. First, there are benefits to consider. Additionally, there may be challenges. Overall, it depends on individual circumstances.';
+
+          // Generate feedback and sample answer in parallel with timeout
           const [aiFeedback, sampleAnswer] = await Promise.all([
-            generateEnglishFeedback(feedbackPrompt, userCefrLevel),
-            generateVersantSampleAnswer(currentQuestion.text, currentQuestion.part, userCefrLevel)
+            withTimeout(generateEnglishFeedback(feedbackPrompt, userCefrLevel), 30000, defaultFeedback),
+            withTimeout(generateVersantSampleAnswer(currentQuestion.text, currentQuestion.part, userCefrLevel), 30000, defaultSampleAnswer)
           ]);
 
           // Parse markdown content for Versant-specific feedback
@@ -130,6 +150,17 @@ export const useVersantStore = create<VersantStore>((set, get) => ({
           };
         } catch (feedbackError) {
           console.error('Failed to generate feedback:', feedbackError);
+          // Provide default feedback even on error
+          feedback = {
+            cefrLevel: userCefrLevel,
+            score: 70,
+            advice: 'Great effort! Keep practicing your English speaking skills.',
+            sampleAnswer: currentQuestion.part === 'E'
+              ? 'The passage discusses the main topic and provides key information.'
+              : 'In my opinion, this is an important topic to consider.',
+            grammarNotes: [],
+            vocabularyTips: []
+          };
         }
       }
 
