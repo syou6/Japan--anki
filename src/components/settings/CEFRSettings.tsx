@@ -98,7 +98,7 @@ export const CEFRSettings: React.FC<CEFRSettingsProps> = ({ currentLevel, onLeve
             >
               <div className="p-4 bg-white">
                 <img
-                  src="https://www.pearson.com/content/dam/one-dot-com/one-dot-com/english/PublishingImages/Versant/versant-score-cefr-chart.png"
+                  src="/images/versant-cefr-chart.png"
                   alt="Versant Score to CEFR Level Chart"
                   className="w-full rounded-lg border border-gray-200"
                   onError={(e) => {
