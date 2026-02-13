@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CEFRSettings } from './CEFRSettings';
 import { NotificationSettings } from './NotificationSettings';
+import { FamilyManager } from '../family/FamilyManager';
 import { SubscriptionManager } from '../subscription/SubscriptionManager';
 import { ApiUsageMonitor } from '../ApiUsageMonitor';
 import { useAuthStore } from '../../stores/authStore';
@@ -17,8 +18,9 @@ export const SettingsView: React.FC = () => {
     try {
       await updateCefrLevel(level);
       toast.success(`CEFR level updated to ${level}`);
-    } catch (error) {
-      toast.error('Failed to update CEFR level');
+    } catch (error: any) {
+      const message = error?.message || 'Unknown error';
+      toast.error(`Failed to update CEFR level: ${message}`);
     }
   };
 
@@ -33,6 +35,9 @@ export const SettingsView: React.FC = () => {
         currentLevel={user?.cefr_level || 'B1'}
         onLevelChange={handleCefrChange}
       />
+
+      {/* Teacher Connection */}
+      <FamilyManager />
 
       {/* Notification Settings */}
       <NotificationSettings />

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import type { Components } from 'react-markdown';
 import { Award, Target } from 'lucide-react';
 import type { EnglishFeedback } from '../../types';
 
@@ -8,16 +9,47 @@ interface FeedbackCardProps {
 }
 
 export const FeedbackCard: React.FC<FeedbackCardProps> = ({ feedback }) => {
+  const h2CountRef = useRef(0);
+
   const getCefrColor = (level: string) => {
     const colors: Record<string, string> = {
       'A1': 'bg-gray-100 text-gray-700',
+      'A1+': 'bg-gray-200 text-gray-800',
       'A2': 'bg-blue-100 text-blue-700',
+      'A2+': 'bg-blue-200 text-blue-800',
       'B1': 'bg-green-100 text-green-700',
+      'B1+': 'bg-green-200 text-green-800',
       'B2': 'bg-yellow-100 text-yellow-700',
+      'B2+': 'bg-yellow-200 text-yellow-800',
       'C1': 'bg-orange-100 text-orange-700',
-      'C2': 'bg-purple-100 text-purple-700'
+      'C1+': 'bg-purple-100 text-purple-700'
     };
     return colors[level] || 'bg-gray-100 text-gray-700';
+  };
+
+  // Reset counter on each render
+  h2CountRef.current = 0;
+
+  const markdownComponents: Components = {
+    h2: ({ children }) => {
+      h2CountRef.current += 1;
+      const isFirst = h2CountRef.current === 1;
+      return (
+        <h2
+          style={{
+            fontSize: '1.125rem',
+            fontWeight: 700,
+            color: '#111827',
+            marginTop: isFirst ? '0' : '2rem',
+            marginBottom: '1rem',
+            paddingTop: isFirst ? '0' : '1.5rem',
+            borderTop: isFirst ? 'none' : '2px solid #e5e7eb',
+          }}
+        >
+          {children}
+        </h2>
+      );
+    },
   };
 
   return (
@@ -50,7 +82,6 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ feedback }) => {
       {/* Markdown Content */}
       <div className="bg-white rounded-xl p-4 sm:p-6 prose prose-sm sm:prose max-w-none
         prose-headings:text-gray-900 prose-headings:font-bold
-        prose-h2:text-lg prose-h2:mt-8 prose-h2:mb-4 prose-h2:pt-6 prose-h2:border-t-2 prose-h2:border-gray-200
         prose-h3:text-base prose-h3:mt-4 prose-h3:mb-2
         prose-h4:text-sm prose-h4:mt-3 prose-h4:mb-1
         prose-p:text-gray-700 prose-p:leading-relaxed prose-p:my-3
@@ -58,9 +89,10 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ feedback }) => {
         prose-strong:text-gray-900
         prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-indigo-600 prose-code:text-sm
         prose-blockquote:border-l-4 prose-blockquote:border-indigo-300 prose-blockquote:bg-indigo-50 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:my-3
-        [&>h2:first-child]:mt-0 [&>h2:first-child]:pt-0 [&>h2:first-child]:border-t-0
       ">
-        <ReactMarkdown>{feedback.markdownContent}</ReactMarkdown>
+        <ReactMarkdown components={markdownComponents}>
+          {feedback.markdownContent}
+        </ReactMarkdown>
       </div>
     </div>
   );

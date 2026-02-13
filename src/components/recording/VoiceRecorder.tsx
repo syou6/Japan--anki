@@ -283,11 +283,11 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onViewChange, isGu
         setAdditionalText('');
         setTranscribedText('');
 
-        // Return to home
+        // Navigate to diary to show AI feedback
         if (onViewChange) {
           setTimeout(() => {
-            onViewChange('home');
-          }, 1000);
+            onViewChange('diary');
+          }, 500);
         }
       } else {
         throw new Error('Save process did not complete');
