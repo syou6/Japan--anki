@@ -29,77 +29,71 @@ export const StandardDialog: React.FC<StandardDialogProps> = ({
   isLoading = false
 }) => {
   const confirmColors = {
-    primary: 'bg-black hover:bg-gray-800 border-black',
-    danger: 'bg-red-600 hover:bg-red-700 border-red-600',
-    success: 'bg-green-600 hover:bg-green-700 border-green-600'
+    primary: 'bg-brand-600 hover:bg-brand-700 border-brand-600',
+    danger: 'bg-red-500 hover:bg-red-600 border-red-500',
+    success: 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500'
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* オーバーレイ */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black bg-opacity-50 z-50"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
           />
-          
-          {/* ダイアログ */}
+
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
-            <div className="bg-white rounded-2xl border-4 border-black max-w-lg w-full overflow-hidden">
-              {/* ヘッダー - キャンセルは常に左上 */}
-              <div className="flex items-center justify-between p-6 border-b-3 border-black bg-gray-50">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-elevated max-w-lg w-full overflow-hidden">
+              <div className="flex items-center justify-between p-5 border-b border-gray-100">
                 <button
                   onClick={onClose}
                   disabled={isLoading}
-                  className="
-                    p-3 rounded-xl border-3 border-gray-600
-                    bg-white text-gray-700 hover:bg-gray-100
-                    transition-all flex items-center gap-2
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                    font-bold
-                  "
+                  className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
                   aria-label={EN.dialog.cancel}
                 >
-                  <X className="w-6 h-6" />
-                  <span className="hidden sm:inline">{cancelLabel}</span>
+                  <X className="w-5 h-5" />
                 </button>
-                
-                <h2 className="text-2xl font-bold text-black text-center flex-1">
+
+                <h2 className="text-base font-semibold text-gray-900 text-center flex-1">
                   {title}
                 </h2>
-                
-                {/* 右側のスペーサー（バランスのため） */}
-                <div className="w-[100px]" />
+
+                <div className="w-9" />
               </div>
-              
-              {/* コンテンツ */}
-              <div className="p-6">
+
+              <div className="p-5">
                 {children}
               </div>
-              
-              {/* フッター - 決定は常に右下 */}
+
               {showConfirm && onConfirm && (
-                <div className="p-6 border-t-3 border-black bg-gray-50">
-                  <div className="flex justify-end">
+                <div className="p-5 border-t border-gray-100 bg-gray-50">
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={onClose}
+                      disabled={isLoading}
+                      className="px-4 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+                    >
+                      {cancelLabel}
+                    </button>
                     <button
                       onClick={onConfirm}
                       disabled={isLoading}
                       className={`
-                        px-8 py-4 rounded-xl border-3
+                        px-5 py-2 rounded-xl border
                         ${confirmColors[confirmVariant]}
-                        text-white font-bold text-xl
-                        transition-all flex items-center gap-3
+                        text-white font-medium text-sm
+                        transition-all flex items-center gap-2
                         disabled:opacity-50 disabled:cursor-not-allowed
-                        focus:ring-4 focus:ring-offset-2 focus:ring-black
+                        focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2
                       `}
                     >
                       {isLoading ? (
@@ -107,15 +101,14 @@ export const StandardDialog: React.FC<StandardDialogProps> = ({
                           <motion.div
                             animate={{ rotate: 360 }}
                             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                            className="w-6 h-6 border-3 border-white border-t-transparent rounded-full"
+                            className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
                           />
                           <span>{EN.dialog.processing}</span>
                         </>
                       ) : (
                         <>
-                          <Check className="w-6 h-6" />
+                          <Check className="w-4 h-4" />
                           <span>{confirmLabel}</span>
-                          <span className="text-2xl ml-2">→</span>
                         </>
                       )}
                     </button>

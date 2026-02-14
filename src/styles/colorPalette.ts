@@ -1,44 +1,44 @@
-// 高齢者向け統一カラーパレット
+// モダンUI カラーパレット（ティール/エメラルド系）
 export const colors = {
   // メイン機能の色
   home: {
-    light: '#86efac',    // パステル緑
-    base: '#4ade80',     // 明るい緑
-    dark: '#059669',     // 濃い緑
-    darker: '#047857',   // より濃い緑
+    light: '#ccfbf1',    // teal-100
+    base: '#14b8a6',     // teal-500
+    dark: '#0d9488',     // teal-600
+    darker: '#0f766e',   // teal-700
   },
   record: {
-    light: '#fca5a5',    // パステル赤
-    base: '#f87171',     // 明るい赤
-    dark: '#dc2626',     // 濃い赤
-    darker: '#b91c1c',   // より濃い赤
+    light: '#ffe4e6',    // rose-100
+    base: '#f43f5e',     // rose-500
+    dark: '#e11d48',     // rose-600
+    darker: '#be123c',   // rose-700
   },
   play: {
-    light: '#93c5fd',    // パステル青
-    base: '#60a5fa',     // 明るい青
-    dark: '#2563eb',     // 濃い青
-    darker: '#1d4ed8',   // より濃い青
+    light: '#e0f2fe',    // sky-100
+    base: '#0ea5e9',     // sky-500
+    dark: '#0284c7',     // sky-600
+    darker: '#0369a1',   // sky-700
   },
   // 共通UI要素の色
   ui: {
-    success: '#10b981',  // 成功（緑）
-    warning: '#f59e0b',  // 警告（オレンジ）
-    danger: '#ef4444',   // 危険（赤）
-    info: '#3b82f6',     // 情報（青）
-    neutral: '#6b7280',  // 中立（グレー）
+    success: '#10b981',  // emerald-500
+    warning: '#f59e0b',  // amber-500
+    danger: '#ef4444',   // red-500
+    info: '#0ea5e9',     // sky-500
+    neutral: '#6b7280',  // gray-500
   },
   // テキスト色
   text: {
-    primary: '#000000',   // 主要テキスト（黒）
-    secondary: '#374151', // 副テキスト（濃いグレー）
-    disabled: '#9ca3af',  // 無効テキスト（薄いグレー）
-    onDark: '#ffffff',    // 暗い背景上のテキスト（白）
+    primary: '#111827',   // gray-900
+    secondary: '#6b7280', // gray-500
+    disabled: '#d1d5db',  // gray-300
+    onDark: '#ffffff',
   },
   // 背景色
   background: {
-    primary: '#ffffff',   // 主要背景（白）
-    secondary: '#f9fafb', // 副背景（薄いグレー）
-    tertiary: '#f3f4f6',  // 第三背景（グレー）
+    primary: '#ffffff',
+    secondary: '#f9fafb', // gray-50
+    tertiary: '#f3f4f6',  // gray-100
   }
 };
 
@@ -57,8 +57,8 @@ export const buttonStyles = {
     },
     inactive: {
       backgroundColor: colors.home.light,
-      borderColor: colors.home.dark,
-      color: colors.text.primary,
+      borderColor: 'transparent',
+      color: colors.home.darker,
     }
   },
   record: {
@@ -69,8 +69,8 @@ export const buttonStyles = {
     },
     inactive: {
       backgroundColor: colors.record.light,
-      borderColor: colors.record.dark,
-      color: colors.text.primary,
+      borderColor: 'transparent',
+      color: colors.record.darker,
     }
   },
   play: {
@@ -81,8 +81,8 @@ export const buttonStyles = {
     },
     inactive: {
       backgroundColor: colors.play.light,
-      borderColor: colors.play.dark,
-      color: colors.text.primary,
+      borderColor: 'transparent',
+      color: colors.play.darker,
     }
   }
 };

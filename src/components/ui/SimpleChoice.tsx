@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Check } from 'lucide-react';
 import { EN } from '../../i18n/en';
 
 interface Choice {
@@ -24,96 +24,83 @@ export const SimpleChoice: React.FC<SimpleChoiceProps> = ({
   onSelect,
   selected,
   title,
-  maxVisible = 3 // 最大3つまで表示
+  maxVisible = 3
 }) => {
   const [showMore, setShowMore] = useState(false);
-  
-  // 表示する選択肢を制限
+
   const visibleChoices = showMore ? choices : choices.slice(0, maxVisible);
   const hasMore = choices.length > maxVisible;
 
   return (
-    <div className="bg-white rounded-xl border-3 border-black p-6">
+    <div className="bg-white rounded-xl border border-gray-200 p-5">
       {title && (
-        <h3 className="text-xl font-bold text-black mb-4">
+        <h3 className="text-sm font-semibold text-gray-900 mb-3">
           {title}
         </h3>
       )}
-      
-      <div className="space-y-3">
+
+      <div className="space-y-2">
         <AnimatePresence mode="wait">
           {visibleChoices.map((choice, index) => (
             <motion.button
               key={choice.id}
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ delay: index * 0.1 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ delay: index * 0.05 }}
               onClick={() => onSelect(choice.id)}
               className={`
-                w-full p-4 rounded-xl border-3 transition-all
-                flex items-center gap-4
+                w-full p-3 rounded-xl border transition-all
+                flex items-center gap-3
                 ${selected === choice.id
-                  ? `${choice.color || 'bg-black'} text-white border-white`
-                  : 'bg-white text-black border-black hover:bg-gray-50'
+                  ? 'bg-brand-50 text-brand-700 border-brand-200'
+                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
                 }
               `}
             >
-              {/* アイコン */}
               {choice.icon && (
-                <div className={`
-                  text-3xl
-                  ${selected === choice.id ? 'opacity-100' : 'opacity-80'}
-                `}>
+                <div className="text-xl">
                   {choice.icon}
                 </div>
               )}
-              
-              {/* テキスト */}
+
               <div className="flex-1 text-left">
-                <div className="font-bold text-lg">
+                <div className="font-medium text-sm">
                   {choice.label}
                 </div>
                 {choice.description && (
-                  <div className={`
-                    text-sm mt-1
-                    ${selected === choice.id ? 'opacity-90' : 'opacity-70'}
-                  `}>
+                  <div className="text-xs text-gray-500 mt-0.5">
                     {choice.description}
                   </div>
                 )}
               </div>
-              
-              {/* 選択インジケーター */}
+
               {selected === choice.id && (
-                <div className="text-2xl">
-                  ✓
-                </div>
+                <Check className="w-4 h-4 text-brand-600" />
               )}
             </motion.button>
           ))}
         </AnimatePresence>
-        
-        {/* Show more button */}
+
         {hasMore && (
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={() => setShowMore(!showMore)}
             className="
-              w-full p-4 rounded-xl border-3 border-gray-500
-              bg-gray-100 text-gray-700 hover:bg-gray-200
-              flex items-center justify-center gap-2
-              font-bold text-lg transition-all
+              w-full p-3 rounded-xl border border-gray-200
+              bg-gray-50 text-gray-500 hover:bg-gray-100
+              flex items-center justify-center gap-1.5
+              font-medium text-sm transition-all
             "
           >
             {showMore ? (
               <>
-                <ChevronUp className="w-5 h-5" />
+                <ChevronUp className="w-4 h-4" />
                 <span>{EN.dialog.close}</span>
               </>
             ) : (
               <>
-                <ChevronDown className="w-5 h-5" />
+                <ChevronDown className="w-4 h-4" />
                 <span>{EN.dialog.showMore} ({choices.length - maxVisible})</span>
               </>
             )}

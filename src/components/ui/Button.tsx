@@ -15,25 +15,25 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseClasses = 'font-bold rounded-xl focus:outline-none focus:ring-4 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center gap-2 border-3';
-  
+  const baseClasses = 'font-medium rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 transition-all duration-150 flex items-center justify-center gap-2';
+
   const variants = {
-    primary: 'bg-navy-500 hover:bg-navy-600 text-white border-navy-500 focus:ring-navy-500 disabled:bg-gray-400 disabled:border-gray-400',
-    secondary: 'bg-gray-700 hover:bg-gray-800 text-white border-gray-700 focus:ring-gray-700 disabled:bg-gray-400 disabled:border-gray-400',
-    outline: 'bg-white text-navy-900 border-navy-900 hover:bg-gray-50 focus:ring-navy-500',
-    ghost: 'bg-white text-navy-900 border-transparent hover:border-navy-900 hover:bg-gray-50 focus:ring-navy-500'
+    primary: 'bg-brand-600 hover:bg-brand-700 text-white shadow-soft disabled:bg-gray-300',
+    secondary: 'bg-gray-100 hover:bg-gray-200 text-gray-900 disabled:bg-gray-100 disabled:text-gray-400',
+    outline: 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300',
+    ghost: 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
   };
 
   const sizes = {
-    sm: 'px-4 py-2 text-lg min-h-[56px]',
-    md: 'px-6 py-3 text-xl min-h-[64px]',
-    lg: 'px-8 py-4 text-2xl min-h-[72px]',
-    xl: 'px-12 py-6 text-3xl min-h-[96px]'
+    sm: 'px-3 py-1.5 text-sm min-h-[36px]',
+    md: 'px-4 py-2 text-sm min-h-[40px]',
+    lg: 'px-5 py-2.5 text-base min-h-[44px]',
+    xl: 'px-8 py-4 text-lg min-h-[52px]'
   };
 
   return (
     <motion.button
-      whileHover={{ scale: disabled ? 1 : 1.02 }}
+      whileHover={{ scale: disabled ? 1 : 1.01 }}
       whileTap={{ scale: disabled ? 1 : 0.98 }}
       className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}
       disabled={disabled}

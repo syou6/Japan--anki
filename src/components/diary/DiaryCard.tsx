@@ -197,7 +197,7 @@ export const DiaryCard: React.FC<DiaryCardProps> = ({ entry }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl border-3 border-navy-900 overflow-hidden"
+      className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-card"
     >
       {/* Header */}
       <div className="p-4 sm:p-6 border-b border-gray-100">

@@ -12,56 +12,55 @@ interface ActionButtonProps {
   disabled?: boolean;
 }
 
-// 色とアイコンの組み合わせで機能を明確に
 const variantStyles = {
   primary: {
-    bg: 'bg-black',
-    hover: 'hover:bg-gray-800',
+    bg: 'bg-brand-600',
+    hover: 'hover:bg-brand-700',
     text: 'text-white',
-    border: 'border-black',
-    iconBg: 'bg-white/20'
+    border: 'border-transparent',
+    iconBg: 'bg-white/15'
   },
   secondary: {
-    bg: 'bg-gray-600',
-    hover: 'hover:bg-gray-700',
-    text: 'text-white',
-    border: 'border-gray-600',
-    iconBg: 'bg-white/20'
+    bg: 'bg-gray-100',
+    hover: 'hover:bg-gray-200',
+    text: 'text-gray-900',
+    border: 'border-transparent',
+    iconBg: 'bg-gray-200'
   },
   danger: {
-    bg: 'bg-red-600',
-    hover: 'hover:bg-red-700',
+    bg: 'bg-red-500',
+    hover: 'hover:bg-red-600',
     text: 'text-white',
-    border: 'border-red-600',
-    iconBg: 'bg-white/20'
+    border: 'border-transparent',
+    iconBg: 'bg-white/15'
   },
   success: {
-    bg: 'bg-green-600',
-    hover: 'hover:bg-green-700',
+    bg: 'bg-emerald-500',
+    hover: 'hover:bg-emerald-600',
     text: 'text-white',
-    border: 'border-green-600',
-    iconBg: 'bg-white/20'
+    border: 'border-transparent',
+    iconBg: 'bg-white/15'
   }
 };
 
 const sizeStyles = {
   small: {
-    padding: 'px-4 py-3',
-    text: 'text-base',
-    icon: 'w-5 h-5',
-    minHeight: 'min-h-[56px]'
+    padding: 'px-3 py-2',
+    text: 'text-sm',
+    icon: 'w-4 h-4',
+    minHeight: 'min-h-[40px]'
   },
   medium: {
-    padding: 'px-6 py-4',
-    text: 'text-lg',
-    icon: 'w-6 h-6',
-    minHeight: 'min-h-[72px]'
+    padding: 'px-4 py-3',
+    text: 'text-sm',
+    icon: 'w-5 h-5',
+    minHeight: 'min-h-[48px]'
   },
   large: {
-    padding: 'px-8 py-5',
-    text: 'text-xl',
-    icon: 'w-8 h-8',
-    minHeight: 'min-h-[88px]'
+    padding: 'px-6 py-4',
+    text: 'text-base',
+    icon: 'w-6 h-6',
+    minHeight: 'min-h-[56px]'
   }
 };
 
@@ -76,8 +75,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
 }) => {
   const style = variantStyles[variant];
   const sizeStyle = sizeStyles[size];
-  
-  // 位置に基づいたスタイル（一貫性のため）
+
   const positionClass = {
     left: 'mr-auto',
     center: 'mx-auto',
@@ -86,7 +84,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
 
   return (
     <motion.button
-      whileHover={disabled ? {} : { scale: 1.02 }}
+      whileHover={disabled ? {} : { scale: 1.01 }}
       whileTap={disabled ? {} : { scale: 0.98 }}
       onClick={onClick}
       disabled={disabled}
@@ -94,35 +92,32 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
         ${style.bg} ${style.hover} ${style.text}
         ${sizeStyle.padding} ${sizeStyle.minHeight}
         ${positionClass}
-        border-3 ${style.border}
-        rounded-xl font-bold
-        flex items-center gap-3
-        transition-all duration-200
-        focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-black
+        border ${style.border}
+        rounded-xl font-medium
+        flex items-center gap-2.5
+        transition-all duration-150
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2
         disabled:opacity-50 disabled:cursor-not-allowed
-        relative overflow-hidden
+        shadow-soft
       `}
     >
-      {/* アイコン背景 */}
       <div className={`
         ${style.iconBg}
-        rounded-lg p-2
+        rounded-lg p-1.5
         flex items-center justify-center
       `}>
         <Icon className={sizeStyle.icon} />
       </div>
-      
-      {/* テキストラベル */}
+
       <span className={sizeStyle.text}>
         {label}
       </span>
-      
-      {/* 視覚的な方向性指示 */}
+
       {position === 'right' && (
-        <span className="ml-auto text-2xl">→</span>
+        <span className="ml-auto text-lg opacity-60">→</span>
       )}
       {position === 'left' && (
-        <span className="mr-auto text-2xl">←</span>
+        <span className="mr-auto text-lg opacity-60">←</span>
       )}
     </motion.button>
   );

@@ -141,15 +141,15 @@ export const ElderlyDiaryCard: React.FC<ElderlyDiaryCardProps> = ({ entry }) => 
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-3xl border-4 border-navy-900 overflow-hidden shadow-2xl"
+      className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-card"
     >
       {/* Header with Date - Bigger and Simpler */}
-      <div className="bg-gray-100 p-6 sm:p-8 border-b-4 border-gray-400">
+      <div className="bg-gray-50 p-5 sm:p-6 border-b border-gray-100">
         <div className="text-center">
-          <h3 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-2 text-black">
+          <h3 className="text-2xl sm:text-3xl font-semibold mb-1 text-gray-900">
             {formatDate(entry.created_at)}
           </h3>
-          <p className="text-3xl sm:text-4xl font-bold text-black">
+          <p className="text-lg sm:text-xl text-gray-500">
             {formatTime(entry.created_at)}
           </p>
         </div>
@@ -165,20 +165,20 @@ export const ElderlyDiaryCard: React.FC<ElderlyDiaryCardProps> = ({ entry }) => 
               disabled={isLoadingAudio}
               className={`
                 w-full py-10 sm:py-12 rounded-3xl flex flex-col items-center justify-center
-                transition-all duration-200 border-4 border-navy-900
-                ${isLoadingAudio ? 'bg-gray-400' : isPlaying ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}
+                transition-all duration-200 border border-gray-200
+                ${isLoadingAudio ? 'bg-gray-200' : isPlaying ? 'bg-rose-500 hover:bg-rose-600' : 'bg-brand-500 hover:bg-brand-600'}
               `}
             >
               {isLoadingAudio ? (
-                <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-white">
+                <span className="text-xl sm:text-2xl font-semibold text-white">
                   {EN.elderly.loading}
                 </span>
               ) : isPlaying ? (
-                <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-white">
+                <span className="text-xl sm:text-2xl font-semibold text-white">
                   ■ {EN.elderly.stop}
                 </span>
               ) : (
-                <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-white">
+                <span className="text-xl sm:text-2xl font-semibold text-white">
                   ▶ {EN.elderly.play}
                 </span>
               )}
@@ -188,8 +188,8 @@ export const ElderlyDiaryCard: React.FC<ElderlyDiaryCardProps> = ({ entry }) => 
 
         {/* Text Content - Huge Font */}
         {(entry.content || entry.ai_summary) && (
-          <div className="bg-yellow-100 rounded-3xl border-4 border-navy-900 p-8 mb-8">
-            <p className="text-3xl sm:text-4xl lg:text-5xl text-navy-900 leading-relaxed font-bold whitespace-pre-wrap">
+          <div className="bg-gray-50 rounded-xl p-5 mb-6">
+            <p className="text-base sm:text-lg text-gray-800 leading-relaxed whitespace-pre-wrap">
               {entry.ai_summary || entry.content}
             </p>
           </div>
@@ -199,10 +199,10 @@ export const ElderlyDiaryCard: React.FC<ElderlyDiaryCardProps> = ({ entry }) => 
         {isOwner && (
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="w-full py-8 bg-gray-200 hover:bg-gray-300 rounded-3xl border-4 border-navy-900 transition-colors"
+            className="w-full py-3 bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-200 transition-colors"
             disabled={isDeleting}
           >
-            <span className="text-2xl sm:text-3xl font-black text-navy-900">
+            <span className="text-sm font-medium text-gray-500">
               {EN.elderly.delete}
             </span>
           </button>

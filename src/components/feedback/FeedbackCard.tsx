@@ -13,18 +13,18 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ feedback }) => {
 
   const getCefrColor = (level: string) => {
     const colors: Record<string, string> = {
-      'A1': 'bg-gray-100 text-gray-700',
-      'A1+': 'bg-gray-200 text-gray-800',
-      'A2': 'bg-blue-100 text-blue-700',
-      'A2+': 'bg-blue-200 text-blue-800',
-      'B1': 'bg-green-100 text-green-700',
-      'B1+': 'bg-green-200 text-green-800',
-      'B2': 'bg-yellow-100 text-yellow-700',
-      'B2+': 'bg-yellow-200 text-yellow-800',
-      'C1': 'bg-orange-100 text-orange-700',
-      'C1+': 'bg-purple-100 text-purple-700'
+      'A1': 'bg-gray-100 text-gray-600',
+      'A1+': 'bg-gray-100 text-gray-700',
+      'A2': 'bg-sky-50 text-sky-700',
+      'A2+': 'bg-sky-100 text-sky-800',
+      'B1': 'bg-teal-50 text-teal-700',
+      'B1+': 'bg-teal-100 text-teal-800',
+      'B2': 'bg-amber-50 text-amber-700',
+      'B2+': 'bg-amber-100 text-amber-800',
+      'C1': 'bg-orange-50 text-orange-700',
+      'C1+': 'bg-violet-50 text-violet-700'
     };
-    return colors[level] || 'bg-gray-100 text-gray-700';
+    return colors[level] || 'bg-gray-100 text-gray-600';
   };
 
   // Reset counter on each render
@@ -37,13 +37,13 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ feedback }) => {
       return (
         <h2
           style={{
-            fontSize: '1.125rem',
-            fontWeight: 700,
+            fontSize: '1rem',
+            fontWeight: 600,
             color: '#111827',
-            marginTop: isFirst ? '0' : '2rem',
-            marginBottom: '1rem',
-            paddingTop: isFirst ? '0' : '1.5rem',
-            borderTop: isFirst ? 'none' : '2px solid #e5e7eb',
+            marginTop: isFirst ? '0' : '1.5rem',
+            marginBottom: '0.75rem',
+            paddingTop: isFirst ? '0' : '1.25rem',
+            borderTop: isFirst ? 'none' : '1px solid #f3f4f6',
           }}
         >
           {children}
@@ -53,24 +53,24 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ feedback }) => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4 sm:p-6 space-y-4">
+    <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 space-y-4 shadow-card">
       {/* Header with Level */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-14 h-14 rounded-full flex items-center justify-center bg-indigo-100">
-            <Award className="w-8 h-8 text-indigo-600" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-brand-50">
+            <Award className="w-5 h-5 text-brand-600" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-gray-900">AI Feedback</h3>
-            <div className="flex items-center gap-2">
-              <span className={`inline-block px-2 py-0.5 rounded-full text-sm font-medium ${getCefrColor(feedback.cefrLevel)}`}>
+            <h3 className="text-sm font-semibold text-gray-900">AI Feedback</h3>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className={`inline-block px-2 py-0.5 rounded-md text-xs font-medium ${getCefrColor(feedback.cefrLevel)}`}>
                 {feedback.cefrLevel}
               </span>
               {feedback.targetLevel && (
                 <>
-                  <Target className="w-3 h-3 text-gray-400" />
-                  <span className={`inline-block px-2 py-0.5 rounded-full text-sm font-medium ${getCefrColor(feedback.targetLevel)}`}>
-                    → {feedback.targetLevel}
+                  <Target className="w-3 h-3 text-gray-300" />
+                  <span className={`inline-block px-2 py-0.5 rounded-md text-xs font-medium ${getCefrColor(feedback.targetLevel)}`}>
+                    {feedback.targetLevel}
                   </span>
                 </>
               )}
@@ -80,15 +80,15 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ feedback }) => {
       </div>
 
       {/* Markdown Content */}
-      <div className="bg-white rounded-xl p-4 sm:p-6 prose prose-sm sm:prose max-w-none
-        prose-headings:text-gray-900 prose-headings:font-bold
-        prose-h3:text-base prose-h3:mt-4 prose-h3:mb-2
-        prose-h4:text-sm prose-h4:mt-3 prose-h4:mb-1
-        prose-p:text-gray-700 prose-p:leading-relaxed prose-p:my-3
-        prose-ul:my-3 prose-li:my-1
-        prose-strong:text-gray-900
-        prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-indigo-600 prose-code:text-sm
-        prose-blockquote:border-l-4 prose-blockquote:border-indigo-300 prose-blockquote:bg-indigo-50 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:my-3
+      <div className="bg-gray-50 rounded-xl p-4 sm:p-5 prose prose-sm max-w-none
+        prose-headings:text-gray-900
+        prose-h3:text-sm prose-h3:font-semibold prose-h3:mt-3 prose-h3:mb-1.5
+        prose-h4:text-sm prose-h4:font-medium prose-h4:mt-2 prose-h4:mb-1
+        prose-p:text-gray-600 prose-p:leading-relaxed prose-p:my-2 prose-p:text-sm
+        prose-ul:my-2 prose-li:my-0.5
+        prose-strong:text-gray-800
+        prose-code:bg-white prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-brand-700 prose-code:text-xs prose-code:border prose-code:border-gray-200
+        prose-blockquote:border-l-2 prose-blockquote:border-brand-300 prose-blockquote:bg-brand-50 prose-blockquote:py-1 prose-blockquote:px-3 prose-blockquote:my-2
       ">
         <ReactMarkdown components={markdownComponents}>
           {feedback.markdownContent}

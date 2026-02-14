@@ -37,9 +37,9 @@ export const ElderlyDiaryList: React.FC<ElderlyDiaryListProps> = ({ isGuest = fa
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-navy-900 text-white rounded-3xl p-8 sm:p-10 border-4 border-navy-900"
+        className="bg-brand-600 text-white rounded-2xl p-6 sm:p-8"
       >
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-center">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-center">
           {EN.elderly.diaryList}
         </h1>
       </motion.div>
@@ -54,10 +54,10 @@ export const ElderlyDiaryList: React.FC<ElderlyDiaryListProps> = ({ isGuest = fa
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-3xl border-4 border-navy-900 p-16 text-center"
+            className="bg-white rounded-2xl border border-gray-200 p-12 text-center shadow-card"
           >
             <Calendar className="w-32 h-32 mx-auto mb-8 text-gray-400" />
-            <p className="text-4xl sm:text-5xl font-black text-navy-900">
+            <p className="text-xl sm:text-2xl font-semibold text-gray-900">
               {EN.elderly.noDiaries}
             </p>
             <p className="text-3xl sm:text-4xl font-bold text-gray-600 mt-6">

@@ -2,29 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-/* アニメーション */
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
+/* Modern base styles */
+@layer base {
+  body {
+    @apply text-gray-900 bg-white antialiased;
+    font-feature-settings: "kern" 1, "liga" 1;
   }
 }
 
+/* Animations */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
 @keyframes float {
-  0%, 100% { 
-    transform: translateY(0px); 
-  }
-  50% { 
-    transform: translateY(-20px); 
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
 }
 
 .animate-blob {
@@ -39,18 +35,18 @@
   animation-delay: 4s;
 }
 
-/* ランディングページ用スタイル */
+/* Landing page */
 .gradient-bg {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #5eead4 100%);
 }
 
 .feature-card {
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .phone-mockup {
@@ -58,7 +54,7 @@
   height: 600px;
   border-radius: 30px;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
   background: #000;
 }
 

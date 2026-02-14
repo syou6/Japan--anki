@@ -89,14 +89,14 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-navy-900 text-white rounded-2xl p-6 sm:p-8 border-4 border-navy-900"
+        className="bg-brand-600 text-white rounded-2xl p-6 sm:p-8"
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-3">
+            <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
               {greeting()}
             </h1>
-            <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+            <p className="text-lg sm:text-xl text-white/80">
               {format(today, 'EEEE, MMMM d', { locale: enUS })}
             </p>
           </div>
@@ -111,11 +111,11 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         onClick={handleLogout}
-        className="w-full bg-gray-200 hover:bg-gray-300 text-navy-900 rounded-2xl border-4 border-navy-900 p-6 transition-all hover:scale-[1.02] active:scale-[0.98]"
+        className="w-full bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl border border-gray-200 p-4 transition-all hover:scale-[1.01] active:scale-[0.99]"
       >
         <div className="flex items-center justify-center gap-4">
-          <LogOut className="w-10 h-10 sm:w-12 sm:h-12" />
-          <span className="text-2xl sm:text-3xl font-black">
+          <LogOut className="w-5 h-5 sm:w-6 sm:h-6" />
+          <span className="text-sm sm:text-base font-medium">
             {EN.dashboard.logout}
           </span>
         </div>
@@ -126,38 +126,38 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         whileHover={{ scale: 1.02 }}
-        className="bg-white rounded-2xl border-4 border-navy-900 p-8 sm:p-10 text-center"
+        className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 text-center shadow-card"
       >
         {!todayRecorded ? (
           <>
-            <div className="bg-red-500 w-32 h-32 sm:w-40 sm:h-40 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-navy-900">
-              <Mic className="w-16 h-16 sm:w-20 sm:h-20 text-white" />
+            <div className="bg-rose-500 w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mx-auto mb-5">
+              <Mic className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-navy-900 mb-4">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
               {EN.dashboard.todayPrompt}
             </h2>
-            <p className="text-2xl sm:text-3xl text-navy-700 mb-8 font-bold">
+            <p className="text-base sm:text-lg text-gray-500 mb-6">
               {EN.recording.instruction}
             </p>
             <Button
               onClick={() => onViewChange('record')}
               variant="primary"
               size="xl"
-              className="w-full sm:w-3/4 mx-auto h-24 sm:h-28 text-2xl sm:text-3xl bg-red-500 hover:bg-red-600 border-4 border-navy-900"
+              className="w-full sm:w-3/4 mx-auto bg-rose-500 hover:bg-rose-600"
             >
-              <Mic className="w-10 h-10 sm:w-12 sm:h-12" />
+              <Mic className="w-5 h-5 sm:w-6 sm:h-6" />
               {EN.dashboard.recordButton}
             </Button>
           </>
         ) : (
           <>
-            <div className="bg-green-500 w-32 h-32 sm:w-40 sm:h-40 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-navy-900">
-              <span className="text-6xl sm:text-7xl">✓</span>
+            <div className="bg-emerald-500 w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mx-auto mb-5">
+              <span className="text-4xl sm:text-5xl text-white">✓</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-navy-900 mb-6">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4">
               {EN.dashboard.alreadyRecorded}
             </h2>
-            <p className="text-2xl sm:text-3xl text-green-600 font-bold">
+            <p className="text-base sm:text-lg text-emerald-600 font-medium">
               {EN.dashboard.greatJob}
             </p>
           </>
@@ -173,10 +173,10 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
           onClick={() => onViewChange('diary')}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="bg-white rounded-2xl border-4 border-navy-900 p-6 sm:p-8 text-center hover:bg-blue-50 transition-colors"
+          className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 text-center hover:bg-sky-50 transition-colors shadow-card"
         >
-          <Calendar className="w-16 h-16 sm:w-20 sm:h-20 text-blue-600 mx-auto mb-4" />
-          <h3 className="text-2xl sm:text-3xl font-black text-navy-900">
+          <Calendar className="w-10 h-10 sm:w-12 sm:h-12 text-sky-600 mx-auto mb-3" />
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">
             {EN.dashboard.viewDiary}
           </h3>
         </motion.button>
@@ -188,10 +188,10 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
           onClick={() => onViewChange('practice')}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="bg-white rounded-2xl border-4 border-navy-900 p-6 sm:p-8 text-center hover:bg-purple-50 transition-colors"
+          className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 text-center hover:bg-violet-50 transition-colors shadow-card"
         >
-          <BookOpen className="w-16 h-16 sm:w-20 sm:h-20 text-purple-600 mx-auto mb-4" />
-          <h3 className="text-2xl sm:text-3xl font-black text-navy-900">
+          <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 text-violet-600 mx-auto mb-3" />
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">
             {EN.dashboard.practice}
           </h3>
         </motion.button>
@@ -203,12 +203,12 @@ export const ElderlyParentDashboard: React.FC<ElderlyParentDashboardProps> = ({ 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-yellow-50 rounded-2xl border-4 border-navy-900 p-6 sm:p-8"
+          className="bg-amber-50 rounded-2xl border border-amber-200 p-5 sm:p-6"
         >
-          <h3 className="text-2xl sm:text-3xl font-black text-navy-900 mb-4">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">
             💡 {EN.dashboard.tips.title}
           </h3>
-          <ul className="space-y-3 text-xl sm:text-2xl text-navy-700 font-bold">
+          <ul className="space-y-2 text-sm sm:text-base text-gray-600">
             <li>• {EN.dashboard.tips.tip1}</li>
             <li>• {EN.dashboard.tips.tip2}</li>
             <li>• {EN.dashboard.tips.tip3}</li>
