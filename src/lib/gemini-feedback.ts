@@ -50,11 +50,11 @@ export async function generateJapaneseFeedback(
   const defaultFeedback: JapaneseFeedback = {
     cefrLevel: userCefrLevel,
     targetLevel: targetLevel,
-    markdownContent: `## 📊 Feedback & Corrections
-Your diary entry has been recorded. Keep practicing your Japanese every day!
+    markdownContent: `## 添削とアドバイス
+日記が記録されました。毎日日本語を練習しましょう！
 
-## 💪 Encouragement
-Great work! Keep speaking Japanese every day — you're improving little by little!`
+## ひとことメッセージ
+よく頑張りました！毎日少しずつ日本語を使い続けることが上達の近道です。`
   };
 
   // Check API limits
@@ -68,56 +68,44 @@ Great work! Keep speaking Japanese every day — you're improving little by litt
 
   try {
 
-    const prompt = `# Role
-You are an expert Japanese language coach designed to help English-speaking users improve their Japanese skills through their diary entries.
+    const prompt = `あなたは日本語学習者を支援するプロの日本語講師です。
+ユーザーの日記を分析し、実践的なフィードバックを提供してください。
 
-# Inputs provided by the system
-1. **User Level:** ${userCefrLevel} (CEFR)
-2. **Diary Transcript:**
+# 入力情報
+- ユーザーの現在レベル: CEFR ${userCefrLevel}
+- 目標レベル: CEFR ${targetLevel}
+- 日記の内容:
 ${content}
 
-# Your Task
-Analyze the diary transcript and provide output in two main sections. ALL explanations and feedback must be written in **English**.
+# 指示
+- フィードバックは全て日本語で書いてください
+- ユーザーのレベルに合わせ、難しい漢字にはふりがなを付けてください
+- 添削は具体的に「原文 → 修正案」の形で示してください
+- 目標レベル（${targetLevel}）に向けた表現を紹介してください
 
-## Section 1: Feedback & Level Up
-Analyze the Japanese based on the user's level.
-- **Tone:** Encouraging, empathetic, and professional.
-- **Language:** Explain the feedback in **English** so the user clearly understands, but show Japanese examples.
-- **Constraint:** The advice must be aimed at **one level slightly higher** than the User Level (i+1 = ${targetLevel}).
+# 出力フォーマット（Markdown）
 
-**Analysis points:**
-1. **Grammar & Particles:** Correct unnatural phrasing or particle misuse. If the user uses simple grammar, suggest a more sophisticated structure appropriate for the next level.
-2. **Vocabulary & Kanji:** Identify basic words used and suggest more natural or advanced alternatives. Include kanji with readings.
-3. **Pronunciation & Pitch Accent:** Identify 2-3 words in the user's text that are typically difficult for English speakers. Provide tips on pitch accent and pronunciation.
+## 添削とアドバイス
+日記の中から改善できる箇所を最大3つ取り上げ、以下の形式で示してください:
+- ❌ 原文の表現
+- ✅ より自然な表現
+- 💡 なぜこの方が良いか（文法・ニュアンスの簡潔な説明）
 
-## Section 2: Topic Extension (Reading Material)
-Based on the content of the diary:
-1. **Identify the Main Topic:** Extract the core theme.
-2. **Generate an Article:** Write an engaging article in **Japanese** (approx. 150-200 characters) about this topic.
-   - **Difficulty:** The Japanese level must be **slightly higher (i+1 = ${targetLevel})** than the User Level.
-   - **Content:** Include enough rich vocabulary to support the extraction of 10 key items.
-3. **Vocabulary List:** Extract **10 key words or phrases** from this generated article that are valuable for the user to learn.
+## レベルアップ表現
+${targetLevel}レベルで使える表現を3つ紹介してください。日記の内容に関連した実用的なものにしてください:
+- **表現**: 読み方（ふりがな）
+- **意味**: 簡潔な説明
+- **例文**: 日記の内容に合わせた使用例
 
-# Output Format (Markdown)
+## 関連リーディング
+日記のテーマに基づいた短い読み物（150〜200字）を${targetLevel}レベルで作成してください。
 
-## 📊 Feedback & Corrections
-(Provide corrections in English, explain grammar/particle usage, and suggest better vocabulary)
+## 重要単語リスト
+上の読み物から学習に役立つ単語を8個抽出してください:
+- **漢字表記**（読み方）: 意味の説明
 
-## 🗣️ Pronunciation & Pitch Accent Tips
-(List tricky words from the user's text and tips on how to pronounce them naturally)
-
-## 📖 Recommended Reading: [Insert Topic Name]
-(Insert the generated Japanese article here)
-
-## 🇺🇸 English Summary
-(Brief summary of the article in English)
-
-## 🗝️ Key Vocabulary & Phrases
-(List **10** important words/phrases from the "Recommended Reading" article above. Use the format below:)
-- **[Japanese]** \`[Reading]\` : [English Meaning]
-
-## 💪 Encouragement
-(Write a personalized encouraging message in English, praising specific good points and suggesting next steps)`;
+## ひとことメッセージ
+日記の良かった点を具体的に褒め、次のステップを提案する励ましのメッセージ（2〜3文）`;
 
     const markdownContent = await callGeminiApi(prompt);
 
@@ -152,16 +140,16 @@ function validateCefrLevel(level: string): CEFRLevel | null {
  */
 export function getCefrDescription(level: CEFRLevel): string {
   const descriptions: Record<CEFRLevel, string> = {
-    'A1': 'Beginner - Hiragana/Katakana, basic greetings (JLPT N5)',
-    'A1+': 'Beginner High - Simple self-introduction, basic particles',
-    'A2': 'Elementary - Daily conversations, basic kanji (JLPT N4)',
-    'A2+': 'Elementary High - Familiar situations, te-form mastery',
-    'B1': 'Intermediate - General topics, compound sentences (JLPT N3)',
-    'B1+': 'Intermediate High - Express opinions, keigo basics',
-    'B2': 'Upper Intermediate - Abstract topics, formal writing (JLPT N2)',
-    'B2+': 'Upper Intermediate High - Nuanced discussion, news comprehension',
-    'C1': 'Advanced - Complex texts, natural expression (JLPT N1)',
-    'C1+': 'Proficient - Near-native fluency, specialized discourse'
+    'A1': '入門 - ひらがな・カタカナ、基本的な挨拶（JLPT N5相当）',
+    'A1+': '入門上 - 簡単な自己紹介、基本的な助詞',
+    'A2': '初級 - 日常会話、基本漢字（JLPT N4相当）',
+    'A2+': '初級上 - 身近な場面での会話、て形の活用',
+    'B1': '中級 - 一般的な話題、複文（JLPT N3相当）',
+    'B1+': '中級上 - 意見表明、敬語の基礎',
+    'B2': '中上級 - 抽象的な話題、フォーマルな文章（JLPT N2相当）',
+    'B2+': '中上級上 - ニュアンスのある議論、ニュース理解',
+    'C1': '上級 - 複雑な文章、自然な表現（JLPT N1相当）',
+    'C1+': '熟達 - ネイティブに近い流暢さ、専門分野の議論'
   };
   return descriptions[level];
 }
@@ -197,34 +185,31 @@ export async function generateVersantSampleAnswer(
     const timeLimit = part === 'E' ? 30 : 40;
 
     const prompt = part === 'E'
-      ? `You are a Japanese speaking test sample answer generator.
+      ? `日本語スピーキングテストの模範解答を作成してください。
 
-**Task:** Generate a model summary answer in Japanese for this passage:
-"${question}"
+課題: 以下の文章を要約して話してください。
+「${question}」
 
-**Requirements:**
-- CEFR Level: ${targetLevel} (target level for the learner)
-- Length: Speakable within ${timeLimit} seconds
-- Include: Main idea, key supporting points, conclusion
-- Tone: Clear, organized, natural spoken Japanese
-- Use appropriate transition words (まず, さらに, 最後に, etc.)
-- Write entirely in Japanese
+条件:
+- 日本語レベル: CEFR ${targetLevel}
+- ${timeLimit}秒以内に話せる長さ
+- 構成: 主旨 → 要点 → まとめ
+- 接続詞を適切に使用（まず、さらに、最後に等）
+- 自然な話し言葉で書くこと
 
-**Output:** Only the sample answer text in Japanese, no explanations or labels.`
-      : `You are a Japanese speaking test sample answer generator.
+模範解答のみを出力してください（説明やラベルは不要）。`
+      : `日本語スピーキングテストの模範解答を作成してください。
 
-**Task:** Generate a model opinion answer in Japanese for this question:
-"${question}"
+課題: 以下の質問に自分の意見を述べてください。
+「${question}」
 
-**Requirements:**
-- CEFR Level: ${targetLevel} (target level for the learner)
-- Length: Speakable within ${timeLimit} seconds
-- Structure: State opinion → Give 2-3 reasons with examples → Conclude
-- Tone: Natural spoken Japanese, conversational but organized
-- Use appropriate phrases: 「私の意見では」「〜と思います」「例えば」「さらに」「まとめると」
-- Write entirely in Japanese
+条件:
+- 日本語レベル: CEFR ${targetLevel}
+- ${timeLimit}秒以内に話せる長さ
+- 構成: 意見表明 → 理由2〜3つ（具体例付き） → 結論
+- 自然な話し言葉（「〜と思います」「例えば」「まとめると」等を使用）
 
-**Output:** Only the sample answer text in Japanese, no explanations or labels.`;
+模範解答のみを出力してください（説明やラベルは不要）。`;
 
     const sampleAnswer = await callGeminiApi(prompt);
 

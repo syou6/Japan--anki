@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
-import { analyzeText, generateFamilySummary, analyzeHealthScore } from '../lib/gemini';
+import { analyzeEntry } from '../lib/gemini';
 import { generateJapaneseFeedback } from '../lib/gemini-feedback';
+import { useSubscriptionStore } from './subscriptionStore';
 import { toast } from 'sonner';
 import type { DiaryEntry, CEFRLevel } from '../types';
 
@@ -117,10 +118,16 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
   createEntry: async (content: string, audioBlob?: Blob): Promise<any> => {
     try {
       console.log('createEntry start:', { contentLength: content.length, hasAudio: !!audioBlob });
-      
+
+      // Subscription check: Free plan diary limit
+      const subStore = useSubscriptionStore.getState();
+      if (!subStore.canCreateDiary()) {
+        throw new Error('今月の日記作成上限に達しました。プレミアムプランにアップグレードして無制限に日記を作成しましょう。');
+      }
+
       let voiceUrl = null;
       let transcribedContent = content;
-      
+
       // Get user first
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError) {
@@ -249,6 +256,9 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
       await get().fetchEntries();
 
       // Run AI analysis in background (don't block save)
+      // Increment diary count for subscription tracking
+      subStore.incrementDiaryCount();
+
       if (content && content.trim() && insertedData?.id) {
         const diaryId = insertedData.id;
         (async () => {
@@ -263,26 +273,26 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
               .single();
             const cefrLevel: CEFRLevel = userProfile?.cefr_level || 'B1';
 
-            // Run all AI calls in parallel
-            const [analysisResult, aiSummary, healthScore, japaneseFeedback] = await Promise.allSettled([
-              analyzeText(content),
-              generateFamilySummary(content),
-              analyzeHealthScore(content),
-              generateJapaneseFeedback(content, cefrLevel),
+            // Check subscription for AI features
+            const canAI = subStore.canUseAI();
+            const canFeedback = subStore.canUseAIFeedback();
+
+            // Run AI calls based on subscription
+            const [analysisResult, feedbackResult] = await Promise.allSettled([
+              canAI ? analyzeEntry(content) : Promise.resolve(null),
+              canFeedback ? generateJapaneseFeedback(content, cefrLevel) : Promise.resolve(null),
             ]);
 
             const analysis = analysisResult.status === 'fulfilled' ? analysisResult.value : null;
-            const summary = aiSummary.status === 'fulfilled' ? aiSummary.value : '';
-            const health = healthScore.status === 'fulfilled' ? healthScore.value : 75;
-            const feedback = japaneseFeedback.status === 'fulfilled' ? japaneseFeedback.value : null;
+            const feedback = feedbackResult.status === 'fulfilled' ? feedbackResult.value : null;
 
             // Update diary with AI results
             await supabase
               .from('diaries')
               .update({
-                emotion: feedback?.cefrLevel ? 'neutral' : (analysis?.emotion || 'neutral'),
-                health_score: health,
-                ai_summary: feedback?.summary || summary || analysis?.summary || '',
+                emotion: analysis?.emotion || 'neutral',
+                health_score: analysis?.health_score || 75,
+                ai_summary: analysis?.family_summary || analysis?.summary || '',
                 ai_keywords: analysis?.keywords || [],
                 ai_feedback: feedback || null,
               })

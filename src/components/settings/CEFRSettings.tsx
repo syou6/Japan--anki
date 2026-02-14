@@ -32,8 +32,8 @@ export const CEFRSettings: React.FC<CEFRSettingsProps> = ({ currentLevel, onLeve
           <GraduationCap className="w-6 h-6 text-indigo-600" />
         </div>
         <div>
-          <h3 className="text-xl font-bold text-gray-900">Your Japanese Level</h3>
-          <p className="text-gray-600">Select your current CEFR level for personalized feedback</p>
+          <h3 className="text-xl font-bold text-gray-900">あなたの日本語レベル</h3>
+          <p className="text-gray-600">AIフィードバックの基準レベルを選択</p>
         </div>
       </div>
 
@@ -80,7 +80,7 @@ export const CEFRSettings: React.FC<CEFRSettingsProps> = ({ currentLevel, onLeve
         >
           <div className="flex items-center gap-2">
             <ExternalLink className="w-4 h-4 text-blue-600" />
-            <span className="font-medium text-blue-800">Check your Japanese Level (JLPT → CEFR)</span>
+            <span className="font-medium text-blue-800">JLPTとCEFRの対応表</span>
           </div>
           {showLevelChart ? (
             <ChevronUp className="w-5 h-5 text-blue-600" />
@@ -98,27 +98,27 @@ export const CEFRSettings: React.FC<CEFRSettingsProps> = ({ currentLevel, onLeve
             >
               <div className="p-4 bg-white">
                 <div className="text-sm text-gray-600">
-                  <p className="font-medium mb-3">JLPT Level → CEFR Level:</p>
+                  <p className="font-medium mb-3">JLPTレベル → CEFRレベル:</p>
                   <ul className="space-y-2">
                     <li className="flex items-center gap-2">
                       <span className="px-2 py-0.5 bg-gray-100 rounded font-bold text-xs">N5</span>
-                      <span>→ A1 (Beginner) — Hiragana, Katakana, basic greetings</span>
+                      <span>→ A1（入門）— ひらがな・カタカナ、基本的な挨拶</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="px-2 py-0.5 bg-blue-100 rounded font-bold text-xs">N4</span>
-                      <span>→ A2 (Elementary) — Daily conversation, ~300 kanji</span>
+                      <span>→ A2（初級）— 日常会話、漢字約300字</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="px-2 py-0.5 bg-green-100 rounded font-bold text-xs">N3</span>
-                      <span>→ B1 (Intermediate) — General topics, ~650 kanji</span>
+                      <span>→ B1（中級）— 一般的な話題、漢字約650字</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="px-2 py-0.5 bg-yellow-100 rounded font-bold text-xs">N2</span>
-                      <span>→ B2 (Upper Intermediate) — Abstract topics, ~1000 kanji</span>
+                      <span>→ B2（中上級）— 抽象的な話題、漢字約1000字</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="px-2 py-0.5 bg-orange-100 rounded font-bold text-xs">N1</span>
-                      <span>→ C1 (Advanced) — Complex texts, ~2000 kanji</span>
+                      <span>→ C1（上級）— 複雑な文章、漢字約2000字</span>
                     </li>
                   </ul>
                 </div>

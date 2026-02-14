@@ -1,80 +1,56 @@
 import { analyzeFree, generateFamilySummaryFree } from './free-analyzer';
-import { analyzeWithGemini } from './gemini-api';
+import { analyzeWithGemini, type AnalysisResult } from './gemini-api';
 
-export interface TranscriptionResult {
-  text: string;
-  summary?: string;
-  keywords?: string[];
-  emotion?: string;
+export interface EntryAnalysis {
+  summary: string;
+  family_summary: string;
+  emotion: string;
+  health_score: number;
+  keywords: string[];
 }
 
 /**
- * テキストを分析する（音声文字起こしは行わない）
- * サーバー側 API Route 経由で Gemini 2.0 Flash を使用、エラー時は無料分析にフォールバック
+ * 日記を1回のAPI呼び出しで総合分析する
+ * 要約・家族向け要約・感情・健康スコア・キーワードを一括取得
  */
-export async function analyzeText(text: string): Promise<TranscriptionResult> {
-  if (!text) {
-    return { text: '' };
+export async function analyzeEntry(text: string): Promise<EntryAnalysis> {
+  const fallback: EntryAnalysis = {
+    summary: text.substring(0, 100),
+    family_summary: generateFamilySummaryFree(text),
+    emotion: '普通',
+    health_score: 75,
+    keywords: []
+  };
+
+  if (!text || !text.trim()) {
+    return fallback;
   }
 
   try {
     const result = await analyzeWithGemini(text);
     return {
-      text,
       summary: result.summary,
-      keywords: result.keywords,
-      emotion: result.emotion
+      family_summary: result.family_summary,
+      emotion: result.emotion,
+      health_score: result.health_score,
+      keywords: result.keywords
     };
   } catch (error) {
     console.error('Gemini API失敗、無料版にフォールバック:', error);
+    const free = analyzeFree(text);
+    return {
+      summary: free.summary,
+      family_summary: generateFamilySummaryFree(text),
+      emotion: free.emotion,
+      health_score: free.health_score,
+      keywords: free.keywords
+    };
   }
-
-  // 無料分析を使用（エラー時）
-  const result = analyzeFree(text);
-  return {
-    text,
-    summary: result.summary,
-    keywords: result.keywords,
-    emotion: result.emotion
-  };
 }
 
 /**
  * 音声ファイルの文字起こし（現在は未実装）
- * 注: Web Speech APIは録音済み音声の文字起こしには適していないため、
- * 将来的にはWhisper APIなどの利用を検討
  */
 export function transcribeAudioFile(audioBlob: Blob): Promise<string> {
   return Promise.resolve('');
-}
-
-/**
- * 長い日記を家族向けに要約
- * サーバー側 API Route 経由で Gemini 2.0 Flash を使用、エラー時は無料分析にフォールバック
- */
-export async function generateFamilySummary(content: string): Promise<string> {
-  try {
-    const { generateFamilySummaryWithGemini } = await import('./gemini-api');
-    return await generateFamilySummaryWithGemini(content);
-  } catch (error) {
-    console.error('Gemini API失敗、無料版にフォールバック:', error);
-  }
-
-  return generateFamilySummaryFree(content);
-}
-
-/**
- * 健康状態をスコアリング
- * サーバー側 API Route 経由で Gemini 2.0 Flash を使用、エラー時は無料分析にフォールバック
- */
-export async function analyzeHealthScore(content: string, voiceData?: any): Promise<number> {
-  try {
-    const result = await analyzeWithGemini(content);
-    return result.health_score;
-  } catch (error) {
-    console.error('Gemini API失敗、無料版にフォールバック:', error);
-  }
-
-  const result = analyzeFree(content);
-  return result.health_score;
 }

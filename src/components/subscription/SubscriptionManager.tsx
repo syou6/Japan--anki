@@ -124,10 +124,10 @@ export const SubscriptionManager: React.FC = () => {
               </div>
               <div className="text-right">
                 <div className="text-3xl font-bold text-gray-900">
-                  ${currentPlan.price}
+                  ¥{currentPlan.price.toLocaleString()}
                 </div>
                 <div className="text-gray-600">
-                  {currentPlan.interval === 'month' ? EN.subscription.perMonth : EN.subscription.perYear}
+                  /月
                 </div>
               </div>
             </div>
@@ -136,7 +136,7 @@ export const SubscriptionManager: React.FC = () => {
               <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
                 <Calendar className="w-4 h-4" />
                 <span>
-                  {EN.subscription.nextRenewal}: {new Date(subscription.current_period_end).toLocaleDateString('en-US')}
+                  {EN.subscription.nextRenewal}: {new Date(subscription.current_period_end).toLocaleDateString('ja-JP')}
                 </span>
                 {subscription.cancel_at_period_end && (
                   <span className="flex items-center gap-1 text-orange-600">
@@ -198,10 +198,10 @@ export const SubscriptionManager: React.FC = () => {
                     {plan.name}
                   </h3>
                   <div className="text-4xl font-bold text-gray-900 mb-2">
-                    ${plan.price}
+                    ¥{plan.price.toLocaleString()}
                   </div>
                   <div className="text-gray-600">
-                    {plan.interval === 'month' ? EN.subscription.perMonth : EN.subscription.perYear}
+                    /月
                   </div>
                 </div>
 

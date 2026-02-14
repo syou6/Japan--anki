@@ -70,13 +70,13 @@ export const useGuestStore = create<GuestStore>()(
         // ゲストモードは1回だけAI分析を使用可能
         if (get().canUseAI() && content) {
           try {
-            const { analyzeText, generateFamilySummary, analyzeHealthScore } = await import('../lib/gemini');
+            const { analyzeEntry } = await import('../lib/gemini');
             console.log('ゲストモード: AI分析を実行（1回限定）');
-            
-            const analysisResult = await analyzeText(content);
-            emotion = analysisResult?.emotion || '普通';
-            aiSummary = await generateFamilySummary(content);
-            healthScore = await analyzeHealthScore(content);
+
+            const analysis = await analyzeEntry(content);
+            emotion = analysis.emotion;
+            aiSummary = analysis.family_summary;
+            healthScore = analysis.health_score;
             
             // AI使用回数を増やす
             set(state => ({ aiUsageCount: state.aiUsageCount + 1 }));

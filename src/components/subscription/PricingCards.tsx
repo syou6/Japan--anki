@@ -99,9 +99,9 @@ export const PricingCards: React.FC<PricingCardsProps> = ({ currentPlan = 'free'
 
               <div className="text-center mb-6">
                 <span className="text-4xl font-bold text-gray-900">
-                  ${plan.price}
+                  ¥{plan.price.toLocaleString()}
                 </span>
-                <span className="text-gray-600 ml-2">/{plan.interval === 'month' ? 'mo' : 'yr'}</span>
+                <span className="text-gray-600 ml-2">/月</span>
               </div>
 
               <ul className="space-y-3 mb-8">

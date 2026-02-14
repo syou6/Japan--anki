@@ -2,6 +2,7 @@ import { canCallApi, recordApiUsage, getCachedAnalysis, cacheAnalysis, showApiUs
 
 export interface AnalysisResult {
   summary: string;
+  family_summary: string;
   emotion: string;
   health_score: number;
   keywords: string[];
@@ -41,6 +42,7 @@ export async function analyzeWithGemini(text: string): Promise<AnalysisResult> {
     console.warn('🚫 API制限:', reason);
     return {
       summary: text.substring(0, 100) + '...(API制限により簡易分析)',
+      family_summary: text.substring(0, 100),
       emotion: '普通',
       health_score: 75,
       keywords: []
@@ -57,19 +59,20 @@ export async function analyzeWithGemini(text: string): Promise<AnalysisResult> {
   while (retryCount < MAX_RETRIES) {
     try {
       // プロンプトを構成
-      const prompt = `
-以下の日記を分析して、JSON形式で結果を返してください。
+      const prompt = `以下の日本語日記を分析し、JSONのみを返してください。説明文は不要です。
 
-日記内容：
+日記:
 ${text}
 
-以下の形式で返してください（JSONのみ、説明文は不要）：
-{
-  "summary": "50文字以内の要約",
-  "emotion": "喜び/楽しい/悲しみ/不安/疲れ/普通のいずれか",
-  "health_score": 0-100の数値（健康状態スコア）,
-  "keywords": ["キーワード1", "キーワード2", "キーワード3"]（最大3個）
-}`;
+分析基準:
+- summary: 日記の内容を50文字以内で要約
+- family_summary: 家族向けに気分・体調・出来事を温かい文体で100文字以内にまとめた要約
+- emotion: 文脈から感情を判定（喜び/楽しい/感謝/悲しみ/不安/怒り/疲れ/普通 のいずれか）
+- health_score: 身体・精神の健康度を0〜100で推定（運動・食事・睡眠・ストレスの言及を考慮）
+- keywords: 日記の主要テーマを表すキーワード（最大3個）
+
+出力:
+{"summary":"...","family_summary":"...","emotion":"...","health_score":0,"keywords":["..."]}`;
 
       const responseText = await callGeminiApi(prompt);
 
@@ -88,6 +91,7 @@ ${text}
       // 検証とデフォルト値
       const result = {
         summary: analysis.summary || text.substring(0, 50),
+        family_summary: analysis.family_summary || analysis.summary || text.substring(0, 100),
         emotion: analysis.emotion || '普通',
         health_score: Math.min(100, Math.max(0, analysis.health_score || 75)),
         keywords: Array.isArray(analysis.keywords) ? analysis.keywords.slice(0, 3) : []
@@ -121,6 +125,7 @@ ${text}
       // エラー時は無料版の分析にフォールバック
       return {
         summary: text.substring(0, 100),
+        family_summary: text.substring(0, 100),
         emotion: '普通',
         health_score: 75,
         keywords: []
@@ -131,6 +136,7 @@ ${text}
   // ここには到達しないはずだが念のため
   return {
     summary: text.substring(0, 100),
+    family_summary: text.substring(0, 100),
     emotion: '普通',
     health_score: 75,
     keywords: []
@@ -140,14 +146,12 @@ ${text}
 // 家族向け要約を生成
 export async function generateFamilySummaryWithGemini(text: string): Promise<string> {
   try {
-    const prompt = `
-以下の日記を家族が読みやすいように100文字以内で要約してください。
-健康状態や気分、主な出来事を含めてください。
+    const prompt = `以下の日記を家族向けに100文字以内で要約してください。
+気分・体調・主な出来事を優先して含め、温かみのある文体にしてください。
+要約のみ出力（説明不要）。
 
-日記内容：
-${text}
-
-要約（100文字以内）：`;
+日記:
+${text}`;
 
     const responseText = await callGeminiApi(prompt);
     return responseText.trim();
