@@ -1,7 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { canCallApi, recordApiUsage, recordApiSuccess, recordApiError, showApiUsageWarning } from './api-limiter';
-
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
 export type CEFRLevel = 'A1' | 'A1+' | 'A2' | 'A2+' | 'B1' | 'B1+' | 'B2' | 'B2+' | 'C1' | 'C1+';
 
@@ -14,6 +11,25 @@ export interface JapaneseFeedback {
 
 /** @deprecated Use JapaneseFeedback instead */
 export type EnglishFeedback = JapaneseFeedback;
+
+/**
+ * Call the server-side Gemini API route
+ */
+async function callGeminiApi(prompt: string): Promise<string> {
+  const res = await fetch('/api/gemini-ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt }),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `API request failed (${res.status})`);
+  }
+
+  const data = await res.json();
+  return data.text;
+}
 
 /**
  * Generate Japanese feedback for diary entry using Gemini API
@@ -41,11 +57,6 @@ Your diary entry has been recorded. Keep practicing your Japanese every day!
 Great work! Keep speaking Japanese every day — you're improving little by little!`
   };
 
-  if (!apiKey) {
-    console.log('Gemini API key not configured');
-    return defaultFeedback;
-  }
-
   // Check API limits
   const { allowed, reason } = canCallApi();
   if (!allowed) {
@@ -56,11 +67,6 @@ Great work! Keep speaking Japanese every day — you're improving little by litt
   showApiUsageWarning();
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash'
-    });
-
 
     const prompt = `# Role
 You are an expert Japanese language coach designed to help English-speaking users improve their Japanese skills through their diary entries.
@@ -113,9 +119,7 @@ Based on the content of the diary:
 ## 💪 Encouragement
 (Write a personalized encouraging message in English, praising specific good points and suggesting next steps)`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const markdownContent = response.text();
+    const markdownContent = await callGeminiApi(prompt);
 
     // Record API usage
     const estimatedTokens = Math.ceil(content.length / 3) + 200;
@@ -183,10 +187,6 @@ export async function generateVersantSampleAnswer(
     ? 'この文章は主なテーマとポイントについて述べています。中心的な考えを支える重要な詳細が含まれています。結論として、この情報はテーマを理解するのに役立ちます。'
     : '私の意見では、これは大切なテーマだと思います。考えるべきことがいくつかあると思います。まず、主な点について考える必要があります。さらに、メリットとデメリットがあります。全体的に、多くの人に影響を与えることだと思います。';
 
-  if (!apiKey) {
-    return defaultAnswer;
-  }
-
   // Check API limits
   const { allowed } = canCallApi();
   if (!allowed) {
@@ -194,13 +194,7 @@ export async function generateVersantSampleAnswer(
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash'
-    });
-
     const timeLimit = part === 'E' ? 30 : 40;
-    const wordCount = part === 'E' ? '60-80' : '80-100';
 
     const prompt = part === 'E'
       ? `You are a Japanese speaking test sample answer generator.
@@ -232,16 +226,14 @@ export async function generateVersantSampleAnswer(
 
 **Output:** Only the sample answer text in Japanese, no explanations or labels.`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const sampleAnswer = response.text().trim();
+    const sampleAnswer = await callGeminiApi(prompt);
 
     // Record API usage
     const estimatedTokens = Math.ceil(question.length / 3) + 100;
     recordApiUsage(estimatedTokens);
     recordApiSuccess();
 
-    return sampleAnswer;
+    return sampleAnswer.trim();
 
   } catch (error: any) {
     console.error('Gemini sample answer error:', error.message);
