@@ -40,7 +40,7 @@ export const VersantHome: React.FC = () => {
             {EN.nav.practice}
           </h1>
           <p className="text-lg text-gray-600">
-            Practice speaking with Versant-style exercises
+            Practice speaking Japanese with JLPT-style exercises
           </p>
         </div>
 
@@ -131,11 +131,11 @@ export const VersantHome: React.FC = () => {
           <ul className="space-y-2 text-yellow-700">
             <li className="flex items-start gap-2">
               <span className="font-bold">1.</span>
-              <span>Listen carefully to the question before you start speaking</span>
+              <span>Listen carefully to the Japanese passage or question before speaking</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="font-bold">2.</span>
-              <span>Speak clearly and at a natural pace - don't rush</span>
+              <span>Speak clearly and at a natural pace - focus on correct particles</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="font-bold">3.</span>
@@ -143,7 +143,7 @@ export const VersantHome: React.FC = () => {
             </li>
             <li className="flex items-start gap-2">
               <span className="font-bold">4.</span>
-              <span>Practice daily to build confidence and fluency</span>
+              <span>Practice daily to build confidence and natural Japanese fluency</span>
             </li>
           </ul>
         </motion.div>

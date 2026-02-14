@@ -1,7 +1,7 @@
 /**
- * Versant Practice Questions
- * Part E: Summary (30 seconds to respond)
- * Part F: Opinion (40 seconds to respond)
+ * JLPT-style Speaking Practice Questions
+ * Part E: Summary (30 seconds to respond) - Listen to a Japanese passage and summarize
+ * Part F: Opinion (40 seconds to respond) - Answer a question in Japanese
  */
 
 export interface VersantQuestion {
@@ -12,193 +12,193 @@ export interface VersantQuestion {
   category?: string;
 }
 
-// Part E: Summary Questions (Listen to a passage and summarize in 30 seconds)
+// Part E: Summary Questions (Listen to a Japanese passage and summarize in 30 seconds)
 export const partEQuestions: VersantQuestion[] = [
   {
     id: 'e1',
     part: 'E',
-    text: `The company decided to implement a new remote work policy. Starting next month, employees can work from home up to three days per week. This change was made after a survey showed that 80% of employees preferred flexible work arrangements. The management believes this will improve work-life balance and reduce commuting stress.`,
+    text: `ある会社は来月から新しいリモートワーク制度を始めることにしました。社員は週に三日まで自宅で仕事ができるようになります。社員アンケートで80%の人が柔軟な働き方を希望していたことがわかり、この変更が決まりました。経営陣は、これによりワークライフバランスが改善され、通勤のストレスも減ると考えています。`,
     timeLimit: 30,
-    category: 'Business'
+    category: 'ビジネス'
   },
   {
     id: 'e2',
     part: 'E',
-    text: `A new study found that people who exercise regularly have better memory and concentration. Researchers tested 500 participants over two years. Those who exercised at least 30 minutes a day performed 20% better on cognitive tests. The scientists recommend combining physical activity with mental exercises for best results.`,
+    text: `新しい研究によると、定期的に運動する人は記憶力と集中力が良いことがわかりました。研究者は500人の参加者を2年間にわたって調査しました。毎日少なくとも30分運動した人は、認知テストで20%高い成績を出しました。科学者たちは、最良の結果を得るために身体活動と脳のトレーニングを組み合わせることを勧めています。`,
     timeLimit: 30,
-    category: 'Health'
+    category: '健康'
   },
   {
     id: 'e3',
     part: 'E',
-    text: `The city announced a new public transportation plan. They will add 50 electric buses and extend the subway line to the airport. The project will cost 2 billion dollars and take three years to complete. Officials expect this will reduce traffic congestion by 30% and help the environment.`,
+    text: `市は新しい公共交通機関の計画を発表しました。電気バスを50台追加し、地下鉄の路線を空港まで延長する予定です。このプロジェクトは20億ドルの費用がかかり、完成まで3年かかる見込みです。当局は、これにより交通渋滞が30%減少し、環境にも良い影響があると期待しています。`,
     timeLimit: 30,
-    category: 'Transportation'
+    category: '交通'
   },
   {
     id: 'e4',
     part: 'E',
-    text: `A famous restaurant chain is changing its menu to include more plant-based options. The CEO said customer demand for vegetarian and vegan dishes has doubled in the past year. They will introduce ten new items next month. The company also plans to use only sustainable packaging by the end of the year.`,
+    text: `有名なレストランチェーンがメニューを変更して、植物性の料理を増やすことにしました。社長によると、ベジタリアンやビーガン料理の需要がこの1年で2倍になったそうです。来月には10種類の新メニューが登場します。また、年末までに全ての包装を環境に優しい素材に変える計画もあります。`,
     timeLimit: 30,
-    category: 'Food'
+    category: '食べ物'
   },
   {
     id: 'e5',
     part: 'E',
-    text: `Universities are seeing a rise in online learning. Last year, enrollment in online courses increased by 40%. Students say they like the flexibility of studying from anywhere. However, some professors worry that students miss important social interactions. Many schools are now offering hybrid programs that combine online and in-person classes.`,
+    text: `大学ではオンライン学習が増えています。昨年、オンラインコースの登録者数は40%増加しました。学生たちはどこからでも勉強できる柔軟性が気に入っていると言っています。しかし、一部の教授は学生が大切な社会的交流を逃していることを心配しています。多くの学校がオンラインと対面授業を組み合わせたハイブリッドプログラムを提供し始めています。`,
     timeLimit: 30,
-    category: 'Education'
+    category: '教育'
   },
   {
     id: 'e6',
     part: 'E',
-    text: `A technology company launched a new smartphone with advanced AI features. The phone can translate conversations in real-time and take professional-quality photos automatically. It costs $999 and will be available in stores next week. Early reviews say the battery life could be better, but overall the phone has received positive feedback.`,
+    text: `あるテクノロジー企業が、高度なAI機能を搭載した新しいスマートフォンを発売しました。このスマートフォンはリアルタイムで会話を翻訳し、自動的にプロ品質の写真を撮ることができます。価格は999ドルで、来週から店頭に並びます。初期のレビューでは、バッテリーの持ちが改善できると言われていますが、全体的にはポジティブな評価を受けています。`,
     timeLimit: 30,
-    category: 'Technology'
+    category: 'テクノロジー'
   }
 ];
 
-// Part F: Opinion Questions (Give your opinion in 40 seconds)
+// Part F: Opinion Questions (Give your opinion in Japanese in 40 seconds)
 export const partFQuestions: VersantQuestion[] = [
   {
     id: 'f1',
     part: 'F',
-    text: `Some people think that working from home is better than working in an office. What is your opinion?`,
+    text: `在宅勤務とオフィス勤務、どちらが良いと思いますか？あなたの意見を聞かせてください。`,
     timeLimit: 40,
-    category: 'Work'
+    category: '仕事'
   },
   {
     id: 'f2',
     part: 'F',
-    text: `Do you think social media has more positive or negative effects on society? Please explain your view.`,
+    text: `SNSは社会にとってプラスの影響が大きいですか、それともマイナスの影響が大きいですか？あなたの考えを教えてください。`,
     timeLimit: 40,
-    category: 'Technology'
+    category: 'テクノロジー'
   },
   {
     id: 'f3',
     part: 'F',
-    text: `Should students be required to wear uniforms at school? Why or why not?`,
+    text: `学校で制服を着ることは必要だと思いますか？理由も含めて答えてください。`,
     timeLimit: 40,
-    category: 'Education'
+    category: '教育'
   },
   {
     id: 'f4',
     part: 'F',
-    text: `Is it better to live in a big city or a small town? What do you prefer and why?`,
+    text: `大きな都市と小さな町、どちらに住みたいですか？その理由は何ですか？`,
     timeLimit: 40,
-    category: 'Lifestyle'
+    category: '生活'
   },
   {
     id: 'f5',
     part: 'F',
-    text: `Some people prefer to travel alone, while others like to travel with friends or family. Which do you prefer?`,
+    text: `一人で旅行するのと、友達や家族と旅行するのと、どちらが好きですか？`,
     timeLimit: 40,
-    category: 'Travel'
+    category: '旅行'
   },
   {
     id: 'f6',
     part: 'F',
-    text: `Do you think it's important to learn a foreign language? Please explain your answer.`,
+    text: `外国語を学ぶことは大切だと思いますか？あなたの考えを教えてください。`,
     timeLimit: 40,
-    category: 'Education'
+    category: '教育'
   },
   {
     id: 'f7',
     part: 'F',
-    text: `Should companies be required to offer paid parental leave? What is your opinion?`,
+    text: `会社は育児休暇を義務化するべきだと思いますか？あなたの意見を聞かせてください。`,
     timeLimit: 40,
-    category: 'Work'
+    category: '仕事'
   },
   {
     id: 'f8',
     part: 'F',
-    text: `Is it better to save money or spend it on experiences? What do you think?`,
+    text: `お金を貯めるのと経験に使うのと、どちらが良いと思いますか？`,
     timeLimit: 40,
-    category: 'Finance'
+    category: 'お金'
   },
   {
     id: 'f9',
     part: 'F',
-    text: `Do you think online shopping will replace traditional stores in the future? Why or why not?`,
+    text: `将来、ネットショッピングが実店舗に取って代わると思いますか？なぜそう思いますか？`,
     timeLimit: 40,
-    category: 'Shopping'
+    category: '買い物'
   },
   {
     id: 'f10',
     part: 'F',
-    text: `Should people be required to vote in elections? Please share your thoughts.`,
+    text: `選挙で投票することを義務化するべきだと思いますか？あなたの考えを聞かせてください。`,
     timeLimit: 40,
-    category: 'Politics'
+    category: '政治'
   },
   {
     id: 'f11',
     part: 'F',
-    text: `Is it important for children to learn how to cook? What do you think?`,
+    text: `子供が料理を学ぶことは大切だと思いますか？あなたの意見を教えてください。`,
     timeLimit: 40,
-    category: 'Life Skills'
+    category: '生活スキル'
   },
   {
     id: 'f12',
     part: 'F',
-    text: `Do you think electric cars will become more popular than gasoline cars? Why?`,
+    text: `電気自動車はガソリン車よりも普及すると思いますか？なぜですか？`,
     timeLimit: 40,
-    category: 'Environment'
+    category: '環境'
   },
   {
     id: 'f13',
     part: 'F',
-    text: `Should homework be given to students every day? What is your opinion?`,
+    text: `毎日宿題を出すべきだと思いますか？あなたの意見を聞かせてください。`,
     timeLimit: 40,
-    category: 'Education'
+    category: '教育'
   },
   {
     id: 'f14',
     part: 'F',
-    text: `Do you prefer to read books or watch movies? Please explain your preference.`,
+    text: `本を読むのと映画を見るのと、どちらが好きですか？理由も教えてください。`,
     timeLimit: 40,
-    category: 'Entertainment'
+    category: '娯楽'
   },
   {
     id: 'f15',
     part: 'F',
-    text: `Is it important to have a healthy work-life balance? How can people achieve this?`,
+    text: `ワークライフバランスは大切だと思いますか？どうすれば実現できますか？`,
     timeLimit: 40,
-    category: 'Work'
+    category: '仕事'
   },
   {
     id: 'f16',
     part: 'F',
-    text: `Should fast food be banned in schools? What do you think?`,
+    text: `学校でファストフードを禁止するべきだと思いますか？あなたの考えを教えてください。`,
     timeLimit: 40,
-    category: 'Health'
+    category: '健康'
   },
   {
     id: 'f17',
     part: 'F',
-    text: `Do you think robots will take over many jobs in the future? Is this good or bad?`,
+    text: `将来、ロボットが多くの仕事を引き継ぐと思いますか？それは良いことですか、悪いことですか？`,
     timeLimit: 40,
-    category: 'Technology'
+    category: 'テクノロジー'
   },
   {
     id: 'f18',
     part: 'F',
-    text: `Is it better to have a few close friends or many acquaintances? What do you prefer?`,
+    text: `親しい友達が少ない方がいいですか、知り合いが多い方がいいですか？あなたはどちらを好みますか？`,
     timeLimit: 40,
-    category: 'Relationships'
+    category: '人間関係'
   },
   {
     id: 'f19',
     part: 'F',
-    text: `Should people reduce their use of plastic? What can individuals do to help?`,
+    text: `プラスチックの使用を減らすべきだと思いますか？個人として何ができますか？`,
     timeLimit: 40,
-    category: 'Environment'
+    category: '環境'
   },
   {
     id: 'f20',
     part: 'F',
-    text: `Do you think it's important to follow the news every day? Why or why not?`,
+    text: `毎日ニュースを見ることは大切だと思いますか？なぜそう思いますか？`,
     timeLimit: 40,
-    category: 'Media'
+    category: 'メディア'
   }
 ];
 

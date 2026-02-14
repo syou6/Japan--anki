@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
-import { generateEnglishFeedback, generateVersantSampleAnswer, type CEFRLevel } from '../lib/gemini-feedback';
+import { generateJapaneseFeedback, generateVersantSampleAnswer, type CEFRLevel } from '../lib/gemini-feedback';
 import type { VersantQuestion } from '../lib/versant-questions';
 
 export interface VersantFeedback {
@@ -121,15 +121,15 @@ export const useVersantStore = create<VersantStore>((set, get) => ({
           const defaultFeedback = {
             cefrLevel: userCefrLevel,
             targetLevel: userCefrLevel,
-            markdownContent: '## 💪 Encouragement\nGreat effort! Keep practicing your English speaking skills.'
+            markdownContent: '## 💪 Encouragement\nGreat effort! Keep practicing your Japanese speaking skills.'
           };
           const defaultSampleAnswer = currentQuestion.part === 'E'
-            ? 'The passage discusses the main topic and provides key information. The speaker mentions several important points that support the central idea.'
-            : 'In my opinion, this is an important topic. I believe we should consider multiple perspectives. First, there are benefits to consider. Additionally, there may be challenges. Overall, it depends on individual circumstances.';
+            ? 'この文章は主なテーマとポイントについて述べています。話者はいくつかの重要な点を挙げて、中心的な考えを説明しています。'
+            : '私の意見では、これは大切なテーマだと思います。まず、いくつかの利点があります。さらに、課題もあるかもしれません。全体的に、状況によると思います。';
 
           // Generate feedback and sample answer in parallel with timeout
           const [aiFeedback, sampleAnswer] = await Promise.all([
-            withTimeout(generateEnglishFeedback(feedbackPrompt, userCefrLevel), 30000, defaultFeedback),
+            withTimeout(generateJapaneseFeedback(feedbackPrompt, userCefrLevel), 30000, defaultFeedback),
             withTimeout(generateVersantSampleAnswer(currentQuestion.text, currentQuestion.part, userCefrLevel), 30000, defaultSampleAnswer)
           ]);
 
@@ -138,7 +138,7 @@ export const useVersantStore = create<VersantStore>((set, get) => ({
           const encouragementMatch = aiFeedback.markdownContent.match(/## 💪 Encouragement\n([\s\S]*?)(?=##|$)/);
           const advice = encouragementMatch
             ? encouragementMatch[1].trim()
-            : 'Keep practicing! Your English is improving.';
+            : 'Keep practicing! Your Japanese is improving.';
 
           feedback = {
             cefrLevel: aiFeedback.cefrLevel,
@@ -154,10 +154,10 @@ export const useVersantStore = create<VersantStore>((set, get) => ({
           feedback = {
             cefrLevel: userCefrLevel,
             score: 70,
-            advice: 'Great effort! Keep practicing your English speaking skills.',
+            advice: 'Great effort! Keep practicing your Japanese speaking skills.',
             sampleAnswer: currentQuestion.part === 'E'
-              ? 'The passage discusses the main topic and provides key information.'
-              : 'In my opinion, this is an important topic to consider.',
+              ? 'この文章は主なテーマについて述べ、重要な情報を提供しています。'
+              : '私の意見では、これは大切なテーマだと思います。',
             grammarNotes: [],
             vocabularyTips: []
           };

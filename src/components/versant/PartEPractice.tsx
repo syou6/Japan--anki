@@ -210,8 +210,8 @@ export const PartEPractice: React.FC<PartEPracticeProps> = ({ onBack }) => {
             {/* Instructions */}
             <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
               <p className="text-blue-800">
-                <strong>Instructions:</strong> Listen to the passage, then summarize
-                the main points in your own words. You have 30 seconds.
+                <strong>Instructions:</strong> Listen to the Japanese passage, then summarize
+                the main points in Japanese. You have 30 seconds.
               </p>
             </div>
 

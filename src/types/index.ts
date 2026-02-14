@@ -12,11 +12,14 @@ export interface User {
 }
 
 // Markdown形式のフィードバック
-export interface EnglishFeedback {
+export interface JapaneseFeedback {
   cefrLevel: CEFRLevel;
   targetLevel: CEFRLevel;
   markdownContent: string;  // 全フィードバックをMarkdownで保存
 }
+
+/** @deprecated Use JapaneseFeedback instead */
+export type EnglishFeedback = JapaneseFeedback;
 
 export interface DiaryEntry {
   id: string;

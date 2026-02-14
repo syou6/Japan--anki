@@ -13,37 +13,37 @@ export const LandingPage: React.FC = () => {
     {
       icon: <Mic className="w-8 h-8" />,
       title: "Easy Voice Recording",
-      description: "Just press a button and speak to record your diary. Perfect for practicing English speaking."
+      description: "Just press a button and speak to record your diary. Perfect for practicing Japanese speaking."
     },
     {
       icon: <Brain className="w-8 h-8" />,
       title: "AI-Powered Feedback",
-      description: "Get instant feedback on your grammar, vocabulary, and pronunciation to improve your English."
+      description: "Get instant feedback on your grammar, particles, vocabulary, and pitch accent to improve your Japanese."
     },
     {
       icon: <BookOpen className="w-8 h-8" />,
-      title: "Versant Practice",
-      description: "Practice Part E and Part F questions to prepare for speaking tests and boost your confidence."
+      title: "JLPT-Style Practice",
+      description: "Practice with JLPT-style speaking exercises to build confidence and prepare for real conversations."
     },
     {
       icon: <Shield className="w-8 h-8" />,
       title: "Track Your Progress",
-      description: "See your CEFR level and track improvement over time with detailed analytics."
+      description: "See your CEFR level, track JLPT progress, and measure improvement over time with detailed analytics."
     }
   ];
 
   const testimonials = [
     {
-      name: "Yuki S. (TOEIC 520)",
-      text: "Recording a diary every day helped me speak English more naturally. The AI feedback is super helpful!"
+      name: "Sarah K. (JLPT N4)",
+      text: "Recording a diary every day helped me speak Japanese more naturally. The AI feedback on my particles is super helpful!"
     },
     {
-      name: "Takeshi M. (TOEIC 480)",
-      text: "The Versant practice feature really helped me prepare for my company's speaking test."
+      name: "David M. (JLPT N3)",
+      text: "The JLPT-style practice feature really helped me prepare for real Japanese conversations at work."
     },
     {
-      name: "Mika T. (TOEIC 550)",
-      text: "I love how the app suggests better vocabulary. My English is improving day by day!"
+      name: "Emma T. (JLPT N5)",
+      text: "I love how the app suggests better vocabulary and kanji. My Japanese is improving day by day!"
     }
   ];
 
@@ -82,7 +82,7 @@ export const LandingPage: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="text-5xl md:text-6xl font-bold text-gray-900 mb-6"
             >
-              Speak English
+              Speak Japanese
               <span className="text-indigo-600"> Every Day</span>
             </motion.h1>
             <motion.p
@@ -91,8 +91,8 @@ export const LandingPage: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto"
             >
-              Record your daily thoughts in English. Get AI-powered feedback to improve your speaking skills.
-              Practice Versant-style questions and track your CEFR level progress.
+              Record your daily thoughts in Japanese. Get AI-powered feedback to improve your speaking skills.
+              Practice JLPT-style questions and track your CEFR level progress.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -127,10 +127,10 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Why Choose English AI Diary?
+              Why Choose Japanese AI Diary?
             </h2>
             <p className="text-xl text-gray-600">
-              The perfect tool for TOEIC 500-level learners who want to improve speaking
+              The perfect tool for Japanese learners who want to improve speaking
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -165,7 +165,7 @@ export const LandingPage: React.FC = () => {
               What Our Users Say
             </h2>
             <p className="text-xl text-gray-600">
-              Real feedback from English learners like you
+              Real feedback from Japanese learners like you
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -203,7 +203,7 @@ export const LandingPage: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="text-4xl font-bold text-white mb-4"
           >
-            Ready to Start Speaking?
+            Ready to Start Speaking Japanese?
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -211,7 +211,7 @@ export const LandingPage: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl text-indigo-100 mb-8"
           >
-            Start free today. Just 1 minute of English speaking per day can make a difference.
+            Start free today. Just 1 minute of Japanese speaking per day can make a difference.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -243,7 +243,7 @@ export const LandingPage: React.FC = () => {
                 <span className="ml-2 text-xl font-bold">{EN.app.name}</span>
               </div>
               <p className="text-gray-400">
-                Speak English every day. Improve your skills with AI feedback.
+                Speak Japanese every day. Improve your skills with AI feedback.
               </p>
             </div>
             <div>
@@ -251,7 +251,7 @@ export const LandingPage: React.FC = () => {
               <ul className="space-y-2 text-gray-400">
                 <li>Voice Recording</li>
                 <li>AI Feedback</li>
-                <li>Versant Practice</li>
+                <li>JLPT Practice</li>
                 <li>Progress Tracking</li>
               </ul>
             </div>

@@ -32,7 +32,7 @@ export const CEFRSettings: React.FC<CEFRSettingsProps> = ({ currentLevel, onLeve
           <GraduationCap className="w-6 h-6 text-indigo-600" />
         </div>
         <div>
-          <h3 className="text-xl font-bold text-gray-900">Your English Level</h3>
+          <h3 className="text-xl font-bold text-gray-900">Your Japanese Level</h3>
           <p className="text-gray-600">Select your current CEFR level for personalized feedback</p>
         </div>
       </div>
@@ -72,7 +72,7 @@ export const CEFRSettings: React.FC<CEFRSettingsProps> = ({ currentLevel, onLeve
         })}
       </div>
 
-      {/* Check your English Level - Versant Score Chart */}
+      {/* Check your Japanese Level - JLPT to CEFR Chart */}
       <div className="mt-6 border border-blue-200 rounded-xl overflow-hidden">
         <button
           onClick={() => setShowLevelChart(!showLevelChart)}
@@ -80,7 +80,7 @@ export const CEFRSettings: React.FC<CEFRSettingsProps> = ({ currentLevel, onLeve
         >
           <div className="flex items-center gap-2">
             <ExternalLink className="w-4 h-4 text-blue-600" />
-            <span className="font-medium text-blue-800">Check your English Level (Versant Score)</span>
+            <span className="font-medium text-blue-800">Check your Japanese Level (JLPT → CEFR)</span>
           </div>
           {showLevelChart ? (
             <ChevronUp className="w-5 h-5 text-blue-600" />
@@ -97,26 +97,29 @@ export const CEFRSettings: React.FC<CEFRSettingsProps> = ({ currentLevel, onLeve
               className="border-t border-blue-200"
             >
               <div className="p-4 bg-white">
-                <img
-                  src="/images/versant-cefr-chart.png"
-                  alt="Versant Score to CEFR Level Chart"
-                  className="w-full rounded-lg border border-gray-200"
-                  onError={(e) => {
-                    // Fallback to text if image fails to load
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    target.nextElementSibling?.classList.remove('hidden');
-                  }}
-                />
-                <div className="hidden mt-4 text-sm text-gray-600">
-                  <p className="font-medium mb-2">Versant Score → CEFR Level:</p>
-                  <ul className="space-y-1">
-                    <li>26-35 → A1 (Beginner)</li>
-                    <li>36-42 → A1+ / A2</li>
-                    <li>43-50 → A2+ / B1</li>
-                    <li>51-57 → B1+ / B2</li>
-                    <li>58-68 → B2+ / C1</li>
-                    <li>69-80 → C1+ (Proficient)</li>
+                <div className="text-sm text-gray-600">
+                  <p className="font-medium mb-3">JLPT Level → CEFR Level:</p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 bg-gray-100 rounded font-bold text-xs">N5</span>
+                      <span>→ A1 (Beginner) — Hiragana, Katakana, basic greetings</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 bg-blue-100 rounded font-bold text-xs">N4</span>
+                      <span>→ A2 (Elementary) — Daily conversation, ~300 kanji</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 bg-green-100 rounded font-bold text-xs">N3</span>
+                      <span>→ B1 (Intermediate) — General topics, ~650 kanji</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 bg-yellow-100 rounded font-bold text-xs">N2</span>
+                      <span>→ B2 (Upper Intermediate) — Abstract topics, ~1000 kanji</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 bg-orange-100 rounded font-bold text-xs">N1</span>
+                      <span>→ C1 (Advanced) — Complex texts, ~2000 kanji</span>
+                    </li>
                   </ul>
                 </div>
               </div>

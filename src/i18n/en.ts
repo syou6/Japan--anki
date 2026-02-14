@@ -1,10 +1,10 @@
-// English text constants for English AI Diary
+// English text constants for Japanese AI Diary
 
 export const EN = {
   // App name
   app: {
-    name: 'English AI Diary',
-    tagline: 'Speak English Every Day',
+    name: 'Japanese AI Diary',
+    tagline: 'Speak Japanese Every Day',
   },
 
   // Navigation
@@ -19,7 +19,7 @@ export const EN = {
     homeDesc: 'Dashboard',
     recordDesc: 'Speak',
     diaryDesc: 'History',
-    practiceDesc: 'Versant',
+    practiceDesc: 'JLPT',
     settingsDesc: 'Config',
     // Active indicator
     active: 'Active',
@@ -52,7 +52,7 @@ export const EN = {
   // Recording
   recording: {
     title: 'Record Your Diary',
-    instruction: 'Press the microphone button and speak in English about your day',
+    instruction: 'Press the microphone button and speak in Japanese about your day',
     recording: 'Recording...',
     stopButton: 'Stop Recording',
     startButton: 'Start Recording',
@@ -69,7 +69,7 @@ export const EN = {
     saveTitle: 'Save Your Diary',
     transcribedText: 'Transcribed Text',
     additionalNotes: 'Additional Notes (Optional)',
-    notesPlaceholder: 'e.g., I went to the park with my friend today...',
+    notesPlaceholder: 'e.g., Today I went to the park with my friend...',
     saving: 'Saving...',
     saveButton: 'Save',
     back: 'Back',
@@ -127,7 +127,7 @@ export const EN = {
   // Settings
   settings: {
     title: 'Settings',
-    cefrLevel: 'English Level (CEFR)',
+    cefrLevel: 'Japanese Level (CEFR)',
     cefrDescription: 'AI feedback will be based on this level',
     notifications: 'Notifications',
     notificationSettings: 'Notification Settings',
@@ -137,44 +137,44 @@ export const EN = {
     apiUsage: 'AI Usage Statistics',
   },
 
-  // CEFR levels (10 stages)
+  // CEFR levels (10 stages) with JLPT mapping
   cefr: {
-    'A1': 'A1 - Beginner',
+    'A1': 'A1 - Beginner (JLPT N5)',
     'A1+': 'A1+ - Beginner High',
-    'A2': 'A2 - Elementary',
+    'A2': 'A2 - Elementary (JLPT N4)',
     'A2+': 'A2+ - Elementary High',
-    'B1': 'B1 - Intermediate',
+    'B1': 'B1 - Intermediate (JLPT N3)',
     'B1+': 'B1+ - Intermediate High',
-    'B2': 'B2 - Upper Intermediate',
+    'B2': 'B2 - Upper Intermediate (JLPT N2)',
     'B2+': 'B2+ - Upper Intermediate High',
-    'C1': 'C1 - Advanced',
+    'C1': 'C1 - Advanced (JLPT N1)',
     'C1+': 'C1+ - Proficient',
   },
 
   // Feedback
   feedback: {
     title: 'AI Feedback',
-    loading: 'Analyzing your English...',
-    grammar: 'Grammar & Phrasing',
-    vocabulary: 'Vocabulary',
-    pronunciation: 'Pronunciation Tips',
+    loading: 'Analyzing your Japanese...',
+    grammar: 'Grammar & Particles',
+    vocabulary: 'Vocabulary & Kanji',
+    pronunciation: 'Pronunciation & Pitch Accent',
     reading: 'Recommended Reading',
-    summary: 'Summary (Japanese)',
+    summary: 'English Summary',
     keyVocab: 'Key Vocabulary',
   },
 
-  // Versant Practice
+  // Speaking Practice (JLPT-style)
   versant: {
     title: 'Speaking Practice',
     partE: {
       title: 'Part E: Summary',
-      description: 'Listen to a short passage and summarize it in 30 seconds.',
-      descriptionJa: '短い文章を聞いて30秒以内で要約します。',
+      description: 'Listen to a short Japanese passage and summarize it in 30 seconds.',
+      descriptionJa: 'Listen to a passage in Japanese and summarize the main points.',
     },
     partF: {
       title: 'Part F: Opinion',
-      description: 'Answer a question with your opinion in about 40 seconds.',
-      descriptionJa: '質問に対して40秒程度で自分の意見を述べます。',
+      description: 'Answer a question in Japanese with your opinion in about 40 seconds.',
+      descriptionJa: 'Listen to a question and give your opinion in Japanese.',
     },
     start: 'Start Practice',
     history: 'Practice History',
@@ -293,7 +293,7 @@ export const EN = {
     step1: 'Tap the share button at the bottom of Safari',
     step2: 'Select "Add to Home Screen"',
     step3: 'Tap "Add" at the top right',
-    step4: 'Open "English AI Diary" from home screen',
+    step4: 'Open "Japanese AI Diary" from home screen',
     iosNote: 'Requires iOS 16.4 or later',
     androidTip: 'For smartphone users',
     androidInstructions: 'Use Chrome/Edge browser, Menu → Add to Home Screen',
@@ -313,7 +313,7 @@ export const EN = {
   // Teacher Sharing
   family: {
     title: 'Teacher Connection',
-    addRecipient: 'Invite Your English Teacher',
+    addRecipient: 'Invite Your Japanese Teacher',
     addDescription: 'Enter your teacher\'s email address to share your diary for feedback',
     addButton: 'Invite',
     yourViewers: 'Your Teacher',
@@ -383,7 +383,7 @@ export const EN = {
   parentDashboard: {
     todayDate: 'Today is',
     weather: 'Sunny',
-    recordPrompt: 'Record your English diary',
+    recordPrompt: 'Record your Japanese diary',
     recordSubPrompt: '1-3 minutes is perfect!',
     topicIdeas: 'Topic ideas:',
     topics: {
@@ -408,13 +408,13 @@ export const EN = {
   onboarding: {
     steps: [
       {
-        title: 'Practice English Every Day',
-        description: 'Record a short diary in English each day. Just 1-3 minutes of speaking practice helps you improve naturally.',
-        benefit: 'Build a daily English habit'
+        title: 'Practice Japanese Every Day',
+        description: 'Record a short diary in Japanese each day. Just 1-3 minutes of speaking practice helps you improve naturally.',
+        benefit: 'Build a daily Japanese habit'
       },
       {
         title: 'Just Speak - No Typing Required',
-        description: 'Press record and speak about your day. The app transcribes your speech automatically.',
+        description: 'Press record and speak about your day in Japanese. The app transcribes your speech automatically.',
         benefit: 'Perfect for busy learners'
       },
       {
@@ -424,7 +424,7 @@ export const EN = {
       },
       {
         title: 'Track Your Progress',
-        description: 'Review past entries, see your CEFR level progress, and practice with Versant-style questions.',
+        description: 'Review past entries, see your CEFR level progress, and practice with JLPT-style questions.',
         benefit: 'Measure your improvement'
       }
     ],
@@ -449,10 +449,10 @@ export const EN = {
     },
     recording: {
       title: 'Recording Screen',
-      description: 'Record your voice diary in English',
+      description: 'Record your voice diary in Japanese',
       tips: [
         'Press the record button to start',
-        'Speak in English for 1-3 minutes',
+        'Speak in Japanese for 1-3 minutes',
         'The volume meter shows if your voice is clear',
         'Review and save your recording when done'
       ]
@@ -470,7 +470,7 @@ export const EN = {
       title: 'Settings',
       description: 'Configure your preferences',
       tips: [
-        'Set your English level (CEFR)',
+        'Set your Japanese level (CEFR / JLPT)',
         'Manage notifications',
         'View your account details'
       ]
@@ -492,7 +492,7 @@ export const EN = {
   pwa: {
     useAsApp: 'Use as App',
     install: 'Install App',
-    installDescription: 'Add English AI Diary to your home screen for the best experience. You\'ll also receive push notifications.',
+    installDescription: 'Add Japanese AI Diary to your home screen for the best experience. You\'ll also receive push notifications.',
     iosInstructions: 'Add to home screen to enable push notifications',
     step1: 'Tap the share button below',
     step2: 'Select "Add to Home Screen"',
@@ -582,7 +582,7 @@ export const EN = {
     successMessage: 'Thank you for subscribing. You now have access to premium features.',
     startApp: 'Start App',
     manageSubscription: 'Manage Subscription',
-    premiumActivated: 'Premium features activated. Unlimited recordings, AI analysis, and family sharing are now available.',
+    premiumActivated: 'Premium features activated. Unlimited recordings, AI analysis, and teacher sharing are now available.',
     cancelTitle: 'Subscription Cancelled',
     cancelMessage: 'Your subscription has been cancelled. You can resubscribe anytime.',
     backToApp: 'Back to App',

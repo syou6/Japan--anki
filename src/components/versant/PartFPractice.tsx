@@ -207,8 +207,8 @@ export const PartFPractice: React.FC<PartFPracticeProps> = ({ onBack }) => {
             {/* Instructions */}
             <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
               <p className="text-purple-800">
-                <strong>Instructions:</strong> Listen to the question, then give your
-                opinion with reasons. You have 40 seconds to respond.
+                <strong>Instructions:</strong> Listen to the Japanese question, then give your
+                opinion in Japanese with reasons. You have 40 seconds to respond.
               </p>
             </div>
 

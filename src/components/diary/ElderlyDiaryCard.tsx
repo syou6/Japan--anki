@@ -230,6 +230,16 @@ export const ElderlyDiaryCard: React.FC<ElderlyDiaryCardProps> = ({ entry }) => 
 
 function getEmotionEmoji(emotion: string): string {
   const emotionMap: { [key: string]: string } = {
+    'happy': '😊',
+    'excited': '😄',
+    'sad': '😢',
+    'anxious': '😰',
+    'calm': '😌',
+    'angry': '😤',
+    'satisfied': '😇',
+    'grateful': '🙏',
+    'love': '❤️',
+    // Japanese emotion mappings (for backward compatibility)
     '喜び': '😊',
     '楽しい': '😄',
     '悲しみ': '😢',

@@ -1,7 +1,7 @@
 {
-  "name": "AI Voice Journal",
-  "short_name": "AI Voice Journal",
-  "description": "高齢者向け音声日記アプリ - 話すだけで日記が完成",
+  "name": "Japanese AI Diary",
+  "short_name": "Japanese AI Diary",
+  "description": "Practice speaking Japanese every day with AI-powered feedback and JLPT-style exercises",
   "theme_color": "#667eea",
   "background_color": "#ffffff",
   "display": "standalone",
@@ -9,7 +9,7 @@
   "scope": "/",
   "start_url": "/lp.html",
   "id": "ai-voice-journal-pwa",
-  "categories": ["lifestyle", "productivity", "health"],
+  "categories": ["lifestyle", "productivity", "education"],
   "icons": [
     {
       "src": "/icon-192x192.png",

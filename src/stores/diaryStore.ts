@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { analyzeText, generateFamilySummary, analyzeHealthScore } from '../lib/gemini';
-import { generateEnglishFeedback } from '../lib/gemini-feedback';
+import { generateJapaneseFeedback } from '../lib/gemini-feedback';
 import { toast } from 'sonner';
 import type { DiaryEntry, CEFRLevel } from '../types';
 
@@ -264,17 +264,17 @@ export const useDiaryStore = create<DiaryStore>((set, get) => ({
             const cefrLevel: CEFRLevel = userProfile?.cefr_level || 'B1';
 
             // Run all AI calls in parallel
-            const [analysisResult, aiSummary, healthScore, englishFeedback] = await Promise.allSettled([
+            const [analysisResult, aiSummary, healthScore, japaneseFeedback] = await Promise.allSettled([
               analyzeText(content),
               generateFamilySummary(content),
               analyzeHealthScore(content),
-              generateEnglishFeedback(content, cefrLevel),
+              generateJapaneseFeedback(content, cefrLevel),
             ]);
 
             const analysis = analysisResult.status === 'fulfilled' ? analysisResult.value : null;
             const summary = aiSummary.status === 'fulfilled' ? aiSummary.value : '';
             const health = healthScore.status === 'fulfilled' ? healthScore.value : 75;
-            const feedback = englishFeedback.status === 'fulfilled' ? englishFeedback.value : null;
+            const feedback = japaneseFeedback.status === 'fulfilled' ? japaneseFeedback.value : null;
 
             // Update diary with AI results
             await supabase

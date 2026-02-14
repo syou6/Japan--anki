@@ -6,19 +6,22 @@ const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 export type CEFRLevel = 'A1' | 'A1+' | 'A2' | 'A2+' | 'B1' | 'B1+' | 'B2' | 'B2+' | 'C1' | 'C1+';
 
 // Markdown形式のフィードバック
-export interface EnglishFeedback {
+export interface JapaneseFeedback {
   cefrLevel: CEFRLevel;
   targetLevel: CEFRLevel;
   markdownContent: string;  // 全フィードバックをMarkdownで保存
 }
 
+/** @deprecated Use JapaneseFeedback instead */
+export type EnglishFeedback = JapaneseFeedback;
+
 /**
- * Generate English feedback for diary entry using Gemini API
+ * Generate Japanese feedback for diary entry using Gemini API
  */
-export async function generateEnglishFeedback(
+export async function generateJapaneseFeedback(
   content: string,
   userCefrLevel: CEFRLevel = 'B1'
-): Promise<EnglishFeedback> {
+): Promise<JapaneseFeedback> {
   // Target level is i+1 (one level higher than current)
   const levelProgression: Record<CEFRLevel, CEFRLevel> = {
     'A1': 'A1+', 'A1+': 'A2', 'A2': 'A2+', 'A2+': 'B1',
@@ -28,14 +31,14 @@ export async function generateEnglishFeedback(
   const targetLevel = levelProgression[userCefrLevel];
 
   // Default fallback response
-  const defaultFeedback: EnglishFeedback = {
+  const defaultFeedback: JapaneseFeedback = {
     cefrLevel: userCefrLevel,
     targetLevel: targetLevel,
     markdownContent: `## 📊 Feedback & Corrections
-Your diary entry has been recorded. Keep practicing your English every day!
+Your diary entry has been recorded. Keep practicing your Japanese every day!
 
 ## 💪 Encouragement
-頑張って英語の練習を続けてください！毎日少しずつ上達しています。`
+Great work! Keep speaking Japanese every day — you're improving little by little!`
   };
 
   if (!apiKey) {
@@ -60,7 +63,7 @@ Your diary entry has been recorded. Keep practicing your English every day!
 
 
     const prompt = `# Role
-You are an expert English language coach designed to help users improve their English skills through their diary entries.
+You are an expert Japanese language coach designed to help English-speaking users improve their Japanese skills through their diary entries.
 
 # Inputs provided by the system
 1. **User Level:** ${userCefrLevel} (CEFR)
@@ -68,47 +71,47 @@ You are an expert English language coach designed to help users improve their En
 ${content}
 
 # Your Task
-Analyze the diary transcript and provide output in two main sections.
+Analyze the diary transcript and provide output in two main sections. ALL explanations and feedback must be written in **English**.
 
 ## Section 1: Feedback & Level Up
-Analyze the English based on the user's level.
+Analyze the Japanese based on the user's level.
 - **Tone:** Encouraging, empathetic, and professional.
-- **Language:** Explain the feedback in **Japanese** so the user clearly understands, but show English examples.
+- **Language:** Explain the feedback in **English** so the user clearly understands, but show Japanese examples.
 - **Constraint:** The advice must be aimed at **one level slightly higher** than the User Level (i+1 = ${targetLevel}).
 
 **Analysis points:**
-1. **Grammar & Phrasing:** Correct unnatural phrasing. If the user uses simple grammar, suggest a more sophisticated structure appropriate for the next level.
-2. **Vocabulary:** Identify basic words used and suggest more precise or academic synonyms.
-3. **Pronunciation Advice:** Identify 2-3 words in the user's text that are typically difficult to pronounce. Provide phonetics or tips.
+1. **Grammar & Particles:** Correct unnatural phrasing or particle misuse. If the user uses simple grammar, suggest a more sophisticated structure appropriate for the next level.
+2. **Vocabulary & Kanji:** Identify basic words used and suggest more natural or advanced alternatives. Include kanji with readings.
+3. **Pronunciation & Pitch Accent:** Identify 2-3 words in the user's text that are typically difficult for English speakers. Provide tips on pitch accent and pronunciation.
 
 ## Section 2: Topic Extension (Reading Material)
 Based on the content of the diary:
 1. **Identify the Main Topic:** Extract the core theme.
-2. **Generate an Article:** Write an engaging article (approx. 150-200 words) about this topic.
-   - **Difficulty:** The English level must be **slightly higher (i+1 = ${targetLevel})** than the User Level.
+2. **Generate an Article:** Write an engaging article in **Japanese** (approx. 150-200 characters) about this topic.
+   - **Difficulty:** The Japanese level must be **slightly higher (i+1 = ${targetLevel})** than the User Level.
    - **Content:** Include enough rich vocabulary to support the extraction of 10 key items.
 3. **Vocabulary List:** Extract **10 key words or phrases** from this generated article that are valuable for the user to learn.
 
 # Output Format (Markdown)
 
 ## 📊 Feedback & Corrections
-(Provide corrections, grammar explanations in Japanese, and better vocabulary suggestions here)
+(Provide corrections in English, explain grammar/particle usage, and suggest better vocabulary)
 
-## 🗣️ Pronunciation Tips
-(List tricky words from the user's text and tips on how to say them)
+## 🗣️ Pronunciation & Pitch Accent Tips
+(List tricky words from the user's text and tips on how to pronounce them naturally)
 
 ## 📖 Recommended Reading: [Insert Topic Name]
-(Insert the generated English article here)
+(Insert the generated Japanese article here)
 
-## 🇯🇵 Summary
-(Brief summary of the article in Japanese)
+## 🇺🇸 English Summary
+(Brief summary of the article in English)
 
 ## 🗝️ Key Vocabulary & Phrases
 (List **10** important words/phrases from the "Recommended Reading" article above. Use the format below:)
-- **[Word/Phrase]** \`[IPA Pronunciation]\` : [Japanese Meaning]
+- **[Japanese]** \`[Reading]\` : [English Meaning]
 
 ## 💪 Encouragement
-(Write a personalized encouraging message in Japanese, praising specific good points and suggesting next steps)`;
+(Write a personalized encouraging message in English, praising specific good points and suggesting next steps)`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -132,6 +135,9 @@ Based on the content of the diary:
   }
 }
 
+/** @deprecated Use generateJapaneseFeedback instead */
+export const generateEnglishFeedback = generateJapaneseFeedback;
+
 function validateCefrLevel(level: string): CEFRLevel | null {
   const validLevels: CEFRLevel[] = ['A1', 'A1+', 'A2', 'A2+', 'B1', 'B1+', 'B2', 'B2+', 'C1', 'C1+'];
   return validLevels.includes(level as CEFRLevel) ? (level as CEFRLevel) : null;
@@ -142,16 +148,16 @@ function validateCefrLevel(level: string): CEFRLevel | null {
  */
 export function getCefrDescription(level: CEFRLevel): string {
   const descriptions: Record<CEFRLevel, string> = {
-    'A1': 'Beginner - Basic phrases and simple expressions',
-    'A1+': 'Beginner High - Simple interactions and basic needs',
-    'A2': 'Elementary - Routine tasks and simple conversations',
-    'A2+': 'Elementary High - Familiar situations and simple exchanges',
-    'B1': 'Intermediate - Main points in clear standard speech',
-    'B1+': 'Intermediate High - Extended conversation on familiar topics',
-    'B2': 'Upper Intermediate - Complex texts and fluent conversation',
-    'B2+': 'Upper Intermediate High - Nuanced discussion and debate',
-    'C1': 'Advanced - Complex texts and spontaneous expression',
-    'C1+': 'Proficient - Near-native fluency and precision'
+    'A1': 'Beginner - Hiragana/Katakana, basic greetings (JLPT N5)',
+    'A1+': 'Beginner High - Simple self-introduction, basic particles',
+    'A2': 'Elementary - Daily conversations, basic kanji (JLPT N4)',
+    'A2+': 'Elementary High - Familiar situations, te-form mastery',
+    'B1': 'Intermediate - General topics, compound sentences (JLPT N3)',
+    'B1+': 'Intermediate High - Express opinions, keigo basics',
+    'B2': 'Upper Intermediate - Abstract topics, formal writing (JLPT N2)',
+    'B2+': 'Upper Intermediate High - Nuanced discussion, news comprehension',
+    'C1': 'Advanced - Complex texts, natural expression (JLPT N1)',
+    'C1+': 'Proficient - Near-native fluency, specialized discourse'
   };
   return descriptions[level];
 }
@@ -174,8 +180,8 @@ export async function generateVersantSampleAnswer(
 
   // Default fallback
   const defaultAnswer = part === 'E'
-    ? 'The passage discusses the main topic and key points. It mentions important details that support the central idea. In conclusion, this information is valuable for understanding the subject.'
-    : 'In my opinion, this is an important topic to consider. I believe that there are several factors we need to think about. First, we should consider the main aspects. Additionally, there are benefits and challenges to consider. Overall, I think this is something that affects many people in different ways.';
+    ? 'この文章は主なテーマとポイントについて述べています。中心的な考えを支える重要な詳細が含まれています。結論として、この情報はテーマを理解するのに役立ちます。'
+    : '私の意見では、これは大切なテーマだと思います。考えるべきことがいくつかあると思います。まず、主な点について考える必要があります。さらに、メリットとデメリットがあります。全体的に、多くの人に影響を与えることだと思います。';
 
   if (!apiKey) {
     return defaultAnswer;
@@ -197,32 +203,34 @@ export async function generateVersantSampleAnswer(
     const wordCount = part === 'E' ? '60-80' : '80-100';
 
     const prompt = part === 'E'
-      ? `You are an English speaking test sample answer generator.
+      ? `You are a Japanese speaking test sample answer generator.
 
-**Task:** Generate a model summary answer for this passage:
+**Task:** Generate a model summary answer in Japanese for this passage:
 "${question}"
 
 **Requirements:**
 - CEFR Level: ${targetLevel} (target level for the learner)
-- Length: ${wordCount} words (speakable within ${timeLimit} seconds)
+- Length: Speakable within ${timeLimit} seconds
 - Include: Main idea, key supporting points, conclusion
-- Tone: Clear, organized, natural spoken English
-- Use appropriate transition words (First, Additionally, In conclusion, etc.)
+- Tone: Clear, organized, natural spoken Japanese
+- Use appropriate transition words (まず, さらに, 最後に, etc.)
+- Write entirely in Japanese
 
-**Output:** Only the sample answer text, no explanations or labels.`
-      : `You are an English speaking test sample answer generator.
+**Output:** Only the sample answer text in Japanese, no explanations or labels.`
+      : `You are a Japanese speaking test sample answer generator.
 
-**Task:** Generate a model opinion answer for this question:
+**Task:** Generate a model opinion answer in Japanese for this question:
 "${question}"
 
 **Requirements:**
 - CEFR Level: ${targetLevel} (target level for the learner)
-- Length: ${wordCount} words (speakable within ${timeLimit} seconds)
+- Length: Speakable within ${timeLimit} seconds
 - Structure: State opinion → Give 2-3 reasons with examples → Conclude
-- Tone: Natural spoken English, conversational but organized
-- Use appropriate phrases: "In my opinion", "I believe that", "For example", "Furthermore", "To sum up"
+- Tone: Natural spoken Japanese, conversational but organized
+- Use appropriate phrases: 「私の意見では」「〜と思います」「例えば」「さらに」「まとめると」
+- Write entirely in Japanese
 
-**Output:** Only the sample answer text, no explanations or labels.`;
+**Output:** Only the sample answer text in Japanese, no explanations or labels.`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
